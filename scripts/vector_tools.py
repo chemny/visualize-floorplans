@@ -110,10 +110,10 @@ def svg_to_png(svg_path: Path, png_path: Path, width: int, height: int) -> str:
     """Render the exact SVG file to PNG without an image-generation model."""
     svg_bytes = svg_path.read_bytes()
     try:
-        import fitz  # type: ignore
-        document = fitz.open(stream=svg_bytes, filetype="svg")
+        import pymupdf  # type: ignore
+        document = pymupdf.open(stream=svg_bytes, filetype="svg")
         page = document[0]
-        matrix = fitz.Matrix(width / page.rect.width, height / page.rect.height)
+        matrix = pymupdf.Matrix(width / page.rect.width, height / page.rect.height)
         pixmap = page.get_pixmap(matrix=matrix, alpha=False)
         atomic_write(png_path, pixmap.tobytes("png"))
         return "pymupdf"
