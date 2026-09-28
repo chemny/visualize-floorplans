@@ -1,0 +1,4 @@
+interface:
+  display_name: "Floorplan Visualizer"
+  short_description: "Confirm floor plans and create coordinated renovation previews"
+  default_prompt: "Use $visualize-floorplans in three stages: first reconstruct my floor plan, compare it with the source, and record my confirmation of zones plus doors and windows; then help me choose or specify one renovation scheme and create only the images I need; if I request video, confirm the route afterward and clearly distinguish a real validated continuous walkthrough from an unverified or substitute presentation."

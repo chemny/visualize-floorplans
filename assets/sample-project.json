@@ -1,0 +1,122 @@
+{
+  "schema_version": "0.3",
+  "project_id": "sample-two-bedroom",
+  "input_image": "sample-floorplan.png",
+  "interpretation_artifacts": {
+    "source_image": "sample-floorplan.png",
+    "topdown_base": "outputs/interpretation/topdown-base-v1.png",
+    "topdown_base_svg": "outputs/interpretation/topdown-base-v1.svg",
+    "access_map": "outputs/interpretation/topdown-access-v1.png",
+    "zoning_plan": "outputs/interpretation/topdown-zoning-v1.png",
+    "topology": "run/access-topology.json",
+    "artifact_version": "interpretation-v1",
+    "status": "access_confirmed",
+    "confirmation": {
+      "confirmed_version": "interpretation-v1",
+      "confirmed_by": "sample-user",
+      "approval_source": "explicit_user_confirmation",
+      "scopes": {
+        "structure_and_zones": {
+          "status": "confirmed",
+          "confirmed_item_ids": ["living-room", "dining-room", "primary-bedroom", "second-bedroom", "kitchen", "bathroom", "balcony", "wall-layout-v1"],
+          "evidence": ["sample zoning plan compared with sample source"]
+        },
+        "access_elements": {
+          "status": "confirmed",
+          "confirmed_item_ids": ["entry-door", "primary-bedroom-door"],
+          "evidence": ["sample access map and schedule reviewed"]
+        }
+      },
+      "unresolved_items": []
+    }
+  },
+  "mode": "conceptual",
+  "use_case": "renovation",
+  "floor_plan": {
+    "rooms": [
+      {"id": "living-room", "name": "客厅", "type": "living_room", "certainty": "confirmed"},
+      {"id": "dining-room", "name": "餐厅", "type": "dining_room", "certainty": "confirmed"},
+      {"id": "primary-bedroom", "name": "主卧", "type": "bedroom", "certainty": "confirmed"},
+      {"id": "second-bedroom", "name": "次卧", "type": "bedroom", "certainty": "confirmed"},
+      {"id": "kitchen", "name": "厨房", "type": "kitchen", "certainty": "confirmed"},
+      {"id": "bathroom", "name": "卫生间", "type": "bathroom", "certainty": "confirmed"},
+      {"id": "balcony", "name": "阳台", "type": "balcony", "certainty": "confirmed"}
+    ],
+    "relationships": [
+      "客厅连接阳台",
+      "餐厅靠近厨房",
+      "主卧和次卧通过走廊连接公共区域"
+    ],
+    "uncertainties": ["原图没有可靠的层高信息"]
+  },
+  "structural_locks": [
+    {
+      "id": "lock-seven-rooms",
+      "kind": "room_count",
+      "applies_to": ["all"],
+      "rule": "Preserve all seven named rooms and their relative adjacency",
+      "source": "confirmed_2d",
+      "evidence": ["approved zoning plan"],
+      "status": "confirmed"
+    },
+    {
+      "id": "lock-balcony-adjacency",
+      "kind": "adjacency",
+      "applies_to": ["living-room", "balcony"],
+      "rule": "Preserve the balcony connected to the living room",
+      "source": "user_confirmation",
+      "evidence": ["user-approved zone relationship"],
+      "status": "confirmed"
+    },
+    {
+      "id": "lock-walls-openings",
+      "kind": "opening",
+      "applies_to": ["all"],
+      "rule": "Preserve visible wall, door, window, sliding-door, and bay-window locations and types",
+      "source": "confirmed_access",
+      "evidence": ["approved access map"],
+      "status": "confirmed"
+    },
+    {
+      "id": "lock-no-room-mutation",
+      "kind": "room_count",
+      "applies_to": ["all"],
+      "rule": "Do not add, remove, merge, or split rooms",
+      "source": "confirmed_2d",
+      "evidence": ["approved room inventory"],
+      "status": "confirmed"
+    }
+  ],
+  "design": {
+    "style_options": [
+      {"id": "modern_minimal", "name": "现代简约", "palette": ["warm white", "warm gray", "natural wood"], "materials": ["matte paint", "wood", "restrained stone"]},
+      {"id": "wood_cream", "name": "原木奶油", "palette": ["cream", "light oak", "soft beige"], "materials": ["light oak", "linen", "matte paint"]},
+      {"id": "modern_luxury", "name": "现代轻奢", "palette": ["ivory", "taupe", "charcoal"], "materials": ["stone", "metal accents", "leather or velvet"]},
+      {"id": "modern_chinese", "name": "现代新中式", "palette": ["warm white", "walnut", "ink gray"], "materials": ["wood", "stone", "textured fabric"]}
+    ],
+    "selected_style": "wood_cream",
+    "household": "two adults and one child",
+    "budget_tier": "medium",
+    "palette": ["warm white", "light oak", "soft beige"],
+    "materials": ["light oak", "matte wall paint", "linen"],
+    "requirements": ["child-friendly storage", "easy-clean surfaces"]
+  },
+  "delivery": {
+    "mode": "base_plus_floorplan_adaptive",
+    "max_images": 24,
+    "featured_room_ids": [],
+    "omit_room_ids": [],
+    "include_bathrooms": false,
+    "include_structure_reference": true,
+    "include_furnished_plan": true
+  },
+  "outputs": {
+    "style_preview": "four_style_grid",
+    "canonical_view": "cutaway_birdseye",
+    "room_views": ["living_room_from_entry", "dining_room_toward_living_room", "primary_bedroom_from_door"],
+    "style_variants": ["modern_minimal", "modern_wood", "new_chinese"],
+    "size": "1536x1024",
+    "quality": "medium",
+    "format": "png"
+  }
+}

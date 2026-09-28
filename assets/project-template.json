@@ -1,0 +1,94 @@
+{
+  "schema_version": "0.3",
+  "project_id": "replace-me",
+  "input_image": "/absolute/path/to/floorplan.png",
+  "input_assessment": {
+    "condition": "critical_missing",
+    "items": [{"id": "source-review", "origin": "unknown", "description": "Inspect uploaded source and record consequential gaps", "consequential": true, "evidence": []}]
+  },
+  "interpretation_artifacts": {
+    "source_image": "/absolute/path/to/floorplan.png",
+    "topdown_base": "outputs/interpretation/topdown-base-v1.png",
+    "topdown_base_svg": "outputs/interpretation/topdown-base-v1.svg",
+    "access_map": "outputs/interpretation/topdown-access-v1.png",
+    "zoning_plan": "outputs/interpretation/topdown-zoning-v1.png",
+    "topology": "run/access-topology.json",
+    "recognition": "run/recognition.json",
+    "artifact_version": "interpretation-v1",
+    "status": "unconfirmed",
+    "confirmation": {
+      "confirmed_version": null,
+      "confirmed_by": null,
+      "approval_source": null,
+      "artifact_sha256": {},
+      "facts_sha256": null,
+      "source_self_check": {"method": null, "evidence": null},
+      "scopes": {
+        "structure_and_zones": {
+          "status": "unconfirmed",
+          "confirmed_item_ids": [],
+          "evidence": []
+        },
+        "access_elements": {
+          "status": "unconfirmed",
+          "confirmed_item_ids": [],
+          "evidence": []
+        }
+      },
+      "unresolved_items": ["structure_and_access_review_pending"]
+    }
+  },
+  "mode": "conceptual",
+  "use_case": "renovation",
+  "floor_plan": {
+    "rooms": [],
+    "relationships": [],
+    "uncertainties": []
+  },
+  "structural_locks": [],
+  "design": {
+    "style_options": [
+      {"id": "modern_minimal", "name": "现代简约", "palette": ["warm white", "warm gray", "natural wood"], "materials": ["matte paint", "wood", "restrained stone"]},
+      {"id": "wood_cream", "name": "原木奶油", "palette": ["cream", "light oak", "soft beige"], "materials": ["light oak", "linen", "matte paint"]},
+      {"id": "modern_luxury", "name": "现代轻奢", "palette": ["ivory", "taupe", "charcoal"], "materials": ["stone", "metal accents", "leather or velvet"]},
+      {"id": "modern_chinese", "name": "现代新中式", "palette": ["warm white", "walnut", "ink gray"], "materials": ["wood", "stone", "textured fabric"]},
+      {"id": "midcentury_modern", "name": "中古现代", "palette": ["walnut", "ochre", "muted olive"], "materials": ["sculpted wood", "leather", "woven upholstery"]},
+      {"id": "song_eastern", "name": "轻东方宋式", "palette": ["rice white", "pale wood", "celadon"], "materials": ["fine timber joinery", "linen", "matte ceramic"]},
+      {"id": "contemporary_french", "name": "克制法式优雅", "palette": ["warm ivory", "pale oak", "burgundy accents"], "materials": ["delicate shallow mouldings", "travertine", "velvet", "patinated brass"]},
+      {"id": "italian_luxury", "name": "意式克制奢华", "palette": ["walnut", "warm gray", "cognac"], "materials": ["limited honed stone", "tailored leather", "bronze", "wool"]},
+      {"id": "champagne_pearl", "name": "香槟珍珠", "palette": ["pearl milky white", "pale champagne", "warm taupe"], "materials": ["soft sheen lacquer", "silk texture", "restrained champagne metal", "sculptural glass"]},
+      {"id": "milan_greige", "name": "米兰暖灰", "palette": ["warm greige", "mushroom gray", "espresso accents"], "materials": ["suede texture", "stitched leather", "smoked glass", "brushed titanium"]},
+      {"id": "paris_art_deco", "name": "巴黎装饰艺术", "palette": ["ivory", "dusty mauve", "burgundy"], "materials": ["restrained geometric detailing", "burl wood lacquer", "velvet", "ribbed glass"]},
+      {"id": "sculptural_cream", "name": "奶油雕塑感", "palette": ["ivory", "sand", "cognac accents"], "materials": ["boucle", "ribbed ceramic", "limestone", "sculptural upholstery"]}
+    ],
+    "selected_style": null,
+    "custom_style": null,
+    "reference_images": [],
+    "preserve_furniture": [],
+    "room_schemes": {},
+    "scheme": {"version":"scheme-v1", "layout":[], "furniture":[], "finishes":[]},
+    "household": "",
+    "budget_tier": "medium",
+    "palette": [],
+    "materials": [],
+    "requirements": []
+  },
+  "delivery": {
+    "mode": "base_plus_floorplan_adaptive",
+    "max_images": 24,
+    "featured_room_ids": [],
+    "omit_room_ids": [],
+    "include_bathrooms": false,
+    "include_structure_reference": true,
+    "include_furnished_plan": true
+  },
+  "outputs": {
+    "style_preview": "style_comparison_boards",
+    "canonical_view": "cutaway_birdseye",
+    "room_views": [],
+    "style_variants": [],
+    "size": "1536x1024",
+    "quality": "medium",
+    "format": "png"
+  }
+}

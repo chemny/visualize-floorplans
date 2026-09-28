@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0", "revision": "synthetic-v1",
+  "plan": {
+    "schema_version": "1.0", "revision": "synthetic-v1",
+    "canvas": {"width": 800, "height": 600, "background": "#ffffff"},
+    "walls": [
+      {"id":"north","start":[40,50],"end":[760,50],"thickness":12},
+      {"id":"west","start":[40,50],"end":[40,530],"thickness":12},
+      {"id":"east","start":[760,50],"end":[760,530],"thickness":12},
+      {"id":"south-a","start":[40,530],"end":[360,530],"thickness":12},
+      {"id":"south-b","start":[450,530],"end":[760,530],"thickness":12}
+    ],
+    "rooms":[{"id":"studio","label":"Synthetic studio","label_point":[400,310],"polygon":[[47,57],[753,57],[753,523],[47,523]]}],
+    "doors":[{"id":"entry","hinge":[360,530],"closed_tip":[450,530],"open_tip":[360,440],"arc_direction":"counterclockwise"}],
+    "openings":[],
+    "annotations":[{"id":"notice","point":[40,580],"text":"FICTIONAL EXAMPLE - canvas units, not construction dimensions"}]
+  },
+  "furniture":[
+    {"id":"bed","symbol":"bed","room_id":"studio","x":80,"y":90,"width":150,"height":220,"label":"Bed"},
+    {"id":"cabinet","symbol":"cabinet","room_id":"studio","x":80,"y":350,"width":190,"height":60,"label":"Cabinet"},
+    {"id":"sofa","symbol":"sofa","room_id":"studio","x":550,"y":90,"width":150,"height":70,"label":"Sofa"},
+    {"id":"table","symbol":"table","room_id":"studio","x":565,"y":220,"width":100,"height":65,"label":"Table"}
+  ]
+}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+<style>.wall{fill:#222;stroke:#111;stroke-linecap:square}.room{fill:none;stroke:#aaa;stroke-dasharray:5 4}.door-leaf,.door-swing{fill:none;stroke:#111;stroke-width:2}.window,.fixed_glazing{stroke:#2563eb;stroke-width:5}.bay_window{fill:none;stroke:#7c3aed;stroke-width:4}.sliding_door{stroke:#ea580c;stroke-width:4}.open_passage{stroke:#0891b2;stroke-width:4;stroke-dasharray:7 5}.unknown_gap{stroke:#dc2626;stroke-width:4;stroke-dasharray:3 4}.label{font:14px sans-serif;fill:#222}.note{font:12px sans-serif;fill:#555}</style>
+<rect id="canvas-background" data-kind="background" x="0" y="0" width="800" height="600" fill="#ffffff"/>
+<g id="rooms" data-layer="rooms">
+<text id="studio-label" data-kind="room-label" class="label" x="400" y="310" text-anchor="middle" fill="#222222" stroke="none" font-family="sans-serif" font-size="14">Synthetic studio</text>
+</g><g id="walls" data-layer="walls">
+<line id="north" data-kind="wall" class="wall" x1="40" y1="50" x2="760" y2="50" fill="none" stroke="#111111" stroke-linecap="square" stroke-width="12"/>
+<line id="west" data-kind="wall" class="wall" x1="40" y1="50" x2="40" y2="530" fill="none" stroke="#111111" stroke-linecap="square" stroke-width="12"/>
+<line id="east" data-kind="wall" class="wall" x1="760" y1="50" x2="760" y2="530" fill="none" stroke="#111111" stroke-linecap="square" stroke-width="12"/>
+<line id="south-a" data-kind="wall" class="wall" x1="40" y1="530" x2="360" y2="530" fill="none" stroke="#111111" stroke-linecap="square" stroke-width="12"/>
+<line id="south-b" data-kind="wall" class="wall" x1="450" y1="530" x2="760" y2="530" fill="none" stroke="#111111" stroke-linecap="square" stroke-width="12"/>
+</g><g id="access" data-layer="access">
+<line id="entry-leaf" data-kind="door-leaf" class="door-leaf" x1="360" y1="530" x2="360" y2="440" fill="none" stroke="#111111" stroke-width="2"/>
+<path id="entry-swing" data-kind="door-swing" class="door-swing" d="M 450 530 A 90 90 0 0 0 360 440" fill="none" stroke="#111111" stroke-width="2"/>
+</g><g id="annotations" data-layer="annotations">
+<text id="notice" data-kind="annotation" class="note" x="40" y="580" fill="#555555" stroke="none" font-family="sans-serif" font-size="12">FICTIONAL EXAMPLE - canvas units, not construction dimensions</text>
+</g><metadata>revision=synthetic-v1; conceptual_reference=true</metadata>
+<style>.furniture{fill:none;stroke:#444;stroke-width:1.5}.furniture text{fill:#333;stroke:none;font:11px sans-serif}</style>
+<g id="furniture" data-layer="furniture">
+<g id="bed" data-kind="furniture" data-symbol="bed" class="furniture" fill="none" stroke="#444444" stroke-width="1.5"><rect x="80" y="90" width="150" height="220" rx="2"/><line x1="80" y1="138.4" x2="230" y2="138.4"/><rect x="92" y="98.8" width="52.5" height="30.8" rx="3"/><rect x="165.5" y="98.8" width="52.5" height="30.8" rx="3"/><text x="155" y="324" text-anchor="middle" fill="#333333" stroke="none" font-family="sans-serif" font-size="11">Bed</text></g>
+<g id="cabinet" data-kind="furniture" data-symbol="cabinet" class="furniture" fill="none" stroke="#444444" stroke-width="1.5"><rect x="80" y="350" width="190" height="60" rx="2"/><line x1="175" y1="350" x2="175" y2="410"/><text x="175" y="424" text-anchor="middle" fill="#333333" stroke="none" font-family="sans-serif" font-size="11">Cabinet</text></g>
+<g id="sofa" data-kind="furniture" data-symbol="sofa" class="furniture" fill="none" stroke="#444444" stroke-width="1.5"><rect x="550" y="90" width="150" height="70" rx="2"/><line x1="568" y1="107.5" x2="682" y2="107.5"/><line x1="625" y1="107.5" x2="625" y2="160"/><text x="625" y="174" text-anchor="middle" fill="#333333" stroke="none" font-family="sans-serif" font-size="11">Sofa</text></g>
+<g id="table" data-kind="furniture" data-symbol="table" class="furniture" fill="none" stroke="#444444" stroke-width="1.5"><rect x="565" y="220" width="100" height="65" rx="2"/><ellipse cx="615" cy="252.5" rx="38" ry="24.7"/><text x="615" y="299" text-anchor="middle" fill="#333333" stroke="none" font-family="sans-serif" font-size="11">Table</text></g>
+</g>
+</svg>

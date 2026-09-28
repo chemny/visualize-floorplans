@@ -1,0 +1,79 @@
+{
+  "zones": [
+    {
+      "id": "outside",
+      "label": "户外",
+      "kind": "outside",
+      "certainty": "confirmed",
+      "evidence": ["special exterior node"]
+    },
+    {
+      "id": "living-room",
+      "label": "客厅",
+      "kind": "living_room",
+      "certainty": "confirmed",
+      "evidence": ["user-confirmed room function"]
+    },
+    {
+      "id": "primary-bedroom",
+      "label": "主卧",
+      "kind": "primary_bedroom",
+      "certainty": "confirmed",
+      "evidence": ["user-confirmed room function"]
+    }
+  ],
+  "access_points": [
+    {
+      "id": "entry-door",
+      "kind": "entrance_door",
+      "connects": ["outside", "living-room"],
+      "hinge_location": "source-image lower-left jamb",
+      "swing_into": "living-room",
+      "certainty": "confirmed",
+      "evidence": ["visible entrance door"]
+    },
+    {
+      "id": "primary-bedroom-door",
+      "kind": "interior_door",
+      "connects": ["living-room", "primary-bedroom"],
+      "hinge_location": "source-image right jamb",
+      "swing_into": "primary-bedroom",
+      "certainty": "confirmed",
+      "evidence": ["visible door leaf and swing"]
+    }
+  ],
+  "tour_route": {
+    "entry_access": "entry-door",
+    "exit_access": "entry-door",
+    "steps": [
+      {
+        "order": 1,
+        "from": "outside",
+        "to": "living-room",
+        "via": "entry-door",
+        "stop": "进入客厅"
+      },
+      {
+        "order": 2,
+        "from": "living-room",
+        "to": "primary-bedroom",
+        "via": "primary-bedroom-door",
+        "stop": "参观主卧"
+      },
+      {
+        "order": 3,
+        "from": "primary-bedroom",
+        "to": "living-room",
+        "via": "primary-bedroom-door",
+        "stop": "返回公共区"
+      },
+      {
+        "order": 4,
+        "from": "living-room",
+        "to": "outside",
+        "via": "entry-door",
+        "stop": "从入户门离开"
+      }
+    ]
+  }
+}

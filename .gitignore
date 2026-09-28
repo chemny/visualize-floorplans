@@ -1,0 +1,17 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+outputs/
+run/
+run-*/
+*.log
+.release-local/
+publish-check-report.json
+node_modules/
+# Historical case assets: preserve locally, do not stage for public release.
+assets/furniture-layout-reference/furniture-layout-linework-v9.png
+assets/furniture-layout-reference/furniture-layout-linework-v9.svg

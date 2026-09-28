@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "revision": "replace-with-same-plan-revision",
+  "plan": {
+    "schema_version": "1.0",
+    "revision": "replace-with-same-plan-revision",
+    "canvas": {"width": 1600, "height": 1200, "background": "#ffffff"},
+    "walls": [],
+    "rooms": [],
+    "doors": [],
+    "openings": [],
+    "annotations": []
+  },
+  "furniture": []
+}
