@@ -8,10 +8,12 @@ references and accepted versions together instead of repeating corrections.
 
 ## Preview
 
-![Fictional layout rendered by the local tool](assets/synthetic-layout-v1.png)
+![Floor plan, bird's-eye views and room concept renders](assets/renovation-concept-showcase.png)
 
-Actual deterministic drawing output from a fictional studio, not a client plan
-or a photorealistic reconstruction. [Editable source](assets/synthetic-layout-v1.svg).
+Early renovation concept exploration, shared with the owner's permission—not
+the final confirmed scheme. This ten-image board combines a floor plan,
+bird's-eye views and room renders. Some views contain layout inconsistencies;
+it illustrates visual exploration, not verified reconstruction or construction accuracy.
 
 ## What It Does
 
@@ -100,4 +102,6 @@ Blender is not required. See [runtime guidance](references/platform-runtime.md).
 
 Repository code and instructions use the [MIT License](LICENSE). Dependencies
 retain their own licenses; MIT does not relicense PyMuPDF or other dependencies.
-Public examples are fictional. Never upload a private client plan automatically.
+The showcase contains a real floor plan published with explicit permission;
+the separate synthetic layout is fictional. Never upload a private client plan
+without permission. Publishing the showcase does not certify its geometry.
