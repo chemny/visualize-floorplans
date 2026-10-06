@@ -1,0 +1,18 @@
+{
+  "three": {
+    "version": "0.180.0",
+    "license": "MIT",
+    "source": "https://github.com/mrdoob/three.js"
+  },
+  "floorplanReference": {
+    "source": "https://github.com/wy51ai/floorplan-3d",
+    "commit": "a03136c",
+    "licenseFileInReferenceCheckout": false,
+    "license": "MIT",
+    "licenseFile": "assets/h5/FLOORPLAN-REFERENCE-LICENSE.txt",
+    "licenseVerifiedAt": "2026-10-06",
+    "licenseCommit": "fbcb8d56a12090f53551ddaa7ae31ae4886a94d1",
+    "licenseBlobSha": "9081fb945f7a0cb31c0624c7ee69c99582d4a14c"
+  },
+  "runtime": "bundled source/browser code; no executable dependencies included"
+}

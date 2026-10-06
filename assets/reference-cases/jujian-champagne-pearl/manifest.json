@@ -1,0 +1,196 @@
+{
+  "schema": "floor-visualization-reference-case/1.0",
+  "title": "居间 · 香槟珍珠",
+  "entrypoint": "index.html",
+  "workbenchVersion": "0.2.0-beta.4",
+  "scope": "curated final outputs and supplied references; no intermediate versions or audit history",
+  "representations": {
+    "currentWorkbench": "workbench/index.html",
+    "currentCase": "data/case.json",
+    "currentScheme": "data/scheme.json",
+    "mediaSourceSchemeSha256": "7b9ba276f95077d7b1c9974a03035274811275dcd52bfa0a712c7e4c995c376e",
+    "images": "selected concept images, retained bytes; not regenerated with beta.4 lighting/materials",
+    "tour": "selected H5 walkthrough, retained bytes; not Seedance",
+    "drawings": "selected handoff drawings; not re-exported with beta.4",
+    "mesh": "existing tour source, not re-exported with beta.4",
+    "acceptance": "source-artifact acceptance is not transferred to current beta.4 preview"
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2292,
+      "sha256": "ec402bacac78567983baeab5e0159176142574c8876d66a981045de821654e4e"
+    },
+    {
+      "path": "data/case.json",
+      "bytes": 153005,
+      "sha256": "a569f81760f52192de513923b036e6bee31aff6472cf44a2665f3580b127a7a9"
+    },
+    {
+      "path": "data/media-source-mesh.json.gz",
+      "bytes": 14322117,
+      "sha256": "a4c22bfc36023297f2b9924d9de857f2bad099cd0f7930084ed23bb8278f25a1"
+    },
+    {
+      "path": "data/media-source-metadata.json",
+      "bytes": 153027,
+      "sha256": "00b8f3a4e983d6396cb12e68e371a9e89bbc1ec6da4f42f5c38883f4402f0b3c"
+    },
+    {
+      "path": "data/scheme.json",
+      "bytes": 132252,
+      "sha256": "d4a5d777cb840aaab9bec0aa7ed174208b5232d932462e49aeeea5b54ab12d11"
+    },
+    {
+      "path": "drawings/家具布局.png",
+      "bytes": 727796,
+      "sha256": "25d1664feee81ed9b36cf47b4274eb525c9f9805b547995c82ddbc7bf3c6491f"
+    },
+    {
+      "path": "drawings/家具布局.svg",
+      "bytes": 100261,
+      "sha256": "6e1e1584be8281548511427f156b743ae756c21d209576574c24a8dae8a23315"
+    },
+    {
+      "path": "drawings/户型图.png",
+      "bytes": 321163,
+      "sha256": "527eb8059aacebb8f6a79154228d8d2394597c1fbafaaa6032ddca333a0cb88a"
+    },
+    {
+      "path": "drawings/户型图.svg",
+      "bytes": 39244,
+      "sha256": "f51f55daa1a66878a9d3260135ed82c68d50b1e026dcc0b8b3c0cb6c03e884d9"
+    },
+    {
+      "path": "drawings/硬装图.png",
+      "bytes": 557202,
+      "sha256": "e278bc7eae1f8a87c2bcdd19b874147ee09df7a8c9b9a65a3c6dc66b9b4d329e"
+    },
+    {
+      "path": "images/balcony-left.png",
+      "bytes": 1663812,
+      "sha256": "8254076403a0ac800801e476fc81d5abb06e19ad9aa11207e539580e836dc1a4"
+    },
+    {
+      "path": "images/dining.png",
+      "bytes": 1620539,
+      "sha256": "d8a18127f8454bfbded508e77e4c6d6bf1a745542952191d64c2d149846a77fe"
+    },
+    {
+      "path": "images/guest.png",
+      "bytes": 1634573,
+      "sha256": "17b8d6d3f596292fe5cf021bdfc69a9916c9e7315eac2c63e946233a2635375a"
+    },
+    {
+      "path": "images/kitchen.png",
+      "bytes": 1402922,
+      "sha256": "12132a1b1921aa7257052567736253cc51ce98bcddb1aff556732e56b6dabac1"
+    },
+    {
+      "path": "images/laundry.png",
+      "bytes": 1502822,
+      "sha256": "1c449c84f506fd8654fddb6eaf5c293b1324c73a16cf4a0fd2d74493bc997129"
+    },
+    {
+      "path": "images/living-wide.png",
+      "bytes": 1824842,
+      "sha256": "9b8c365dce9089490b695b7c49c3188342cc7cac56e005b9652b34dde7dcb698"
+    },
+    {
+      "path": "images/master-storage.png",
+      "bytes": 1477395,
+      "sha256": "ca0fc7a08a58a4bc929ece8accc1b843ecf120269cd5ae9b0446ff57e6dae459"
+    },
+    {
+      "path": "images/master-wide.png",
+      "bytes": 1630282,
+      "sha256": "c08cba86a02d77bab9fb2f8cc0f779bfc46fd13e99833de033d4d0bc911272f2"
+    },
+    {
+      "path": "images/masterbath.png",
+      "bytes": 1415493,
+      "sha256": "47eed1ea751e1206cab4eff9f55d9e72d4df6593f2f2c83c463ae623fc7b731b"
+    },
+    {
+      "path": "images/publicbath-wet.png",
+      "bytes": 1718754,
+      "sha256": "e955956656e4f50a159b9831cc9a0f037a753c8d4829515cab94fcb2056bbcd9"
+    },
+    {
+      "path": "images/publicbath.png",
+      "bytes": 1477242,
+      "sha256": "3781d119fd1f3d0de57bca1465d372ef903fadbd7f88804887c4db238cc6ae97"
+    },
+    {
+      "path": "images/study-entry.png",
+      "bytes": 1424979,
+      "sha256": "96c81f8d5e8f47dfb81ec5a45309bd18bfbc9239be79cd3a5179247a06b8d1f2"
+    },
+    {
+      "path": "images/study.png",
+      "bytes": 1486220,
+      "sha256": "78a878ff4bc9f95a9002f1703bc2faa100863992a83c18d83a65c81d34ff52f5"
+    },
+    {
+      "path": "index.html",
+      "bytes": 7689,
+      "sha256": "5bb4686d0d6d3094ecbebb6dbf4df1c8fceb9f77c000f9ab1aa5674d0e831b7b"
+    },
+    {
+      "path": "inputs/家具参考.png",
+      "bytes": 1556690,
+      "sha256": "db9be2c29e1d5fb271b6ad6cec1d068b41e20ff1cfd6305ced76b789249fc097"
+    },
+    {
+      "path": "inputs/户型参考.png",
+      "bytes": 1220140,
+      "sha256": "0ad84b2bfaf48c22eb38a573b83c553bb93c69221f623b9ff869565092dd7c1a"
+    },
+    {
+      "path": "licenses/FLOORPLAN-REFERENCE-LICENSE.txt",
+      "bytes": 1061,
+      "sha256": "293e6ff11a707c7797873366aae769dd0df3c8d4a33e51c01ae4dd5f91664f14"
+    },
+    {
+      "path": "licenses/Three.js-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "path": "tour/route-config.json",
+      "bytes": 16309,
+      "sha256": "1a0de563eaee0dab5b1065883b4ef90e0d0adf6f10a90a939561458eef2d7ec2"
+    },
+    {
+      "path": "tour/route.png",
+      "bytes": 23870,
+      "sha256": "65e097f538c676105fd633205e1a8f826df8d704fa8305a3347f06679503c740"
+    },
+    {
+      "path": "tour/script.json",
+      "bytes": 5405,
+      "sha256": "8e6914a27135b0afeba442b1907b35258c030aa7b19a3f1951329bd59accf588"
+    },
+    {
+      "path": "tour/script.md",
+      "bytes": 1260,
+      "sha256": "960cd3989af3b244337bf17fd366428eb912c513e7088dac2edd309eeae6d7d6"
+    },
+    {
+      "path": "tour/tour.json",
+      "bytes": 380486,
+      "sha256": "e348fa4485657c23b3018001d7e573e897c4c104ce8a64debbbd001e0d7515e7"
+    },
+    {
+      "path": "tour/walkthrough.mp4",
+      "bytes": 9072826,
+      "sha256": "24b0a279a3f6cbcb52ac7c47cbf6748ed9da3da51a5be3076d9c040d1aeb33db"
+    },
+    {
+      "path": "workbench/index.html",
+      "bytes": 4778618,
+      "sha256": "ad56b7f2c58bcf95338a6516f3a80991bd54994c10c9973ed1bfcd47a095c1da"
+    }
+  ],
+  "indexedBytes": 53853669
+}

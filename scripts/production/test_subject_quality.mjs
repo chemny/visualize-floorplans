@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+import assert from 'node:assert/strict';
+import {validateSubjectPlan,summarizeChapter,sampleIndices} from './subject_quality.mjs';
+const tour={fps:24,seconds:4,frames:Array(96).fill({})};
+const chapter={id:'one',purpose:'show main function',startSeconds:0,endSeconds:3,subjects:['object']};
+const plan={schema:'floor-visualization-subject-plan/1.0',schemeSha256:'scheme',tourSha256:'tour',chapters:[chapter]};
+const policy=validateSubjectPlan(plan,tour,'scheme','tour',['object']);
+const samples=Array.from({length:7},(_,i)=>({seconds:i*.5,subjects:{object:{totalSamples:100,unoccludedSamples:20,screenAreaFraction:.2}},composition:{closeArchitectureRatio:0}}));
+assert.equal(summarizeChapter(chapter,samples,policy).pass,true);
+const flicker=structuredClone(samples);for(let i=0;i<flicker.length;i++)if(i!==2)flicker[i].subjects.object.unoccludedSamples=0;
+assert.equal(summarizeChapter(chapter,flicker,policy).pass,false);
+const tiny=structuredClone(samples);tiny.forEach(s=>s.subjects.object.screenAreaFraction=.00001);
+assert.equal(summarizeChapter(chapter,tiny,policy).pass,false);
+const wall=structuredClone(samples);wall.forEach(s=>s.composition.closeArchitectureRatio=.9);
+assert.equal(summarizeChapter(chapter,wall,policy).pass,false);
+assert.throws(()=>validateSubjectPlan(plan,tour,'changed','tour',['object']));
+assert.throws(()=>validateSubjectPlan(plan,tour,'scheme','tour',[]));
+assert.deepEqual(sampleIndices(chapter,tour,policy),[0,12,24,36,48,60,72]);
+const mult=structuredClone(chapter);mult.subjects.push('second');
+assert.equal(summarizeChapter(mult,samples,policy).pass,false);
+console.log(JSON.stringify({checks:8,status:'pass',scope:'window duration, flicker, tiny subject, walls, source revision, missing object, sampling, all subjects'}));

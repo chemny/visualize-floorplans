@@ -1,4 +1,31 @@
-# Development checklist
+# Current local beta closeout · 2026-10-05
+
+- [x] Extract reusable H5 engine, geometry, components, styles and editor UI.
+- [x] Move apartment geometry, furniture/lamp positions, area values, camera starts
+      and approval provenance into external case data.
+- [x] Provide offline HTML build, actual-mesh export, three drawing exports,
+      H5 replay, camera audit/capture, resumable frames, optional FFmpeg encoding.
+- [x] Keep Blender as an explicit optional importer of the same mesh stream.
+- [x] Add relative-link handoff, hashed manifest and local archive packaging.
+- [x] Update bilingual docs, agent entrypoint, dependency and verification status.
+- [x] Check source syntax, help entrypoints, same-case HTML construction and local
+      package structure/integrity. This is not a regression suite.
+- [ ] Run new-floorplan tests and full regression (deferred).
+- [ ] Visually accept a fresh end-to-end replay from the extracted generic engine
+      (part of the deferred regression work).
+- [ ] Execute and accept Seedance video (deferred).
+
+A real H5 homeowner continuous walkthrough has been accepted in the local case;
+its acceptance belongs to that case, not to every future project. Public release
+is not part of this local closeout. Automated recognition, automatic furniture
+layout, construction-grade documentation and usage accounting below are optional
+future product work, not unfinished requirements for the current local package.
+
+## Historical roadmap
+
+The entries below record the older workflow and roadmap. They do not override
+current capability, verification or acceptance status above.
+
 
 ## 1.0 three-stage product gate
 
@@ -20,7 +47,8 @@
 - [x] C6: reuse current image acceptance for local handoff after live QA.
 - [x] Require per-view/untouched-region inspection and two-failed-retry stop (operational rules).
 - [x] Specify faithful contact-sheet assembly without scene regeneration (operational rule).
-- [ ] Validate a real indoor move-through-door-and-turn video sample.
+- [x] Validate one real deterministic H5 indoor move-through-door-and-turn case
+      (local homeowner review; does not validate Seedance or all floorplans).
 
 These checks describe implementation status, not visual proof. Unit tests do not
 establish image fidelity or continuous-video quality.
@@ -118,7 +146,7 @@ and the video sample remain separate acceptance work.
 ## Phase 3: upgrade based on evidence
 
 - [ ] Add floor-plan recognition if room extraction fails repeatedly.
-- [ ] Add structured geometry if wall/door/window drift remains material.
-- [ ] Add Three.js or Blender when users require arbitrary viewpoints.
+- [x] Add structured H5 geometry as the editable architectural authority.
+- [x] Add Three.js and an optional actual-mesh Blender importer.
 - [ ] Add layout generation only after rule templates reach their limit.
-- [ ] Add real camera paths before calling output a walkthrough.
+- [x] Add actual continuous camera paths and scoped local acceptance.

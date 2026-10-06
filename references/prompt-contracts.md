@@ -97,9 +97,10 @@ Attach labels only to zones already present in the access topology. Use
 
 Render only after `scripts/validate_route.py` accepts the topology JSON.
 
-- Draw one continuous route with a visible start, numbered stops, arrow
-  direction, and visible exit.
-- Follow declared confirmed doors and passages between every pair of zones.
+- Draw one continuous route with a visible start, end, and arrow direction.
+  Number intermediate stops when present.
+- Follow declared confirmed doors and passages for cross-zone steps; an indoor
+  move within one zone needs no invented door or passage.
 - Show backtracking when required by the real graph.
 - Never cross a wall or route through a window, bay window, fixed glazing, or
   uncertain opening.

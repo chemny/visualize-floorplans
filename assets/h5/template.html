@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#fffdf9">
+<title>Floor Visualization</title>
+<style>
+:root{
+  --bg:#f3efe7; --paper:#f7f4ee; --panel:#fffdf9; --line:#e3dccf; --ink:#2b2824; --muted:#8a8174;
+  --accent:#b5653a; --accent-soft:#f3e3d8; --teal:#2f5d62;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hidden;overscroll-behavior:none;touch-action:manipulation;
+  -webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;
+  font:13px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+button,input,select{font:inherit;color:inherit}
+.app{display:grid;grid-template-rows:auto minmax(0,1fr) 30px;grid-template-columns:236px minmax(0,1fr) 300px;height:100vh;height:100dvh;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input{-webkit-user-select:text;user-select:text}
+header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:8px 14px;
+  background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{display:flex;flex-direction:column;margin-right:8px;line-height:1.25}
+.brand b{font-size:15px;letter-spacing:.5px}
+.brand span{color:var(--muted);font-size:12px}
+.grp{display:flex;align-items:center;gap:2px;padding:2px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.btn{border:0;background:transparent;padding:5px 9px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#f2ece2}
+.btn.on{background:var(--ink);color:#fff}
+.btn.chip.on{background:var(--accent-soft);color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{background:#9f5530}
+.btn.danger{color:#b3372a}
+.spacer{flex:1}
+aside{background:var(--panel);overflow:auto;border-right:1px solid var(--line)}
+aside.right{border-right:0;border-left:1px solid var(--line)}
+.lib h4{margin:0;padding:12px 14px 6px;font-size:12px;color:var(--muted);font-weight:600;letter-spacing:1px}
+.lib-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 10px 6px}
+.lib h4{position:sticky;top:0;z-index:1;background:var(--panel)}
+.item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 6px;border:1px solid var(--line);
+  border-radius:8px;background:#fff;cursor:grab;user-select:none;touch-action:pan-y;transition:border-color .15s,transform .15s}
+.item.dragging{border-color:var(--accent);opacity:.5}
+@media (hover:hover){.item:hover{border-color:var(--accent);transform:translateY(-1px)}}
+#ghost{position:fixed;left:0;top:0;z-index:30;pointer-events:none;opacity:.8;transform:translate(-50%,-50%);filter:drop-shadow(0 4px 10px rgba(40,30,20,.3))}
+#ghost svg{width:100%;height:100%;display:block;overflow:visible}
+.item svg{width:56px;height:44px}
+.item b{font-weight:500;font-size:12px}
+.item small{color:var(--muted);font-size:11px}
+.hint{padding:10px 14px 16px;color:var(--muted);font-size:12px}
+main{position:relative;overflow:hidden;background:var(--paper)}
+#plan{width:100%;height:100%;display:block;touch-action:none;cursor:default}
+#plan.panning{cursor:grabbing}
+#plan.tool-measure{cursor:crosshair}
+#plan .wall{pointer-events:none}
+#plan.tool-demolish .wall{pointer-events:all;cursor:pointer}
+#plan.tool-demolish .wall:hover{fill:#d9894f}
+#plan.tool-select .room:hover{opacity:.82}
+#plan .furn{cursor:move}
+@media (hover:hover){#plan .furn:hover{filter:drop-shadow(0 0 2px rgba(181,101,58,.7))}}
+[data-handle]{cursor:pointer}
+[data-handle=size]{cursor:nwse-resize}
+.scalebar{position:absolute;left:14px;bottom:12px;background:rgba(255,253,249,.92);border:1px solid var(--line);
+  border-radius:8px;padding:6px 10px;font-size:12px;pointer-events:none}
+.scalebar .bar{height:6px;border:1.5px solid var(--ink);border-top:0;margin-top:3px}
+.modehint{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:var(--ink);color:#fff;
+  padding:5px 12px;border-radius:20px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none}
+.modehint.show{opacity:.9}
+footer{grid-column:1/-1;display:flex;gap:18px;align-items:center;padding:0 14px;background:var(--panel);overflow:hidden;white-space:nowrap;
+  border-top:1px solid var(--line);color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+#tip{overflow:hidden;text-overflow:ellipsis}
+footer b{color:var(--ink);font-weight:500}
+#panel section{padding:12px 16px;border-bottom:1px solid var(--line)}
+#panel h3{margin:0 0 8px;font-size:13px}
+#panel h3 small{color:var(--muted);font-weight:400;margin-left:6px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+td{padding:4px 2px;border-bottom:1px dashed #eee6d9}
+td.r{text-align:right}
+tr.click{cursor:pointer}
+tr.click:hover td{background:#faf5ee}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.15);vertical-align:-2px;margin-right:6px}
+.total{display:flex;justify-content:space-between;margin-top:8px;font-size:14px}
+.total b{color:var(--accent)}
+.muted{color:var(--muted)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
+.form label.full{grid-column:1/-1}
+.form input,.form select{border:1px solid var(--line);border-radius:6px;padding:5px 7px;background:#fff;width:100%}
+.form input[type=color]{padding:2px;height:30px}
+.actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.actions .btn{border:1px solid var(--line);background:#fff}
+.mats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mat{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:6px;background:#fff;cursor:pointer;text-align:left}
+.mat.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.mat i{width:26px;height:26px;border-radius:5px;border:1px solid rgba(0,0,0,.12);flex:none}
+.mat span{font-size:12px;line-height:1.3}
+.mat small{display:block;color:var(--muted)}
+.kbd{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:12px;color:var(--muted)}
+kbd{font:11px ui-monospace,Menlo,monospace;background:#f2ece2;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--ink)}
+.big{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.stats div{background:#faf6ef;border-radius:8px;padding:8px}
+.stats small{display:block;color:var(--muted);font-size:11px}
+#toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;
+  padding:8px 16px;border-radius:8px;opacity:0;transition:.25s;pointer-events:none;z-index:10}
+#toast.show{opacity:1;transform:translateX(-50%)}
+/* ---------- 2D / 3D 切换 ---------- */
+.seg{position:relative;padding:3px}
+.seg .btn{position:relative;z-index:1;width:82px;transition:color .45s}
+.seg .btn:hover{background:transparent}
+.seg .pill{position:absolute;left:3px;top:3px;bottom:3px;width:82px;border-radius:6px;background:var(--accent);
+  box-shadow:0 2px 6px rgba(181,101,58,.35);transition:transform .5s cubic-bezier(.65,0,.35,1)}
+.seg .btn[data-view="2d"],body.m3d .seg .btn[data-view="3d"]{color:#fff}
+body.m3d .seg .btn[data-view="2d"]{color:var(--ink)}
+body.m3d .seg .pill{transform:translateX(84px)}
+body.busy .seg{pointer-events:none}
+body.m3d .only2d,body:not(.m3d) .only3d{display:none!important}
+.only2d,.only3d{animation:fadeIn .45s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+#plan{transition:opacity .45s ease,transform .45s ease}
+main.is3d #plan{opacity:0;pointer-events:none}
+.scalebar{transition:opacity .3s}
+main.is3d .scalebar{opacity:0}
+#view3d{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}
+main.is3d #view3d{opacity:1;visibility:visible;transition:opacity .45s ease}
+#view3d canvas{display:block;outline:none}
+#cross{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;z-index:2;display:none;pointer-events:none}
+#cross:before,#cross:after{content:"";position:absolute;background:#fff;box-shadow:0 0 2px #000}
+#cross:before{left:6px;top:0;width:2px;height:14px}#cross:after{top:6px;left:0;height:2px;width:14px}
+#hint3d{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:rgba(43,40,36,.82);color:#fff;border-radius:20px;
+  padding:5px 14px;font-size:12px;z-index:2;pointer-events:none;white-space:nowrap;transition:opacity .4s}
+main.animating #hint3d{opacity:0}
+.rlabel{font-size:12px;font-weight:600;color:#2b2824;background:rgba(255,253,249,.9);border:1px solid var(--line);
+  border-radius:12px;padding:2px 9px;white-space:nowrap;pointer-events:none}
+.rlabel small{font-weight:400;color:var(--muted);margin-left:4px}
+#roomList{padding:0 10px 6px;display:grid;grid-template-columns:1fr 1fr;gap:4px}
+#roomList button{display:flex;flex-direction:column;width:100%;border:1px solid var(--line);background:#fff;padding:5px 8px;border-radius:7px;cursor:pointer;text-align:left;line-height:1.3}
+#roomList button:hover{background:#f2ece2}
+#roomList button.on{background:var(--accent-soft);color:var(--accent)}
+#roomList small{color:var(--muted);font-variant-numeric:tabular-nums}
+.range{display:flex;align-items:center;gap:6px;padding:0 8px;color:var(--muted);font-size:12px}
+.range input{width:100px;accent-color:var(--accent)}
+.menu{position:relative}
+.menu summary{list-style:none;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px}
+.menu summary::-webkit-details-marker{display:none}
+.menu-pop{position:absolute;right:0;top:calc(100% + 6px);display:flex;flex-direction:column;min-width:150px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:0 10px 30px rgba(40,30,20,.14);z-index:20;animation:fadeIn .2s ease}
+.menu-pop .btn{text-align:left}
+.range span{font-variant-numeric:tabular-nums;color:var(--ink)}
+/* ---------- 选中后的浮动工具条 ---------- */
+#fab{position:absolute;left:50%;bottom:16px;transform:translate(-50%,12px);display:flex;align-items:center;gap:4px;padding:5px;
+  background:rgba(255,253,249,.97);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 26px rgba(40,30,20,.16);
+  z-index:4;opacity:0;visibility:hidden;transition:opacity .2s,transform .2s,visibility 0s linear .2s;max-width:calc(100% - 24px)}
+main.drawer-panel #fab{opacity:0;visibility:hidden}
+#fab.show{opacity:1;visibility:visible;transform:translate(-50%,0);transition:opacity .2s,transform .2s}
+#fab .name{padding:0 8px 0 6px;font-weight:600;max-width:9em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#fab .btn{border:1px solid transparent}
+#fab .sep{width:1px;align-self:stretch;margin:4px 2px;background:var(--line)}
+/* ---------- 触屏漫游摇杆 ---------- */
+#joy{position:absolute;left:28px;bottom:28px;width:130px;height:130px;border-radius:50%;background:rgba(255,253,249,.25);
+  border:2px solid rgba(255,255,255,.7);box-shadow:0 4px 18px rgba(0,0,0,.18);z-index:3;display:none;touch-action:none;backdrop-filter:blur(3px)}
+#joy i{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,253,249,.92);
+  box-shadow:0 2px 8px rgba(0,0,0,.25);pointer-events:none}
+#walkExit{position:absolute;right:16px;bottom:28px;z-index:3;display:none}
+/* ---------- 触屏：加大点击区域 ---------- */
+@media (pointer:coarse){
+  body{font-size:14px}
+  header{padding:8px 12px;gap:8px}
+  .grp{padding:3px;border-radius:10px}
+  .btn{padding:8px 12px;min-height:38px;border-radius:8px}
+  .seg .btn,.seg .pill{width:92px}
+  body.m3d .seg .pill{transform:translateX(94px)}
+  .menu summary{padding:9px 14px}
+  .menu-pop .btn{padding:11px 14px}
+  .item{padding:10px 4px 8px}
+  .form input,.form select{font-size:16px;padding:8px 9px}
+  .form input[type=color]{height:40px}
+  .actions .btn,#fab .btn{min-height:42px;padding:9px 14px}
+  td{padding:7px 2px}
+  #roomList button{padding:8px 10px}
+  .mat{padding:9px 8px}
+  .range input{width:120px!important}
+}
+/* ---------- 竖屏 / 窄屏（如 iPad 竖握）：侧栏改为抽屉 ---------- */
+/* ---------- 宽屏：左右面板可收起 ---------- */
+@media (min-width:1101px){
+  .app{transition:grid-template-columns .3s cubic-bezier(.3,.7,.3,1)}
+  .app.hide-lib{grid-template-columns:0 minmax(0,1fr) 300px}
+  .app.hide-panel{grid-template-columns:236px minmax(0,1fr) 0}
+  .app.hide-lib.hide-panel{grid-template-columns:0 minmax(0,1fr) 0}
+  .app.hide-lib aside.lib,.app.hide-panel aside.right{overflow:hidden;border:0}
+  aside{overflow-x:hidden}
+  aside.lib>div{min-width:220px} #panel{min-width:284px}   /* 收起动画中内容不被挤压变形 */
+}
+.narrow-only{display:none!important}
+@media (max-width:1100px){
+  .grp.narrow-only{display:flex!important}
+  .btn.narrow-only,#fab .btn.narrow-only{display:inline-block!important}
+  .app{grid-template-columns:minmax(0,1fr)}
+  main,aside.lib,aside.right{grid-row:2;grid-column:1}
+  aside.lib,aside.right{position:relative;z-index:6;width:min(320px,86vw);transition:transform .3s cubic-bezier(.3,.7,.3,1),box-shadow .3s}
+  aside.lib{justify-self:start;transform:translateX(-110%)}
+  aside.right{justify-self:end;transform:translateX(110%)}
+  aside.open{transform:none;box-shadow:0 0 30px rgba(40,30,20,.18)}
+  .lib-grid{grid-template-columns:1fr 1fr 1fr}
+  .brand span,footer .only2d{display:none!important}
+}
+
+/* V7: a single bottom scale dock, and pane controls at the right of the header. */
+.item.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);background:#fbf5ee}
+#bottomScale{position:absolute;left:14px;bottom:12px;display:flex;align-items:center;gap:12px;background:rgba(255,253,249,.96);border:1px solid var(--line);border-radius:9px;padding:5px 8px;box-shadow:0 2px 12px #3029210a;max-width:calc(100% - 28px);z-index:3}
+#bottomScale .scalebar{position:static;border:0;background:none;padding:0;min-width:40px}
+#bottomScale #zoomControls{border:0;background:none;padding:0}
+#bottomScale>span{font-size:11px;color:var(--muted);white-space:nowrap}
+body.m3d #bottomScale{display:none}
+.component-preview{display:flex;gap:12px;align-items:center;margin-bottom:12px;background:var(--paper);padding:10px;border:1px solid var(--line);border-radius:8px}
+.component-preview svg{width:72px;height:60px;flex:none}.component-preview small{display:block;color:var(--muted);font-size:11px}
+#subtitle{max-width:580px}
+@media(max-width:600px){header{position:relative;z-index:20}#toolbarOverflow{top:100%}header>.brand{grid-column:1/3}#toolbarOverflow #paneBtns{display:flex;position:static}#bottomScale{left:6px;bottom:8px;max-width:calc(100% - 12px);gap:6px;flex-wrap:wrap;padding:4px 6px}#bottomScale .btn{padding:4px 6px;min-height:30px}#bottomScale>span{font-size:10px}#bottomScale .scalebar{font-size:10px}.brand span{display:block!important;font-size:10px;max-width:280px;white-space:normal;line-height:1.35}}
+#areaStatusNotice{position:fixed;left:50%;bottom:48px;transform:translateX(-50%);max-width:min(640px,85vw);padding:7px 12px;background:#fff3de;color:#72572d;border:1px solid #d8c6a3;border-radius:6px;font-size:12px;z-index:15;pointer-events:none}.area-status-warning{color:#806137;background:#fff5e5}.area-pending .rlabel small:before{content:"约 "}
+</style>
+
+<style>
+.lib h4{position:static}.library-filter{padding:12px 10px 6px;display:grid;gap:7px;position:sticky;top:0;z-index:2;background:var(--panel)}.library-filter input,.library-filter select{width:100%;padding:8px;border:1px solid var(--line);border-radius:7px;background:white;color:var(--ink);font:inherit;font-size:12px}body.preview aside.lib{visibility:hidden;overflow:hidden;width:0}body.preview .app{grid-template-columns:0 minmax(0,1fr) 300px}body.preview .app.hide-panel{grid-template-columns:0 minmax(0,1fr) 0}body.preview .editing{display:none}body.preview #lib{pointer-events:none}.scene-mode-note{font-size:12px;line-height:1.7;color:var(--muted)}#referencesDialog{width:min(94vw,1200px);max-height:90vh;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:20px}#referencesDialog::backdrop{background:#2b2824aa}.refs-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.refs-grid img{width:100%;height:auto}.ref-head{display:flex;justify-content:space-between;gap:20px;margin-bottom:15px}.ref-caption{color:var(--muted);font-size:12px;line-height:1.6}@media(max-width:1100px){body.preview .app,body.preview .app.hide-panel{grid-template-columns:1fr} .refs-grid{grid-template-columns:1fr}}
+@media(max-width:600px){header{gap:5px;padding:6px}.brand b{font-size:13px}.grp{max-width:100%;flex-wrap:wrap}.btn{padding:6px 8px;min-height:32px}.seg .btn,.seg .pill{width:82px}body.m3d .seg .pill{transform:translateX(84px)}#hint3d{font-size:10px;max-width:94%;white-space:normal;text-align:center}#paneBtns .btn{padding:5px 7px}}
+#plan.tool-select .wall,#plan.tool-door .wall,#plan.tool-window .wall{pointer-events:all;cursor:pointer}
+#plan.tool-door .wall:hover,#plan.tool-window .wall:hover{fill:#c4a27f}
+#plan.tool-wall{cursor:crosshair}#toolbarMore{display:none}#tools{flex-wrap:nowrap;max-width:none}.library-filter{display:none!important}
+aside.lib #lib3d{position:sticky;top:0;z-index:3;background:var(--panel);padding-bottom:10px;border-bottom:1px solid var(--line)}
+body.m3d .library-filter{position:static}#recoveryDialog{border:1px solid var(--line);border-radius:12px;max-width:520px;background:var(--panel);padding:24px}#recoveryDialog::backdrop{background:#29251f80}
+@media(max-width:600px){header{display:grid;grid-template-columns:auto 1fr auto;gap:5px;align-items:center}header>.brand{grid-column:2;grid-row:1;margin:0}#paneBtns{grid-column:1;grid-row:1}#viewSeg{grid-column:1/3;grid-row:2;width:max-content}#toolbarMore{display:block;grid-column:3;grid-row:2;position:static}header>.menu{grid-column:3;grid-row:1}header>.spacer{display:none}#toolbarOverflow{display:none;position:absolute;top:108px;left:6px;right:6px;max-height:65dvh;overflow:auto;background:var(--panel);border:1px solid var(--line);box-shadow:0 10px 28px #3c30242a;border-radius:10px;padding:10px;z-index:30}#toolbarMore[open] #toolbarOverflow{display:flex;flex-wrap:wrap;gap:8px}#toolbarOverflow .grp{max-width:100%}#toolbarOverflow .only3d{display:none}body.m3d #toolbarOverflow .only3d{display:flex}body.m3d #toolbarOverflow .only2d{display:none}body.preview #toolbarOverflow .editing{display:none}#tools{max-width:100%;flex-wrap:wrap}.menu-pop{right:4px;left:auto}.brand b{font-size:12px}#paneBtns .btn{font-size:12px;padding:4px}#paneBtns{gap:0}.btn{min-height:34px}.library-filter{position:static}#lib3d{position:static!important}footer{font-size:10px}}
+
+/* V7: a single bottom scale dock, and pane controls at the right of the header. */
+#bottomScale{position:absolute;left:14px;bottom:12px;display:flex;align-items:center;gap:12px;background:rgba(255,253,249,.96);border:1px solid var(--line);border-radius:9px;padding:5px 8px;box-shadow:0 2px 12px #3029210a;max-width:calc(100% - 28px);z-index:3}
+#bottomScale .scalebar{position:static;border:0;background:none;padding:0;min-width:40px}
+#bottomScale #zoomControls{border:0;background:none;padding:0}
+#bottomScale>span{font-size:11px;color:var(--muted);white-space:nowrap}
+body.m3d #bottomScale{display:none}
+.component-preview{display:flex;gap:12px;align-items:center;margin-bottom:12px;background:var(--paper);padding:10px;border:1px solid var(--line);border-radius:8px}
+.component-preview svg{width:72px;height:60px;flex:none}.component-preview small{display:block;color:var(--muted);font-size:11px}
+#subtitle{max-width:580px}
+@media(max-width:600px){header{position:relative;z-index:20}#toolbarOverflow{top:100%}header>.brand{grid-column:1/3}#toolbarOverflow #paneBtns{display:flex;position:static}#bottomScale{left:6px;bottom:8px;max-width:calc(100% - 12px);gap:6px;flex-wrap:wrap;padding:4px 6px}#bottomScale .btn{padding:4px 6px;min-height:30px}#bottomScale>span{font-size:10px}#bottomScale .scalebar{font-size:10px}.brand span{display:block!important;font-size:10px;max-width:280px;white-space:normal;line-height:1.35}}
+</style><style id="workbench-v8">
+/* V8 workspace: controls have stable homes across plan, scene and preview. */
+:root{--panel:#fffdf9;--paper:#f6f3ed;--line:#e4dfd6;--muted:#8b8276;--accent:#ad7951;--accent-soft:#f0e5d8;--ink:#35322d}
+.app,.app.hide-lib,.app.hide-panel,.app.hide-lib.hide-panel,body.preview .app{grid-template-columns:52px 236px minmax(0,1fr) 300px;grid-template-rows:66px minmax(0,1fr) 38px;transition:grid-template-columns .24s ease}
+.app.hide-lib,body.preview .app{grid-template-columns:52px 0 minmax(0,1fr) 300px}
+.app.hide-panel{grid-template-columns:52px 236px minmax(0,1fr) 0}
+.app.hide-lib.hide-panel,body.preview .app.hide-panel{grid-template-columns:52px 0 minmax(0,1fr) 0}
+.app.hide-tools{grid-template-columns:0 236px minmax(0,1fr) 300px}
+.app.hide-tools.hide-lib{grid-template-columns:0 0 minmax(0,1fr) 300px}
+.app.hide-tools.hide-panel{grid-template-columns:0 236px minmax(0,1fr) 0}
+.app.hide-tools.hide-lib.hide-panel{grid-template-columns:0 0 minmax(0,1fr) 0}
+header{grid-column:1/-1;grid-row:1;display:flex!important;flex-direction:column;flex-wrap:nowrap;align-items:stretch;padding:0;gap:0;position:relative;z-index:21;height:66px}
+.project-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px 7px;height:46px}
+.brand{margin:0;gap:4px}.brand b{font-size:15px;letter-spacing:.2px}.brand span{display:block!important;font-size:11px;white-space:nowrap;max-width:none}
+.project-meta{display:flex;gap:14px;align-items:center;font-size:11px;color:var(--muted)}.style-tag{border:1px solid #dacdbb;border-radius:4px;padding:3px 8px;color:#896747;background:#f6f0e6}.saved-indicator{display:flex;align-items:center;gap:5px}.saved-indicator::before{content:'';width:5px;height:5px;background:#8a977a;border-radius:50%}
+.menubar{display:flex;align-items:center;height:34px;border-top:1px solid #eee8df;padding:0 10px;gap:2px}.menu-status{margin-left:auto;font-size:11px;color:var(--muted);padding-right:6px}
+.work-menu{position:relative;height:32px}.work-menu>summary{border:0;border-radius:4px;font-size:12px;background:none;padding:6px 12px;cursor:pointer;min-height:0;line-height:20px}
+.work-menu[open]>summary,.work-menu>summary:hover{background:var(--accent-soft)}
+.work-menu>.menu-pop{left:0;right:auto;top:33px;min-width:184px;padding:5px;border-radius:7px;box-shadow:0 8px 28px #3b302421;max-height:calc(100dvh - 116px);overflow:auto}
+.menu-pop .btn{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-decoration:none;min-height:32px;padding:6px 10px;border-radius:3px}
+.menu-pop kbd{border:0;background:none;font-size:10px;color:var(--muted);padding:0}.menu-pop hr{height:1px;border:0;background:var(--line);margin:5px 4px}.menu-label{display:block;color:var(--muted);padding:5px 10px;font-size:10px}
+.menu-pair{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin:4px 0}.menu-pair .btn{justify-content:center;gap:0}.menu-pop #layers .btn,.menu-pop #modes3d .btn{border-radius:3px}.menu-pop .chip.on::after,.menu-pop #modes3d .on::after{content:'✓';font-size:11px}.menu-pop .range{padding:8px 10px;gap:8px}.menu-pop .range input{width:92px!important}
+.btn:disabled{opacity:.35;cursor:default}.btn:disabled:hover{background:transparent}.btn:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+#toolbarMore,#langBtn{display:none!important}
+.tool-rail{grid-column:1;grid-row:2;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--panel);border-right:1px solid var(--line);padding:9px 5px;overflow-y:auto;min-width:0;z-index:8}
+.hide-tools .tool-rail{visibility:hidden;overflow:hidden;padding:0;border:0}
+#tools .rail-tool{width:48px;height:46px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;padding:4px 0;font-size:11px;flex:none;border-radius:6px;background:none;color:var(--muted)}
+#tools .rail-tool svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+#tools .rail-tool:hover{background:#f2ede4;color:var(--ink)}#tools .rail-tool.on{background:var(--accent-soft);color:#966d49}#tools .rail-tool b{font-size:18px;font-weight:500}.rail-spacer{flex:1;min-height:10px}
+aside.lib{grid-column:2;grid-row:2;position:static;transform:none;width:auto;min-width:0;z-index:9;border-right:1px solid var(--line)}
+aside.right{grid-column:4;grid-row:2;position:static;transform:none;width:auto;min-width:0;z-index:9;border-left:1px solid var(--line);border-right:0}
+.hide-lib aside.lib,.hide-panel aside.right{visibility:hidden;overflow:hidden;border:0}body.preview aside.lib{display:block;visibility:hidden;overflow:hidden;width:auto}
+.pane-heading{height:40px;display:flex;align-items:center;justify-content:space-between;padding:5px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:4}.pane-heading b{font-size:12px;font-weight:600}.pane-heading .btn{padding:3px 7px;font-size:12px;min-height:26px;color:var(--muted)}.property-tabs{justify-content:flex-start;gap:5px}.property-tabs .btn.on{background:var(--accent-soft);color:#966d49}.lib-grid{grid-template-columns:1fr 1fr}.lib h4{position:static}.library-filter,#libSearch,#libCategory,#lib3d{display:none!important}.lib #lib{min-width:220px}.item{border-radius:6px;padding-top:10px;min-height:99px}.item svg{width:59px;height:46px}.hint{font-size:11px}.item b{font-size:11px}
+#stage{grid-column:3;grid-row:2;min-width:0;min-height:0;position:relative}.modehint,#hint3d{display:none!important}
+#panel{min-width:282px}#panel section{padding:14px;border-bottom:1px solid var(--line)}#panel h3{font-size:12px;font-weight:600;margin:0 0 10px}.scene-mode-note{font-size:11px;line-height:1.6}.form label{font-size:11px;color:var(--muted)}.form input,.form select{color:var(--ink);border-radius:5px;padding:7px 8px}.actions{gap:6px}.actions .btn{border:1px solid var(--line);font-size:11px;padding:6px 10px}.component-preview{background:#f6f2eb;border-radius:5px}.component-preview small:last-child{display:none}.stats div{background:#f6f2eb;border-radius:5px}.big{font-size:20px}
+#fab{left:0;top:0;bottom:auto;transform:none!important;transition:opacity .15s,visibility .15s;border-radius:8px;padding:4px;box-shadow:0 4px 18px #352b211c}#fab .btn{font-size:11px;padding:5px 9px;min-height:30px}#fab.show{z-index:5;transform:none;transition:opacity .15s}body.preview #fab{display:none!important}
+footer{grid-column:1/-1;grid-row:3;display:flex;align-items:center;gap:8px;height:38px;background:var(--panel);padding:0 12px;border-top:1px solid var(--line);font-size:11px;min-width:0;z-index:10}.state-dot{width:5px;height:5px;background:var(--accent);border-radius:50%;flex:none}footer #tip{max-width:47%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--muted)}.coords{font-size:10px;white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums;min-width:138px}.coords b{font-weight:400}
+#bottomScale{position:static;left:auto;bottom:auto;border:0;border-left:1px solid var(--line);border-radius:0;background:none;padding:0 0 0 10px;box-shadow:none;max-width:none;display:flex;flex-wrap:nowrap;align-items:center;gap:12px;flex:none;height:26px;z-index:auto}#bottomScale #zoomControls{padding:0;gap:2px}.btn#zoomOut,.btn#zoomIn{font-size:15px}#bottomScale .btn{min-height:26px;padding:2px 8px;font-size:11px}#ratio{min-width:37px;font-size:10px;font-weight:500;color:var(--muted)}#statusWhole{font-size:11px}
+#helpDialog{width:min(620px,94vw);max-height:84dvh;padding:0;border:1px solid var(--line);border-radius:9px;color:var(--ink);background:var(--panel)}.help-content{padding:8px 22px 20px;overflow:auto;max-height:calc(84dvh - 48px);user-select:text}.help-content h3{font-size:13px;margin:20px 0 8px}.help-content p{font-size:12px;color:#70675d;line-height:1.8}.help-content .kbd{line-height:2.1}#helpDialog .ref-head{position:sticky;top:0;background:var(--panel);padding:12px 16px;border-bottom:1px solid var(--line)}
+@media(max-width:1100px){
+ .app,.app.hide-lib,.app.hide-panel,.app.hide-lib.hide-panel,.app.hide-tools,.app.hide-tools.hide-lib,.app.hide-tools.hide-panel,body.preview .app,body.preview .app.hide-panel{grid-template-columns:46px minmax(0,1fr);grid-template-rows:66px minmax(0,1fr) 38px}.app.hide-tools,.app.hide-tools.hide-lib.hide-panel{grid-template-columns:0 minmax(0,1fr)}
+ aside.lib,aside.right{position:relative;grid-column:2;grid-row:2;width:min(320px,calc(100vw - 64px));transform:translateX(-120%);transition:transform .24s ease;visibility:visible!important;border:1px solid var(--line);z-index:19;pointer-events:none}
+ aside.lib{justify-self:start}aside.right{justify-self:end;transform:translateX(120%)}aside.open{transform:none;pointer-events:auto;box-shadow:0 6px 28px #352b2126;overflow:auto!important}body.preview aside.lib{visibility:hidden!important}
+ footer #tip{max-width:38%}.coords{display:none!important}.brand span{font-size:10px}#bottomScale{gap:8px}.narrow-only{display:inline-block!important}
+}
+@media(max-width:600px){
+ .project-heading{padding:5px 10px;height:34px}.brand b{font-size:13px}.brand span{font-size:9px;white-space:normal;line-height:1.35;max-width:340px}.project-meta{display:none}.menubar{padding:0 5px}.work-menu>summary{padding:6px 9px;min-height:0}.menu-status{font-size:9px;max-width:80px;overflow:hidden;white-space:nowrap}.work-menu>.menu-pop{min-width:174px}.work-menu:nth-last-of-type(1)>.menu-pop{left:auto;right:-20px}.menu-pop .btn{font-size:12px;min-height:34px}
+ footer{font-size:9px;padding:0 6px;gap:5px}footer #tip{max-width:29%;font-size:9px}footer .state-dot{display:none}#bottomScale{gap:5px;padding-left:4px;height:30px}#bottomScale .btn{min-height:28px;padding:2px 6px;font-size:10px}#ratio{min-width:31px;font-size:9px}
+ #fab{max-width:calc(100% - 16px);gap:0}#fab .btn{padding:5px 6px;font-size:10px}.form input,.form select{font-size:16px}.pane-heading .btn{min-height:30px}.lib-grid{grid-template-columns:1fr 1fr}
+}
+@media(prefers-reduced-motion:reduce){.app,#view3d,#plan{transition:none}}
+.app{overflow:clip}
+body:not(.m3d) footer #bottomScale{display:flex!important}
+@media(max-width:1100px){aside.lib:not(.open),aside.right:not(.open){visibility:hidden!important}aside.lib.open,aside.right.open{visibility:visible!important}}
+
+
+/* Center the main menus in the top bar; selections use trailing checkmarks. */
+.app{grid-template-rows:46px minmax(0,1fr) 38px!important}
+header{display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;height:46px;padding:0 12px;gap:8px;box-sizing:border-box}
+.project-heading{display:contents}
+header .project-heading .brand{grid-column:1;grid-row:1;min-width:0;margin:0}
+header .header-actions{grid-column:3;grid-row:1;justify-self:end;margin:0;white-space:nowrap}
+.menubar{position:static;grid-column:2;grid-row:1;transform:none;width:max-content;height:46px;border:0;padding:0;gap:4px;flex-wrap:nowrap;white-space:nowrap}
+.project-meta .menu-status{margin:0;padding:0}
+.work-menu>.menu-pop{top:39px}
+.menubar .menu-pop .btn.on{background:transparent;color:var(--ink);box-shadow:none;font-weight:400}
+.menubar .menu-pop .btn.on:hover{background:#f2ece2}
+.menubar .menu-pop .btn.on::after{content:'✓';margin-left:auto;font-size:11px;line-height:1;color:var(--ink);flex:none}
+.menubar .menu-pair .btn{justify-content:space-between;gap:10px}
+@media(max-width:1100px){
+ .menubar{gap:2px}
+ .work-menu>summary{padding:6px 8px}
+ .work-menu>.menu-pop{top:39px;left:50%;right:auto;transform:translateX(-50%)}
+ .work-menu:first-of-type>.menu-pop{left:0;transform:none}
+ .work-menu:last-of-type>.menu-pop{left:auto;right:0;transform:none}
+}
+@media(max-width:600px){.project-heading{padding:5px 10px}.menubar{gap:2px}}
+/* The view switch stays first; all contextual controls now live in the rail. */
+.tool-rail{padding:0;gap:0;overflow:hidden;min-height:0;flex-wrap:nowrap!important}
+.rail-view-switch{display:flex;align-items:center;gap:2px;padding:10px 4px 9px;width:100%;box-sizing:border-box;flex:none;border-bottom:1px solid var(--line);background:var(--panel)}
+#railViewSwitch .btn{flex:1;min-width:0;min-height:29px;padding:4px 0;font-size:10px;border-radius:4px;color:var(--muted);background:transparent}
+#railViewSwitch .btn.on{color:#966d49;background:var(--accent-soft);font-weight:600}
+.rail-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;width:100%;scrollbar-width:thin;scrollbar-color:#d6cbbb transparent}
+.rail-group{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;flex:none;width:100%;box-sizing:border-box}
+.rail-group+.rail-group{border-top:1px solid var(--line)}
+#tools .rail-tool{width:40px;height:41px;min-height:41px;gap:2px;font-size:9.5px;line-height:13px}
+#tools .rail-tool svg{width:17px;height:17px}
+#returnEdit{margin:5px auto}
+[hidden]{display:none!important}
+body.preview #tools .rail-editing,body.walking #tools .rail-editing{display:none!important}
+body.walking .only-orbit{display:none!important}
+/* Room wayfinding and controls follow the current view. */
+body.m3d #lib3d{display:block!important;padding:0 12px 12px;border-bottom:1px solid var(--line)}
+body.m3d #roomList{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+body.m3d #roomList button{display:flex;flex-direction:column;gap:4px;text-align:left;padding:9px 8px;border:1px solid var(--line);background:var(--panel);border-radius:6px;color:var(--ink);font-size:12px}
+body.m3d #roomList small{color:var(--muted);font-size:11px}
+body.m3d #roomList button.on{border-color:#ae8966;background:#f0e7db}
+body.walking aside.lib #lib,body.preview aside.lib #lib{display:none!important}
+body.preview aside.lib{visibility:visible!important;overflow:auto!important}
+.rlabel{display:inline-flex;align-items:baseline;gap:5px;min-width:0;padding:1px 8px!important;border:1px solid rgba(139,124,103,.15)!important;border-radius:12px!important;background:rgba(250,247,240,.78)!important;box-shadow:none!important;font-size:12px!important;font-weight:600;color:#453f37!important;line-height:20px!important;white-space:nowrap;pointer-events:none!important;text-align:center}
+.rlabel small{display:inline!important;color:#81776a!important;font-size:10px!important;font-weight:400;margin:0!important}
+.rlabel.name-only small{display:none!important}
+body.walking #hint3d{bottom:18px;top:auto;max-width:calc(100% - 36px)}
+.scene-room-navigation .room-area-card{gap:5px}
+@media(max-width:800px){.walk-controls label{display:none}#walkRoomStatus{top:12px;left:12px;font-size:12px}}
+@media(max-width:1100px){#stage{grid-column:2}#tools .rail-tool{width:36px}.rail-view-switch{padding:10px 3px 9px}}
+footer #savedState{font-size:10px;flex:none;gap:5px;white-space:nowrap;min-width:45px;color:var(--muted)}
+footer #savedState::before{background:#a39b8f}footer #savedState[data-status='saved']::before{background:#8a977a}footer #savedState[data-status='error']::before{background:#b3372a}footer #savedState[data-status='error']{color:#b3372a}
+.status-separator{color:var(--line);font-size:11px;flex:none}footer #tip{min-width:0;flex-shrink:1}
+@media(max-width:600px){
+ footer #savedState{font-size:9px;min-width:42px;gap:4px}footer #savedState::before{width:4px;height:4px}footer .status-separator{font-size:9px}footer #tip{max-width:none;flex:1}footer>.spacer{display:none}#bottomScale{flex-shrink:0;gap:4px}
+}
+/* Status controls on the left, save status and current action on the right. */
+footer .status-left{display:flex;align-items:center;gap:14px;flex:none;min-width:0}
+footer .status-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto;flex:1;min-width:0;overflow:hidden}
+footer #bottomScale{border:0;padding:0;gap:12px}
+footer .ratio-label{font-size:10px;color:var(--muted);white-space:nowrap}
+footer #tip{max-width:none;min-width:0;flex:0 1 auto}
+@media(max-width:600px){footer .status-left{gap:6px}footer .status-right{gap:5px}footer #bottomScale{gap:7px}footer .ratio-label{font-size:9px}footer #tip{flex:0 1 auto}}
+
+/* Spacious view buttons and a compact set of window actions on the header's right. */
+.project-heading .brand{min-width:0;margin-right:16px}.project-heading .brand b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.header-actions{display:flex;align-items:center;gap:4px;flex:none;margin-left:auto}
+.header-icon{width:30px;height:30px;min-height:30px;padding:6px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--muted)}
+.header-icon:hover{background:#f2ede4;color:var(--ink)}.header-icon.on{background:var(--accent-soft);color:#966d49;border-color:#e0d1be}
+.header-icon svg,.view-button svg,.viewport-action svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.rail-view-switch{flex-direction:column;padding:6px 5px;gap:5px}
+#railViewSwitch .view-button{flex:none;width:40px;height:46px;min-height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 0;font-size:13px;line-height:16px;font-weight:500;border:1px solid var(--line);border-radius:7px}
+#railViewSwitch .view-button.on{border-color:#dfcfbc;color:#966d49;background:var(--accent-soft);font-weight:600}
+#railViewSwitch .view-button:hover{background:#f2ede4;color:var(--ink)}
+.viewport-actions{position:absolute;top:12px;right:12px;z-index:8;display:flex;gap:2px;padding:2px;border:1px solid var(--line);border-radius:7px;background:var(--panel);box-shadow:0 3px 14px #352b2114;max-width:calc(100% - 24px);flex-wrap:wrap}
+.viewport-action{display:flex;align-items:center;gap:3px;padding:3px 6px;min-height:26px;line-height:18px;font-size:11px;border-radius:6px;color:var(--muted);background:transparent}
+.viewport-action.on{background:var(--accent-soft);color:#966d49}.viewport-action:hover{background:#f2ede4;color:var(--ink)}
+@media(max-width:1100px){#railViewSwitch .view-button{width:36px}.project-heading .brand{margin-right:8px}}
+@media(max-width:600px){.project-heading .brand b{font-size:12px}.header-actions{gap:3px}.header-icon{width:28px;height:28px;min-height:28px;padding:5px}.header-icon svg{width:16px;height:16px}.viewport-actions{top:10px;right:10px}.viewport-action{padding:3px 5px;min-height:26px;gap:3px;font-size:10px}.viewport-action svg{width:14px;height:14px}}
+
+.header-icon svg{width:17px;height:17px}.view-button svg{width:17px;height:17px}.viewport-action svg{width:14px;height:14px}
+@media(max-width:600px){.header-icon svg{width:16px;height:16px}.viewport-action svg{width:14px;height:14px}}
+
+/* Direction labels sit between the centered knob and joystick rim. */
+#joy .joy-key{position:absolute;display:grid;place-items:center;width:20px;height:20px;padding:0;border:0;border-radius:4px;background:rgba(255,253,249,.82);color:#554738;font:600 12px ui-monospace,Menlo,monospace;line-height:20px;pointer-events:none;z-index:1;box-shadow:none}
+#joy .joy-up{top:8px;left:50%;transform:translateX(-50%)}#joy .joy-down{bottom:8px;left:50%;transform:translateX(-50%)}#joy .joy-left{left:8px;top:50%;transform:translateY(-50%)}#joy .joy-right{right:8px;top:50%;transform:translateY(-50%)}
+#joy i{z-index:2}.scene-sun{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:11px}.scene-sun input{flex:1;min-width:60px;accent-color:var(--accent)}
+
+/* Mode groups share one extensible floating panel; new actions use the same button style and bindings. */
+.viewport-action-group{display:flex;align-items:center;gap:2px;flex-wrap:wrap;min-width:0}
+.viewport-actions .viewport-action{flex:none;white-space:nowrap}
+
+@media(max-width:1100px){.rail-view-switch{padding-left:4px;padding-right:4px}}
+
+/* Scene controls are grouped in the floating panel; light settings open on demand. */
+.viewport-separator{width:1px;height:14px;background:var(--line);margin:0 2px;flex:none}
+.viewport-menu{position:relative}.viewport-menu>summary{list-style:none;cursor:pointer;white-space:nowrap;line-height:18px}.viewport-menu>summary::-webkit-details-marker{display:none}
+.viewport-menu[open]>summary,.viewport-menu>summary:hover{background:#f2ede4;color:var(--ink)}
+.viewport-pop{position:absolute;top:calc(100% + 5px);right:0;width:208px;max-width:calc(100vw - 76px);padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);box-shadow:0 5px 20px #352b2121;z-index:12}
+.viewport-sun{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:10px;white-space:nowrap}.viewport-sun input{flex:1;width:90px;min-width:0;accent-color:var(--accent)}.viewport-sun span{font-variant-numeric:tabular-nums}
+.lighting-states .viewport-action{min-height:24px;padding:2px 6px;line-height:18px}
+.viewport-sun input{margin:0;height:18px}
+@media(max-width:600px){.viewport-actions{max-width:calc(100% - 20px)}.viewport-pop{width:208px}.viewport-separator{margin:0 1px}}
+
+/* One collapsed wall-display entry; style cards share the furniture sidebar. */
+.menu-sub>summary.btn{background:transparent;cursor:pointer;border:0;list-style:none;font-size:inherit}
+.menu-sub>summary::-webkit-details-marker{display:none}
+.menu-sub[open]>summary{background:#f2ece2}.menu-sub[open]>summary>span:last-child{transform:rotate(90deg)}
+.submenu-list{border-left:1px solid var(--line);margin:2px 4px 5px 10px;padding-left:5px}
+.style-intro{margin:0;padding:10px 12px;font-size:10px;line-height:1.6;color:var(--muted)}
+.style-cards{display:grid;gap:8px;padding:0 10px}
+.style-card{border:1px solid var(--line);border-radius:7px;padding:10px;text-align:left;background:var(--panel);cursor:pointer;color:var(--ink);font:inherit;position:relative}
+.style-card:hover{border-color:#c6b59c;background:#faf6ee}.style-card.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.style-card.on::after{content:'✓';position:absolute;right:10px;top:41px;color:var(--accent);font-size:12px}
+.style-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.style-card:disabled{cursor:default;opacity:.45}
+.style-swatch-row{display:flex;height:20px;border-radius:3px;overflow:hidden;margin-bottom:7px}.style-swatch-row i{flex:1}
+.style-card b{display:block;font-size:12px;font-weight:600;margin-bottom:4px}.style-card small{display:block;font-size:10px;line-height:1.5;color:var(--muted)}
+.style-samples{display:flex;gap:5px;margin-top:7px}.style-samples i{font-style:normal;font-size:9px;padding:3px 7px;border:1px solid #776d6022;border-radius:3px;color:#403a32}
+
+/* Room area entries are native buttons, grouped into compact tiles. */
+#panel .room-area-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+#panel .room-area-card{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;min-width:0;min-height:64px;padding:9px 10px;border:1px solid #ded6cb;border-radius:6px;background:#fffdfa;color:var(--ink);font:inherit;text-align:left;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s}
+#panel .room-area-card:hover{background:#f5eee4;border-color:#b59b7c;box-shadow:0 2px 5px #352b210d}
+#panel .room-area-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#panel .room-area-card:active{background:var(--accent-soft)}
+#panel .room-card-heading{display:flex;align-items:center;gap:6px;width:100%;font-size:12px;font-weight:500;line-height:16px}
+#panel .room-card-heading .sw{width:10px;height:10px;flex:none;margin:0;border-radius:3px}
+#panel .room-card-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#panel .room-card-area{font-size:15px;font-weight:500;line-height:18px;font-variant-numeric:tabular-nums}
+#panel .room-card-area small{font-size:11px;font-weight:400;color:var(--muted)}
+
+/* Property navigation remains visible while the detail panel scrolls. */
+aside.right .property-tabs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;position:sticky;top:0;z-index:5;background:var(--panel)}
+#propertyBack{grid-column:1;grid-row:1;justify-self:start;white-space:nowrap;font-size:11px;padding:3px 5px}
+#propertyBack[hidden]{display:none!important}
+#propertyTab{grid-column:2;grid-row:1;justify-self:center}
+#closeProperties{grid-column:3;grid-row:1;justify-self:end}
+#panel .actions:empty{display:none}
+
+/* Single-axis grips follow the furniture axes, including rotated selections. */
+#gSel [data-handle="width"],#gSel [data-handle="widthLeft"]{cursor:ew-resize}
+#gSel [data-handle="depth"]{cursor:ns-resize}
+#gSel [data-handle="size"]{cursor:nwse-resize}
+
+.renovation-list{margin-top:10px}.renovation-list>summary{cursor:pointer;padding:7px 9px;border:1px solid #ddd3c5;border-radius:6px;background:#f7f3ed;font-size:12px}.renovation-list table{margin-top:6px}
+
+/* Catalog and editing actions remain distinct without widening the rail. */
+.rail-label{font-size:9px;line-height:14px;color:var(--muted);letter-spacing:1px;text-align:center;pointer-events:none}
+.rail-tool-list{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%}
+/* Keep title, all menus and window actions on one row as the window narrows. */
+@media(max-width:760px){header{grid-template-columns:minmax(0,1fr) auto auto;padding:0 8px;gap:6px}header .project-heading .brand b{font-size:14px}.menubar{gap:0}.work-menu>summary{padding:6px 6px}}
+@media(max-width:600px){header{padding:0 6px;gap:4px}header .project-heading .brand b{font-size:13px}.work-menu>summary{font-size:11.5px;padding:6px 4px}.menubar{gap:0}}
+@media(max-width:360px){header .header-actions{gap:2px}header .header-icon{width:24px;height:26px;min-height:26px;padding:4px}header .header-icon svg{width:14px;height:14px}}
+
+/* Three columns without enlarging the library pane. */
+aside.lib #lib .lib-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:0 8px 8px}
+aside.lib #lib .item{min-width:0;min-height:97px;padding:8px 3px 6px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px}
+aside.lib #lib .item svg{width:48px;max-width:100%;height:39px;flex:none}
+aside.lib #lib .item b{font-size:10px;line-height:14px;font-weight:500;min-height:28px;display:flex;align-items:center;justify-content:center;text-align:center;white-space:normal;overflow-wrap:anywhere;width:100%}
+aside.lib #lib .item small{font-size:9px;line-height:13px;white-space:nowrap;letter-spacing:-.2px}
+
+/* Door types are contextual properties, never furniture cards. */
+.door-style-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.door-style-options .door-style-choice{display:flex;justify-content:space-between;align-items:center;min-height:32px;padding:6px 10px;text-align:left;background:#fffdf9;color:#514b43;border:1px solid #dfd7cc;border-radius:7px;font-size:12px}
+.door-style-options .door-style-choice:hover{border-color:#b18a63;background:#f8f2e9}
+.door-style-options .door-style-choice[aria-pressed="true"]{border-color:#b18a63;background:#f0e5d6;color:#896747}
+
+/* Compact object shortcuts: one horizontal row with vertical item separators. */
+#fab{padding:3px;gap:0}
+#fab .btn{min-height:26px;padding:4px 8px;font-size:11px;line-height:16px}
+#fab:not(.door-style-fab)>.btn+.btn{position:relative;margin-left:2px}
+#fab:not(.door-style-fab)>.btn+.btn::before{content:"";position:absolute;left:-1px;top:50%;height:14px;transform:translateY(-50%);border-left:1px solid var(--line)}
+#fab.door-style-fab{background:var(--panel);display:flex;flex-direction:row;align-items:center;width:max-content;gap:0;padding:3px}
+#fab.door-style-fab .door-style-options{display:flex;gap:0}
+#fab.door-style-fab .door-style-choice{position:relative;min-height:26px;padding:4px 17px 4px 7px;border:0;border-radius:4px;font-size:11px;line-height:16px;white-space:nowrap;background:transparent}
+#fab.door-style-fab .door-style-choice>span{position:absolute;right:5px}
+#fab.door-style-fab .door-style-choice+.door-style-choice::before{content:"";position:absolute;left:0;top:50%;height:14px;transform:translateY(-50%);border-left:1px solid var(--line)}
+#fab.door-style-fab .door-style-choice:hover{background:#f8f2e9}
+#fab.door-style-fab .door-style-choice[aria-pressed="true"]{background:#f0e5d6;color:#896747}
+#fab.door-style-fab .door-shortcut-actions{display:flex;align-items:center;justify-content:flex-end;border:0;border-left:1px solid var(--line);height:14px;padding:0 0 0 3px;margin-left:3px}
+#fab.door-style-fab .door-shortcut-actions .btn{min-height:26px;padding:4px 7px}
+@media(max-width:400px){#fab.door-style-fab .door-style-choice{font-size:10px;padding:4px 14px 4px 5px}#fab.door-style-fab .door-shortcut-actions .btn{font-size:10px;padding:4px 5px}}
+
+/* Drawing modes form one compact group beside grid and dimensions. */
+#planViewActions{flex-wrap:nowrap}
+#planViewActions [data-plan-drawing]{white-space:nowrap}
+@media(max-width:600px){#planViewActions [data-plan-drawing] svg{display:none}#planViewActions .viewport-action{padding-left:5px;padding-right:5px;font-size:10px}#planViewActions .viewport-separator{margin:0 2px}}
+
+/* Immersive walk is temporary presentation; stored editor panel preferences remain unchanged. */
+body.m3d #lib3d{display:none!important}
+body.walking .app{grid-template-columns:0 0 minmax(0,1fr) 0!important;grid-template-rows:0 minmax(0,1fr) 30px!important}
+body.walking header,body.walking #tools,body.walking aside.lib,body.walking aside.right{display:none!important}
+body.walking #stage{grid-column:3!important;grid-row:2!important}
+body.walking #viewportActions,body.walking #walkExit,body.walking #fab{display:none!important}
+body.walking footer{height:30px;justify-content:center;background:#faf7f1;border:0;padding:0 10px}
+body.walking footer .status-left,body.walking #savedState,body.walking .status-separator{display:none!important}
+body.walking footer .status-right{justify-content:center;margin:0;overflow:visible}
+body.walking footer #tip{max-width:none;text-align:center;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#walkToolbar{position:absolute;right:14px;top:14px;z-index:9;display:flex;align-items:center;gap:2px;padding:3px;border:1px solid rgba(178,161,141,.3);border-radius:8px;background:rgba(250,247,241,.92);transition:opacity .24s,transform .24s}
+#walkToolbar .viewport-action{min-height:30px;padding:4px 9px;color:#5c5044}
+#walkToolbar .viewport-pop{top:calc(100% + 9px);min-width:190px;max-width:calc(100vw - 40px);font-size:12px;line-height:1.8}
+.walk-sensitivity{display:flex;flex-direction:column;gap:7px;font-size:12px}.walk-sensitivity input{width:100%;accent-color:var(--accent)}
+#walkNotice{position:absolute;left:16px;top:16px;z-index:7;color:#51483c;background:rgba(250,247,241,.86);padding:5px 9px;border-radius:5px;font-size:12px;pointer-events:none;max-width:calc(100% - 32px)}
+body.walk-ui-idle #walkToolbar{opacity:0;transform:translateY(-5px);pointer-events:none}
+body.walk-ui-idle #walkToolbar:focus-within{opacity:1;transform:none;pointer-events:auto}
+body.pointer-locked #joy{display:none!important}
+body.walking #joy{width:116px;height:116px;left:24px;bottom:24px;border-color:rgba(217,205,188,.8);background:rgba(246,242,234,.25);box-shadow:0 2px 8px #463b2d15}
+body.walking #joy i{background:rgba(250,247,241,.9)}
+@media(max-width:600px){#walkToolbar{top:10px;right:10px;max-width:calc(100% - 20px)}#walkToolbar .viewport-action{font-size:10px;padding:4px 6px}#walkNotice{top:53px;left:10px;font-size:11px}body.walking #joy{left:16px;bottom:16px}body.walking footer #tip{font-size:9px}}
+@media(prefers-reduced-motion:reduce){#walkToolbar{transition:none}}
+
+</style></head>
+<body data-workbench-version="__WORKBENCH_VERSION__">
+<div class="app">
+<header><div class="project-heading"><div class="brand"><b title="Floor Visualization · __WORKBENCH_VERSION__">Floor Visualization <small style="font-size:10px;font-weight:400;color:#8c8071">__WORKBENCH_VERSION__</small></b></div><div class="header-actions" role="group" aria-label="窗口快捷操作"><button class="btn header-icon" id="toolbarFurniture" aria-label="家具" title="家具库 ([)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V9h3v5h12V9h3v9H3z M6 9V6h12v3 M5 18v3 M19 18v3"/></svg></button><button class="btn header-icon" id="quickProperties" data-quick-pane="panel" aria-label="属性" title="属性栏 (])"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16 M4 12h16 M4 19h16 M9 3v4 M15 10v4 M8 17v4"/></svg></button><button class="btn header-icon" id="quickFullscreen" aria-label="全屏" title="全屏 (Shift+F)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5 M15 4h5v5 M4 15v5h5 M20 15v5h-5"/></svg></button></div></div><nav class="menubar" aria-label="主菜单">
+<details class="menu work-menu"><summary>文件</summary><div class="menu-pop"><button class="btn " id="importJson"><span>导入 JSON</span></button><button class="btn " id="exportJson"><span>导出 JSON</span></button><button class="btn" id="exportProduction"><span>导出制作包</span></button><details class="menu-sub"><summary class="btn"><span>确认方案</span><span aria-hidden="true">›</span></summary><div class="submenu-list"><button class="btn" data-confirm-stage="structure">确认结构</button><button class="btn" data-confirm-stage="layout">确认布局</button><button class="btn" data-confirm-stage="style">确认风格</button></div></details><button class="btn " id="saveHtml"><span>导出 HTML</span></button><button class="btn " id="exportPng"><span>导出 PNG</span></button><hr><button class="btn danger" id="reset"><span>重置方案</span></button></div></details>
+<details class="menu work-menu"><summary>编辑</summary><div class="menu-pop"><button class="btn " id="undo"><span>撤销</span><kbd>⌘ Z</kbd></button><button class="btn " id="redo"><span>重做</span><kbd>⇧ ⌘ Z</kbd></button><hr><button class="btn" data-command="copy"><span>复制</span><kbd>⌘ D</kbd></button><button class="btn" data-command="rotate"><span>旋转</span><kbd>R</kbd></button><button class="btn" data-command="delete"><span>删除</span><kbd>Delete</kbd></button><hr><button class="btn danger" id="clearAll"><span>清空家具</span></button><button class="btn" data-command="clearMeasures"><span>清除测量</span></button></div></details>
+<details class="menu work-menu"><summary>视图</summary><div class="menu-pop"><button class="btn" data-command="view2d"><span>2D 平面</span><kbd>T</kbd></button><button class="btn" data-command="view3d"><span>3D 场景</span><kbd>T</kbd></button><div class="only3d"><button class="btn" id="previewBtn">浏览模式</button><hr><div id="modes3d"><button class="btn on" data-mode="orbit">鸟瞰</button><button class="btn" data-mode="walk">漫游</button></div><button class="btn " id="vIso"><span>斜视</span></button><button class="btn " id="vTop"><span>俯视</span></button><details class="menu-sub"><summary class="btn"><span>墙体显示</span><span aria-hidden="true">›</span></summary><div class="submenu-list"><button class="btn on" data-cut="__WALL_HEIGHT_M__">全高</button><button class="btn" data-cut="1.2">剖切</button></div></details><div id="toggles3d" class="menu-pair"><button class="btn chip on" data-t="furn">家具</button><button class="btn chip" data-t="grid">网格</button><button class="btn chip on only-orbit" data-t="labels">房间标识</button><button class="btn chip" data-t="night">夜景</button></div><label id="menuSunLabel" class="range">日照 <input type="range" id="sun" min="7" max="18" step=".25" value="10"><span id="sunT">10:00</span></label></div><div class="only2d"><hr><small class="menu-label">显示与吸附</small><div id="layers"><button class="btn chip on" data-layer="dims">尺寸</button><button class="btn chip on" data-layer="labels">房间</button><button class="btn chip on" data-layer="furn">家具</button><button class="btn chip " data-layer="grid">网格</button><button class="btn chip " data-layer="bearing">承重墙</button><button class="btn chip on" data-layer="wallSnap">吸附</button></div></div></div></details>
+<details class="menu work-menu" id="menuStyle"><summary>风格</summary><div class="menu-pop" id="menuStyleList" role="group" aria-label="装修风格"></div></details>
+<details class="menu work-menu"><summary>窗口</summary><div class="menu-pop"><button class="btn" data-command="toolrail"><span>工具栏</span></button><button class="btn " id="tgLib"><span>家具库</span><kbd>[</kbd></button><button class="btn " id="tgPanel"><span>属性栏</span><kbd>]</kbd></button><button class="btn " id="fullscreen"><span>全屏</span><kbd>⇧ F</kbd></button><hr><button class="btn" data-command="restoreLayout"><span>恢复布局</span></button></div></details>
+<details class="menu work-menu"><summary>帮助</summary><div class="menu-pop"><button class="btn" data-command="help"><span>操作说明</span></button><button class="btn" data-command="shortcuts"><span>快捷键</span></button><button class="btn " id="referencesBtn"><span>参考图</span></button><hr><a class="btn" href="https://github.com/wy51ai/floorplan-3d" target="_blank" rel="noopener">参考项目 ↗</a></div></details>
+</nav>
+<button id="langBtn" hidden>EN</button><details id="toolbarMore" hidden><div id="toolbarOverflow"></div></details><input id="fileIn" type="file" accept=".json,application/json" hidden></header>
+
+<nav class="tool-rail" id="tools" aria-label="视图与工具">
+<div id="railViewSwitch" class="rail-view-switch" role="group" aria-label="切换 2D / 3D"><button class="btn view-button on" data-rail-view="2d" aria-pressed="true" title="2D 平面 (T)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z M4 12h8 M12 4v16 M12 10h8"/></svg><span>2D</span></button><button class="btn view-button" data-rail-view="3d" aria-pressed="false" title="3D 场景 (T)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5v9l-9 5-9-5V8z M3 8l9 5 9-5 M12 13v9"/></svg><span>3D</span></button></div>
+<div class="rail-scroll" id="railActions">
+<div id="railLibrary" class="rail-group rail-editing" role="group" aria-label="家具与风格"><span class="rail-label">布置</span><button class="btn rail-tool" id="railFurniture" data-quick-pane="lib" aria-label="家具" aria-pressed="true" title="展开 / 收起家具库 ([)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V9h3v5h12V9h3v9H3z M6 9V6h12v3 M5 18v3 M19 18v3"/></svg><span>家具</span></button><button class="btn rail-tool" id="railStyles" aria-label="风格" aria-pressed="false" title="装修风格"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h2a2 2 0 0 0 0-4h-1a2 2 0 0 1 0-4h3a5 5 0 0 0 5-5c0-3-4-5-9-5z"/><circle cx="7" cy="9" r="1"/><circle cx="11" cy="6" r="1"/><circle cx="16" cy="7" r="1"/></svg><span>风格</span></button></div>
+<div id="railTools" class="rail-group rail-editing" role="group" aria-label="操作工具"><span class="rail-label">工具</span><button class="btn rail-tool on" data-tool="select" title="选择 (V)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l12 9-6 1-3 6z"/></svg><span>选择</span></button><div id="quickPlan" class="rail-tool-list only2d" role="group" aria-label="2D 工具"><button class="btn rail-tool " data-tool="measure" title="测量 (M)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15L15 4l5 5L9 20z M8 11l2 2 M11 8l2 2 M14 5l2 2"/></svg><span>测量</span></button><button class="btn rail-tool " data-tool="wall" title="新增隔墙"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v14H3z M3 12h18 M9 5v7 M16 12v7"/></svg><span>画墙</span></button><button class="btn rail-tool " data-tool="door" title="新增门洞"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V3h13v18 M8 21V6l8 2v13 M12 14h1"/></svg><span>门洞</span></button><button class="btn rail-tool " data-tool="window" title="新增窗洞"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z M12 4v16 M4 12h16"/></svg><span>窗洞</span></button><button class="btn rail-tool " data-tool="demolish" title="拆除 / 恢复普通墙 (X)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19L15 9 M10 5l4-2 7 7-2 4z"/></svg><span>拆墙</span></button></div></div>
+
+<button class="btn rail-tool " id="returnEdit" hidden title="返回编辑"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19l3-6L17 4l3 3-9 9z M5 19l6-3"/></svg><span>编辑</span></button>
+</div>
+</nav>
+<aside class="lib"><div class="pane-heading"><b>家具</b><button class="btn" id="closeLibrary" title="收起家具库">×</button></div>
+    <div id="lib3d" hidden><div id="roomList"></div></div>
+    <div id="lib"></div><div id="styleLibrary" hidden></div>
+  </aside>
+
+  <main id="stage">
+    <svg id="plan" class="tool-select" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">
+      <defs id="defs"></defs>
+      <g id="gGrid"></g>
+      <g id="gRooms"></g>
+      <g id="gFurn"></g>
+      <g id="gWalls"></g>
+      <g id="gOpen"></g>
+      <g id="gTop"></g>
+      <g id="gFurnitureLabels" pointer-events="none"></g>
+      <g id="gLabels" pointer-events="none"></g>
+      <g id="gDims" pointer-events="none"></g>
+      <g id="gMeasure"></g>
+      <g id="gSel"></g><g id="gDraft" pointer-events="none"></g>
+    </svg>
+    <div id="view3d">
+      <div id="cross"></div>
+      <div id="joy" role="group" aria-label="移动操纵杆，W 前进、S 后退、A 左移、D 右移"><kbd class="joy-key joy-up" title="W / ↑ 前进">W</kbd><kbd class="joy-key joy-down" title="S / ↓ 后退">S</kbd><kbd class="joy-key joy-left" title="A / ← 左移">A</kbd><kbd class="joy-key joy-right" title="D / → 右移">D</kbd><i></i></div>
+      <button class="btn primary" id="walkExit" data-en="Exit walk">退出漫游</button>
+      <div id="hint3d"></div>
+      <div id="walkNotice" hidden role="status" aria-live="polite"></div>
+      <div id="walkToolbar" hidden role="toolbar" aria-label="漫游操作">
+        <button class="btn viewport-action" id="walkReturn">返回鸟瞰</button>
+        <button class="btn viewport-action" id="walkNight">切换夜景</button>
+        <button class="btn viewport-action" id="walkFullscreen">全屏</button>
+        <button class="btn viewport-action" id="walkLock" aria-pressed="false" title="可选：锁定光标后用鼠标转头，Esc 释放">鼠标锁定</button>
+        <details id="walkSettings" class="viewport-menu"><summary class="viewport-action" aria-label="漫游设置" title="漫游设置">⚙</summary><div class="viewport-pop"><label class="walk-sensitivity">转头灵敏度 <input id="walkSensitivity" type="range" min="0.5" max="1.5" step="0.1" value="1" aria-label="转头灵敏度"></label></div></details>
+        <details id="walkHelp" class="viewport-menu"><summary class="viewport-action" aria-label="操作帮助" title="操作帮助">?</summary><div class="viewport-pop walk-help">摇杆 / WASD / 方向键移动<br>拖动画面转头 · E 开关门<br>Esc 暂停 · 空格 / 点击继续<br>鼠标锁定可选，Esc 释放光标</div></details>
+      </div>
+    </div>
+    <div class="modehint" id="modehint"></div>
+    <div id="fab"></div>
+    <div id="viewportActions" class="viewport-actions" role="toolbar" aria-label="当前视图快捷操作"><div id="planViewActions" class="viewport-action-group only2d" role="group" aria-label="2D 显示"><button type="button" class="btn viewport-action" data-plan-drawing="structure" aria-pressed="false" title="户型图"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z M4 12h8 M12 4v16 M12 16h8"/></svg><span>户型图</span></button><button type="button" class="btn viewport-action" data-plan-drawing="furniture" aria-pressed="true" title="家具布局"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V9h3v5h12V9h3v9H3z M6 9V6h12v3 M5 18v3 M19 18v3"/></svg><span>家具布局</span></button><button type="button" class="btn viewport-action" data-plan-drawing="hard" aria-pressed="false" title="硬装图"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18 M5 6v5 M19 6v5 M7 11h10 M9 11v3 M15 11v3 M4 19h16"/></svg><span>硬装图</span></button><span class="viewport-separator"></span><button class="btn viewport-action" data-quick-layer="grid" title="显示网格"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z M9 4v16 M15 4v16 M4 9h16 M4 15h16"/></svg><span>网格</span></button><button class="btn viewport-action" data-quick-layer="dims" title="显示尺寸标注"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16 M4 4v6 M20 4v6 M7 14v6 M17 14v6 M7 17h10"/></svg><span>尺寸</span></button></div><div id="sceneViewModes" class="viewport-action-group only3d" role="group" aria-label="3D 视角"><button class="btn viewport-action" data-quick-mode="orbit" aria-pressed="true" title="鸟瞰旋转"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z M3 12l9 5 9-5 M3 16l9 5 9-5"/></svg><span>鸟瞰</span></button><button class="btn viewport-action" data-quick-mode="walk" aria-pressed="false" title="第一人称漫游"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4a2 2 0 1 0 .01 0 M12 8l-3 5 3 2-2 6 M12 8l3 5 4 1 M12 15l4 6"/></svg><span>漫游</span></button><span class="viewport-separator only-orbit"></span><button class="btn viewport-action only-orbit" id="sceneWhole">全屋</button><button class="btn viewport-action only-orbit" id="sceneTop">俯视</button><button class="btn viewport-action only-orbit" data-top-view aria-pressed="false" title="显示或隐藏顶面、空调、插座和收口"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18 M5 6v5 M19 6v5 M7 11h10 M9 11v3 M15 11v3 M4 19h16"/></svg><span>顶面</span></button><div id="sceneDisplayActions" class="viewport-action-group only-orbit" role="group" aria-label="3D 显示"><button class="btn viewport-action" data-quick-cut="__WALL_HEIGHT_M__" title="完整墙高"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V4h14v16z M8 7h8 M8 17h8"/></svg><span>全高</span></button><button class="btn viewport-action" data-quick-cut="1.2" title="剖切墙体"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V12h14v8z M5 4v4 M19 4v4 M3 9h18"/></svg><span>剖切</span></button><button class="btn viewport-action" data-quick-toggle="labels" title="房间名称与地面面积"><span>房间标识</span></button><button class="btn viewport-action" data-quick-toggle="grid" title="显示 3D 网格"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z M9 4v16 M15 4v16 M4 9h16 M4 15h16"/></svg><span>网格</span></button></div><span class="viewport-separator"></span><details id="viewportLighting" class="viewport-menu"><summary class="viewport-action" title="调整光照">光照 ▾</summary><div class="viewport-pop"><div class="viewport-action-group lighting-states" role="group" aria-label="光照状态"><button class="btn viewport-action on" data-light-mode="day" aria-pressed="true">日照</button><button class="btn viewport-action" data-light-mode="night" aria-pressed="false">夜景</button></div><label id="viewportSunLabel" class="viewport-sun"><input id="viewportSun" type="range" min="7" max="18" step=".25" value="10" aria-label="日照时间"><span id="viewportSunTime">10:00</span></label></div></details></div></div>
+  </main>
+
+<aside class="right"><div class="pane-heading property-tabs"><button type="button" class="btn" id="propertyBack" title="返回方案总览" aria-label="返回方案总览" hidden>← 返回</button><button class="btn on" id="propertyTab">属性</button><button class="btn" id="closeProperties" title="收起属性栏" aria-label="收起属性栏">×</button></div><div id="panel"></div></aside>
+
+<footer><div class="status-left"><div id="bottomScale" class="only2d"><div class="grp" id="zoomControls"><button class="btn" id="zoomOut" title="缩小">−</button><button class="btn" id="zoomIn" title="放大">＋</button><button class="btn" id="fit" title="适应窗口 (F)">适应</button></div><span class="ratio-label">比例尺 <b id="ratio">—</b></span></div><span class="coords only2d">X <b id="cx">—</b> · Y <b id="cy">—</b> mm</span><button class="btn only3d" id="statusWhole">全屋</button></div><div class="status-right"><span class="saved-indicator" id="savedState" role="status" aria-live="polite" data-status="ready">就绪</span><span class="status-separator">│</span><span id="tip">选择对象</span><span id="hover" hidden></span></div></footer>
+</div>
+<div id="toast"></div><dialog id="recoveryDialog"><h3>方案读取失败</h3><p id="recoveryMessage"></p><p>原始方案已保留。可以下载后检查，或恢复最近一次有效备份；确认后才开始默认方案。</p><div class="actions"><button class="btn" id="downloadRecovery">下载原始方案</button><button class="btn" id="restoreBackup">恢复有效备份</button><button class="btn danger" id="startDefault">使用默认方案</button></div></dialog>
+
+
+
+<dialog id="referencesDialog"><div class="ref-head"><b>户型与家具参考</b><button class="btn" id="closeRefs">关闭</button></div><div class="refs-grid"><div><h3>确认户型 · 墙体依据</h3><img src="data:image/png;base64,__PLAN_REFERENCE__" alt="确认户型参考图"></div><div><h3>家具布局 · 位置依据</h3><img src="data:image/png;base64,__FURNITURE_REFERENCE__" alt="家具布局参考图"></div></div><p class="ref-caption">__REFERENCE_NOTE__<br>界面、家具符号、模型细节与交互吸收自 wy51ai/floorplan-3d，原始提交 a03136c；本页面为本地适配样稿。</p></dialog><dialog id="helpDialog"><div class="ref-head"><b>操作说明与快捷键</b><button class="btn" id="closeHelp">关闭</button></div><div class="help-content"><section><h3>布置</h3><p>点顶部右侧家具图标展开家具库，拖入画面。选中对象后，在右侧调整尺寸、位置和材质。场景显示与光照设置集中在画布右上角。</p><p>选中家具后，拖动顶部圆点旋转，拖动右下方块自由调整尺寸；左右中点调整宽度，下侧中点调整进深。2D 网格和尺寸在画布右上角面板设置，贴墙吸附默认开启，可在“视图”菜单调整。</p></section><section><h3>墙体与洞口</h3><p>“画墙”依次点击起点和终点。“门洞 / 窗洞”点击普通墙放置。选中洞口后可调整位置、净宽和门轴。</p><p>新增隔墙、洞口和测量线可以删除。删除新墙时一并移除该墙洞口；撤销时一起恢复。原有普通墙使用拆除 / 恢复，承重墙锁定。</p></section><section id="shortcutsSection"><h3>快捷键</h3><div class="kbd"><kbd>V / M / X</kbd><span>选择 / 测量 / 拆墙</span><kbd>Delete</kbd><span>删除选中对象</span><kbd>⌘ / Ctrl Z</kbd><span>撤销</span><kbd>⇧ ⌘ / Ctrl Z</kbd><span>重做</span><kbd>⌘ / Ctrl D</kbd><span>复制家具</span><kbd>R</kbd><span>旋转家具 45°</span><kbd>T / F</kbd><span>切换 2D、3D / 适应</span><kbd>[ / ]</kbd><span>家具库 / 属性栏</span><kbd>Esc</kbd><span>取消绘制或选择</span><kbd>W A S D / 方向键</kbd><span>漫游移动</span><kbd>E / Esc / 空格</kbd><span>开关门 / 暂停 / 继续</span></div></section><section><h3>浏览与切换</h3><p>左侧第一项切换 2D / 3D，默认 2D；下方工具随视图变化，也可按 T 或使用“视图”菜单。画布右上角的功能面板随视图变化：2D 显示网格、尺寸，3D 显示视角、显示和光照操作。漫游直接开始：电脑和触屏均可使用左下摇杆，WASD / 方向键移动、拖动画面转头；Esc 暂停，空格或点击画面继续。可主动开启鼠标锁定，Esc 释放；锁定失败自动回到拖动操作。漫游隐藏侧栏，设置和帮助按需展开。“视图 → 浏览模式”禁止修改；点击“返回编辑”退出。</p></section><section><h3>保存</h3><p>右下角显示保存状态，编辑自动保存到当前浏览器。“文件 → 导出 HTML”生成可离线打开的单文件方案；JSON 用于备份与再次编辑。</p></section></div></dialog><div id="areaStatusNotice" role="status" hidden></div>
+<script id="caseData" type="application/json">__CASE_JSON__</script><script type="application/json" id="projectSeed">null</script><script>__BUNDLE__</script></body>
+</html>

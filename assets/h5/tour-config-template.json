@@ -1,0 +1,14 @@
+{
+  "seconds": 56,
+  "fps": 24,
+  "eyeMm": 1600,
+  "horizontalFovDegrees": 76,
+  "shiftY": 0,
+  "bodyRadiusMm": 180,
+  "gridMm": 50,
+  "maxYawDegreesPerSecond": 32,
+  "accessPolygons": [],
+  "roomSpeedWeights": {},
+  "stops": [],
+  "cameraCues": []
+}

@@ -1,14 +1,86 @@
 ---
 name: visualize-floorplans
-description: Use when reviewing residential floor plans, confirming furniture layouts, or creating reference-driven renovation concept images. Preserve room, door, window, and opening evidence. Outputs are concepts, not measured CAD, BIM, construction drawings, or guaranteed accurate 3D models. Continuous video is experimental and only attempted when explicitly requested.
+description: Review dimensioned floor plans and furniture references, build editable offline H5 2D/3D renovation workbenches, coordinate interior concept images, and create deterministic homeowner camera preflights. Use when the user requests floor-plan confirmation, furniture and finish editing, scheme export, walkthrough planning and local handoff. Preserve structural evidence and versioned approvals. Concept design is not measured CAD or construction documentation; Seedance is a separate optional branch.
 metadata:
-  version: "0.1.0-beta.1"
+  version: "0.2.0-beta.4"
 ---
 
 # Visualize Floorplans
 
-Create a controlled three-stage workflow for interior designers and marketing
-teams:
+## Bundled reference case
+
+For a concrete capability preview, open `assets/reference-cases/jujian-champagne-pearl/index.html` when the user asks to see an example. Read its brief `README.md` for representation boundaries; do not load the mesh or all images unless needed. It contains supplied references, a current beta.4 workbench, selected concept images/drawings, scheme data and an H5 tour. This is a case-specific example, not a shared default apartment or fresh acceptance of every representation. Copy case input into a new project before editing; do not modify the bundled example. Existing image/video/mesh sources differ from the newest lighting/material demo. The page uses relative links and does not open automatically when the Skill is loaded.
+
+## Required quality gates
+
+Before source interpretation, AI interior generation, homeowner camera planning
+or accepted handoff, read `references/h5-quality-gates.md`. Keep case-local
+source calibration/provenance, image/reference/camera consistency and subject
+time-window records. Use `h5.py review-template`, `quality` and
+`audit --subjects`; never infer acceptance from generated files or a collision
+pass. Formal handoff/package use `--accepted --bundle --quality-review` and
+require technical, geometry, visual and explicit human acceptance separately.
+Diagnostic previews remain available with failures and pending statuses visible.
+
+## Local workbench safeguards · beta.4
+
+Use bundled `assets/h5/version.json` as the build identity. Rebuild before packaging
+shared-source changes; retain independent case acceptance. Run installed-source
+regression via `scripts/release_smoke.py`, including interaction modules. Use
+`production/synthetic_cases.py` and `test_workbench_browser.mjs` for isolated
+cross-shape UI checks with existing browser dependencies; report emulated mobile
+separately from physical-device and Windows checks.
+
+Wall geometry edits mark original room/floor partitions and their areas as
+pending; undoing to the original geometry clears that state. Do not silently
+rename, merge or split rooms. Repartition requires a separately confirmed layout.
+Build evidence reports room main-light coverage and placement warnings; never
+invent approved fixture positions. `mainLightingRequired:false` exempts an
+explicit nonfunctional region. Actual mesh emission/occlusion remains a gate.
+Keep material presentation case-local: `presentation.materials.marble.veins:false`
+uses plain marble consistently in 2D/3D. Material changes invalidate style scopes.
+
+## Local beta entrypoint
+
+For H5 interface changes, read `references/h5-interaction-presentation.md`.
+Preserve direct joystick/keyboard/drag walk without blocking entry modals;
+pointer lock is optional. Keep case parity and new-interface visual acceptance
+separate from earlier scheme approvals.
+
+Read `references/h5-tools-and-case-schema.md` when building or operating the
+workbench. Fill `assets/h5/case-template.json` in the case folder after reference
+review, then use `scripts/production/h5.py`: `build`, `export`, `prepare`,
+`audit`, `capture`, `run`, `handoff`, `package`; `doctor` reports dependencies.
+H5 is the default deterministic engine; Blender is optional via
+`run_production.py --engine blender`. Never hardcode case coordinates, palette
+selections, lamp counts, floor areas or approval evidence in the shared engine.
+Keep the existing approved case unchanged during generic-template maintenance.
+
+Version 0.2.0-beta.3 adds local quality gates after the initial implementation closeout. Source/entrypoint/package
+checks are distinct from visual acceptance. See `references/local-beta-status.md`
+for exactly what has been checked and what remains deferred. Do not describe
+unrun cross-floorplan, full regression or Seedance work as completed. There is no
+requirement to expand this closeout into optional recognition, automatic layout,
+construction documentation or public publishing.
+
+
+Prefer the structured H5 workflow when an editable 2D/3D workbench is available:
+
+**Reference review → H5 scheme confirmation → interior renders → continuous camera preflight → requested final video.**
+
+Read `references/h5-production-workflow.md`. Export actual scheme meshes/materials,
+retain scope hashes and approval provenance, and drive every downstream artifact
+from that export. A changed wall invalidates structure/layout/style; furniture
+movement invalidates layout/style; a changed finish invalidates style. Do not
+reconstruct a second independent apartment in Blender.
+
+For H5 quality checks and accepted-version closeout, read
+`references/h5-acceptance-and-handoff.md`. Record an actual playable H5 preview's
+technical result and user acceptance per case; neither validates a Seedance
+generation chain. Preserve the accepted subset and distinguish current drawings
+from older accepted AI images with different lighting or source revisions.
+
+Without a structured workbench, use the existing three-stage concept workflow:
 
 1. reconstruct and confirm the floor plan;
 2. confirm a furniture/equipment layout, choose or specify one renovation direction, generate coordinated images, and
@@ -21,9 +93,10 @@ comparison against the source, and user confirmation are mandatory before any
 renovation image. A single user response may confirm both zones and access
 elements when one complete presentation clearly shows both scopes; do not ask
 again for already recorded items. The image workflow is implemented as a
-controlled conceptual pipeline. The continuous-video execution path is not yet
-validated and must be reported as unavailable or experimental until a real
-playable sample passes visual review.
+controlled conceptual pipeline. Generative continuous-video execution is not
+validated by a deterministic H5 preview and remains unavailable or experimental
+until its own playable sample passes visual review. H5 playback results and
+acceptance are verified per case.
 
 ## Scope and stopping point
 
@@ -32,7 +105,8 @@ engine. Room-perspective images may drift despite preflight. User acceptance,
 visual structural review, and automated file checks are separate facts. If the
 user stops generation, hand off only the accepted subset with rejected and
 unverified outputs explicitly excluded; never mark the abandoned full package
-as passed. Blender is not required. Video remains experimental.
+as passed. Blender is not required. Generative video remains experimental;
+deterministic H5 previews require actual case-specific playback checks.
 
 Before local script execution, read `references/platform-runtime.md` and run
 `scripts/check_environment.py` with the detected Python interpreter. Verify
@@ -59,8 +133,11 @@ Do not reopen unchanged approvals or add deliverables just to keep going.
 - Call every V0 output an **AI 3D concept image**.
 - Call the normalized 2D output an **AI-reconstructed reference plan**, not CAD
   or a measured drawing.
-- Never claim dimensional accuracy, arbitrary camera navigation, construction
-  readiness, or a real 3D model.
+- For image-only outputs, never claim dimensional accuracy, arbitrary camera
+  navigation, construction readiness, or a real 3D model. For actual exported
+  meshes, describe them as a data-derived editable 3D scene; document source
+  dimensions, assumptions, coordinate conversion and verified parity. Never
+  claim measured accuracy or construction readiness from reference drawings.
 - Do not suggest removing or changing structural walls.
 - Mark uncertain room, door, window, orientation, and dimension information.
 - Do not silently add zones. Missing geometry may be proposed as an explicit
@@ -285,11 +362,17 @@ Run this stage only when video is requested and the Stage 2 scheme is current.
 
 1. Plan the route after image approval, not during floor-plan or style review.
    Confirm start, end, rooms visited, and approximate pace. Indoor starts and
-   ends are valid. A graph-valid route is only a first check; the camera path
-   must also avoid walls and furniture.
+   ends are valid. Use `indoor_segment` for an interior clip,
+   `entry_to_interior` for a tour that enters the home and finishes inside, and
+   `full_tour` for outside-to-outside tours; a move inside one open zone has no
+   fake door step. A graph-valid route is only a first check; the camera path
+   must also avoid walls and furniture. Check indoor route points against the
+   current zone polygon and visually inspect the approved furniture layout.
 2. Before any paid or external generation, name the available tool, input
    limits, test scope, likely cost, and stopping condition. The present Skill
-   has route validation but no verified continuous-video execution chain.
+   has route validation but no verified generative continuous-video execution
+   chain. A separately verified H5 preview may be handed off as that case's
+   deterministic walkthrough, with its own checks and human acceptance.
 3. A successful task call or a prompt is not proof. Play the result and inspect
    continuity, route adherence, wall crossings, sudden jumps, and changes to
    rooms, doors, windows, furniture, and materials. If no playable sample passes,

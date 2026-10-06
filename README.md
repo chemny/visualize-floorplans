@@ -1,107 +1,160 @@
-# Visualize Floorplans
+# Floor Visualization
 
 English | [中文](./README.zh.md)
 
-A concept-design workflow for homeowners and interior-design teams who need to
-confirm a floor plan before exploring renovation images. Keep layout decisions,
-references and accepted versions together instead of repeating corrections.
+For homeowners and renovation design teams: review a floor plan and furniture
+references, edit one H5 renovation
+scheme, then create interior concepts and a camera preflight from that same
+version. Structure, layout and finish decisions remain traceable across outputs.
+
+**Local Beta version: 0.2.0-beta.4.** Adds reusable interaction regression,
+room-area pending detection after wall edits, main-light coverage warnings,
+case-configurable marble and modular runtime logic. Rectangle, concave and
+furnished lighting stress fixtures are exercised separately from client visual
+acceptance. Windows, physical mobile devices and generative final video remain
+unverified. Earlier validation runs were local; this release includes the curated reference case. See [current checks](references/beta4-workbench-validation.md).
+
+Read [quality gates](references/h5-quality-gates.md) before source interpretation,
+AI interiors, homeowner camera planning or accepted delivery. Technical,
+geometry, visual and explicit human acceptance remain separate. A raw preview
+manifest cannot grant acceptance. Install the matching release archive or current repository revision; older
+archives do not contain these quality gates.
 
 ## Preview
 
-![Floor plan, bird's-eye views and room concept renders](assets/renovation-concept-showcase.png)
+![Selected living-room concept from the reference case](assets/reference-cases/jujian-champagne-pearl/images/living-wide.png)
 
-Early renovation concept exploration, shared with the owner's permission—not
-the final confirmed scheme. This ten-image board combines a floor plan,
-bird's-eye views and room renders. Some views contain layout inconsistencies;
-it illustrates visual exploration, not verified reconstruction or construction accuracy.
+Selected concept output from the bundled reference case. Open the case to compare
+its supplied references, editable workbench and continuous H5 tour. Concept images
+do not certify measured reconstruction accuracy.
 
-## What It Does
+## Complete reference case
 
-Turn a supplied plan into a reviewed reference plan, a confirmed furniture
-layout and a scoped set of renovation concept images. This beta assists design
-discussion; it does not produce measured CAD, construction drawings or a
-guaranteed accurate 3D reconstruction. Perspective images can drift and must
-not become architectural authority. Continuous video is experimental.
+[Open the Jujian · Champagne Pearl case](assets/reference-cases/jujian-champagne-pearl/index.html): supplied references, 13 concept images, an editable offline 2D/3D workbench, scheme drawings and a 56-second H5 tour, approximately 54 MB.
+
+Ask your agent to “open the bundled reference case and show its workbench and tour.” Open the local entry after installation; a GitHub file view does not execute HTML. The current workbench and retained images/tour have lighting and material differences; see the [case notes](assets/reference-cases/jujian-champagne-pearl/README.md). Intermediate versions and audit history are excluded.
 
 ## Core Capabilities
 
 | Capability | What it helps you do |
 | --- | --- |
-| Plan and opening review | Separate walls, doors, windows and uncertain marks before styling. |
-| Furniture confirmation | Preserve agreed furniture placement and room access. |
-| Style exploration | Compare design directions or use your chosen palette directly. |
-| Pre-generation checks | Fix reference conflicts and camera-relative relationships before generating. |
-| Versioned handoff | Separate accepted images, rejected attempts and unresolved details. |
+| Reference review | Compare dimensioned structure and furniture placement before designing. |
+| Offline H5 workbench | Switch among structure, furniture and hard-decoration drawings and synchronized 3D. |
+| Editing and components | Move/size furniture, edit nonstructural walls/openings, choose door styles, measure, undo and save. |
+| Coordinated finishes | Apply six editable workbench palettes to furniture, floors and tiles in 2D/3D. |
+| Actual-mesh export | Carry geometry, dimensions, materials, light state and scope hashes into downstream work. |
+| Homeowner camera preflight | Use explicit stops and subjects, H5 capture and optional FFmpeg encoding; keep Blender optional. |
+| Local handoff | Preserve accepted assets, create relative file links and package with per-file hashes. |
 
-## Platform Compatibility
-
-Designed for agent workflows in Codex, Claude Code and OpenClaw, with local
-Python tools targeting macOS and Windows. Host image-tool availability is a
-separate requirement; local tests do not establish end-to-end compatibility.
+Image concepts remain an optional host-tool branch. The existing image planner
+supports 12 style directions; the H5 workbench currently provides six finish
+presets. H5 playback is a deterministic design preflight. Seedance is a separate
+requested generative final, with its own review. The tool does not certify measured
+CAD, structural engineering, construction drawings or a globally shortest route.
+Renovation pricing is excluded.
 
 ## Install
 
-Send this to your Agent:
+Give your current agent this request:
 
 ```text
-Install this Skill for me:
-https://github.com/chemny/visualize-floorplans
+Install this skill for me: https://github.com/chemny/visualize-floorplans
+Read SKILL.md, check the existing environment, and report missing optional capabilities.
 ```
 
-The Agent should select the appropriate installation method, check dependencies
-and verify that the Skill loads.
+The agent owns installation and environment detection. The repository contains
+no credentials or private client cases; optional providers need your authorization.
 
-## Quick Start
+## Quick start
 
-Attach a legible floor plan and send:
+Attach the dimensioned plan and furniture reference:
 
 ```text
-Use visualize-floorplans to review this plan. First show the rooms, doors,
-windows and uncertain details for confirmation. Do not generate renovation
-images until the structure and furniture layout are confirmed.
+Use visualize-floorplans. Compare the structure and furniture reference,
+show consequential conflicts for confirmation, then make an editable H5
+2D/3D workbench. Keep the confirmed scheme as the authority for interior
+views. Do not generate a video unless requested.
 ```
 
-The first useful result is a reviewable reference plan and a short list of
-uncertainties, not an unverified photorealistic picture.
+An Agent fills the case template after review. For an already structured case:
 
-## Usage Examples
+```text
+python scripts/production/h5.py doctor
+python scripts/production/h5.py build --case CASE_JSON --out NEW_WORKBENCH_HTML
+```
 
-- “Keep this approved layout. Compare four styles in one preview board.”
-- “Only revise the marked doorway; preserve the other furniture and openings.”
-- “Stop generating images. Package the accepted plans and list unresolved items.”
+Replace placeholders with absolute local paths. Building uses the bundled engine
+and no CDN or npm installation. The blank template intentionally refuses to build
+until actual room and wall geometry is supplied.
 
 ## How It Works
 
-Source review → plan/access confirmation → furniture confirmation → style
-selection → batch preflight → image generation and inspection → accepted handoff.
+Reference review → H5 structure/layout/style confirmation → actual-mesh bundle →
+interior views → requested continuous camera preflight → optional final video →
+accepted handoff.
 
-Image inspection cannot be replaced by a passing script or a file hash. After
-repeated structural errors, stop blind retries. Do not present discarded views
-as verified design. Video route confirmation happens only when video is requested.
+Geometry changes invalidate dependent confirmations. New exports, successful
+hash checks and renders do not grant human acceptance. Current case evidence
+stays outside reusable templates. The Python concept-image planning and
+SVG/PNG tools remain available when no structured H5 input exists.
 
-## Repository Structure
+See [H5 tools and case schema](references/h5-tools-and-case-schema.md),
+[production workflow](references/h5-production-workflow.md), and
+[acceptance and handoff](references/h5-acceptance-and-handoff.md).
+
+## Requirements and compatibility
+
+- H5 build, preparation and packaging: Python 3.11+ standard library.
+- Browser export/capture: existing Node.js, Playwright or Playwright Core and
+  Chromium. Supply executable/module paths explicitly or through documented env vars.
+- Video encoding: existing FFmpeg and ffprobe. Blender is optional.
+- Legacy SVG/PNG drawing: Pillow, PyMuPDF and an available CJK font.
+- Concept-image or Seedance generation: an authorized host tool/provider; no
+  account, credential or provider service is bundled.
+
+Agent workflows target Codex, Claude Code and OpenClaw. Python paths and inputs
+are portable, but the extracted H5 pipeline has not received fresh Windows or
+cross-host end-to-end validation. [Runtime guidance](references/platform-runtime.md)
+separates dependency availability from tested behavior.
+
+## File Guide
 
 ```text
-SKILL.md              Agent workflow
-agents/               Optional host metadata
-references/           Interpretation and review rules
-assets/               Templates and existing reference examples
-scripts/              Local planning, drawing, validation and tests
-requirements.txt      Python dependencies
-.github/workflows/    macOS/Windows test matrix
+SKILL.md                 Agent workflow and current local version
+agents/                  Agent entrypoint metadata
+references/              Interpretation, approval, H5 and delivery rules
+assets/reference-cases/  Curated local reference case / 精选本地参考案例
+assets/h5/               Generic UI, compiled engine, source and blank case templates
+assets/h5/runtime/       Actual-mesh renderer and licensed Three.js runtime
+scripts/production/      Unified H5 CLI, route planner and optional Blender importer
+scripts/                 Existing concept planning and SVG/PNG tools
+CHANGELOG.md             Local implementation history
+THIRD_PARTY_NOTICES.md    Dependency and inherited-code attribution
 ```
-
-## Requirements
-
-Local drawing and tests require Python 3.11+, Pillow and PyMuPDF. A CJK font is
-needed for Chinese labels. Image generation requires a host tool that accepts
-reference images; the skill does not include a provider account or credentials.
-Blender is not required. See [runtime guidance](references/platform-runtime.md).
 
 ## License
 
-Repository code and instructions use the [MIT License](LICENSE). Dependencies
-retain their own licenses; MIT does not relicense PyMuPDF or other dependencies.
-The showcase contains a real floor plan published with explicit permission;
-the separate synthetic layout is fictional. Never upload a private client plan
-without permission. Publishing the showcase does not certify its geometry.
+Original code and documentation use the repository [license](LICENSE).
+Adapted floorplan workbench portions use the upstream MIT license; the complete
+notice is bundled in [FLOORPLAN-REFERENCE-LICENSE.txt](assets/h5/FLOORPLAN-REFERENCE-LICENSE.txt).
+Three.js and other dependencies retain their own licenses. See
+[third-party notices](THIRD_PARTY_NOTICES.md).
+
+## Usage Examples
+
+```text
+Build an editable 2D/3D renovation proposal from this dimensioned plan.
+Show structural uncertainties before proposing furniture or generating interiors.
+```
+
+```text
+Create a continuous homeowner walkthrough from the confirmed scheme.
+Show each main function long enough to understand it; check subjects and clearances.
+```
+
+## Platform Compatibility
+
+Tested locally with Codex on macOS. Designed for Codex, Claude Code and OpenClaw;
+Windows paths and invocation are statically reviewed, not run on a Windows machine.
+Host image generation is checked separately. Seedance and a different-floorplan
+end-to-end run remain outside this release's verified scope.

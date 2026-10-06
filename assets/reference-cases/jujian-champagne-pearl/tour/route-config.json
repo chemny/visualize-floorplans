@@ -1,0 +1,1038 @@
+{
+  "seconds": 56,
+  "fps": 24,
+  "eyeMm": 1600,
+  "bodyRadiusMm": 180,
+  "gridMm": 50,
+  "maxYawDegreesPerSecond": 32,
+  "accessPolygons": [
+    [
+      [
+        3330,
+        9400
+      ],
+      [
+        4540,
+        9400
+      ],
+      [
+        4540,
+        10080
+      ],
+      [
+        3330,
+        10080
+      ]
+    ]
+  ],
+  "roomSpeedWeights": {
+    "Z3": 2.5,
+    "Z6": 1.8,
+    "Z8": 1.2
+  },
+  "exitLookAt": [
+    3950,
+    8200
+  ],
+  "stops": [
+    {
+      "name": "入户",
+      "point": [
+        3950,
+        9850
+      ],
+      "gazeOverride": [
+        3950,
+        7600,
+        1400
+      ]
+    },
+    {
+      "name": "玄关",
+      "point": [
+        3860,
+        8010
+      ],
+      "roomId": "Z7",
+      "lookAt": [
+        4700,
+        5500,
+        1400
+      ],
+      "gazeOverride": [
+        4700,
+        5500,
+        1400
+      ],
+      "mustShow": [
+        "F1",
+        "F3"
+      ]
+    },
+    {
+      "name": "洗手台转入",
+      "point": [
+        3540,
+        6450
+      ],
+      "gazeOverride": [
+        2550,
+        6490,
+        1300
+      ]
+    },
+    {
+      "name": "洗手台",
+      "point": [
+        2940,
+        5770
+      ],
+      "lookAt": [
+        2550,
+        6490,
+        1200
+      ],
+      "observe": true,
+      "mustShow": [
+        "F17"
+      ]
+    },
+    {
+      "name": "公卫进入",
+      "point": [
+        2530,
+        5720
+      ],
+      "gazeOverride": [
+        850,
+        5900,
+        1100
+      ]
+    },
+    {
+      "name": "公卫",
+      "point": [
+        1630,
+        5900
+      ],
+      "roomId": "Z3",
+      "lookAt": [
+        850,
+        5900,
+        700
+      ],
+      "mustShow": [
+        "F16",
+        "F34"
+      ]
+    },
+    {
+      "name": "公卫浅入回转",
+      "point": [
+        1650,
+        6120
+      ],
+      "lookAt": [
+        740,
+        6290,
+        800
+      ],
+      "observe": true
+    },
+    {
+      "name": "公卫退出",
+      "point": [
+        2470,
+        6030
+      ],
+      "gazeOverride": [
+        2550,
+        4600,
+        1300
+      ]
+    },
+    {
+      "name": "次卧",
+      "point": [
+        2620,
+        3650
+      ],
+      "roomId": "Z2",
+      "lookAt": [
+        1240,
+        3000,
+        1150
+      ],
+      "mustShow": [
+        "F4"
+      ]
+    },
+    {
+      "name": "次卧靠窗",
+      "point": [
+        2530,
+        2180
+      ],
+      "gazeOverride": [
+        1900,
+        1700,
+        1350
+      ]
+    },
+    {
+      "name": "推拉门通行",
+      "point": [
+        2440,
+        1750
+      ],
+      "gazeOverride": [
+        1750,
+        1150,
+        1300
+      ]
+    },
+    {
+      "name": "阳台右侧通道",
+      "point": [
+        2440,
+        1360
+      ],
+      "gazeOverride": [
+        1100,
+        820,
+        1100
+      ]
+    },
+    {
+      "name": "阳台",
+      "point": [
+        3350,
+        1150
+      ],
+      "roomId": "Z1",
+      "lookAt": [
+        1100,
+        820,
+        1250
+      ],
+      "gazeOverride": [
+        5100,
+        1400,
+        1350
+      ]
+    },
+    {
+      "name": "阳台洗衣区",
+      "point": [
+        4900,
+        1280
+      ],
+      "lookAt": [
+        6040,
+        1010,
+        1200
+      ],
+      "observe": true,
+      "mustShow": [
+        "LAUNDRY-CAB"
+      ]
+    },
+    {
+      "name": "客厅入口",
+      "point": [
+        5100,
+        2130
+      ],
+      "gazeOverride": [
+        5550,
+        3350,
+        1350
+      ],
+      "observe": true,
+      "mustShow": [
+        "F1"
+      ],
+      "observationOffsetFrames": 12
+    },
+    {
+      "name": "客厅",
+      "point": [
+        5100,
+        3000
+      ],
+      "roomId": "Z4",
+      "lookAt": [
+        5600,
+        3500,
+        1200
+      ],
+      "mustShow": [
+        "F6"
+      ],
+      "observationOffsetFrames": 10
+    },
+    {
+      "name": "客厅转出",
+      "point": [
+        5250,
+        4740
+      ],
+      "gazeOverride": [
+        5200,
+        6800,
+        1350
+      ]
+    },
+    {
+      "name": "餐厨关系视角",
+      "point": [
+        5600,
+        5600
+      ],
+      "lookAt": [
+        5890,
+        8600,
+        1100
+      ],
+      "observe": true,
+      "mustShow": [
+        "F6"
+      ],
+      "viewSigmaFrames": 52
+    },
+    {
+      "name": "餐厨转向入口",
+      "point": [
+        6200,
+        6200
+      ],
+      "gazeOverride": [
+        7750,
+        6500,
+        1400
+      ]
+    },
+    {
+      "name": "共享入口",
+      "point": [
+        7750,
+        6500
+      ],
+      "gazeOverride": [
+        7900,
+        5100,
+        1400
+      ]
+    },
+    {
+      "name": "主卧",
+      "point": [
+        7900,
+        5110
+      ],
+      "roomId": "Z5",
+      "lookAt": [
+        9480,
+        3300,
+        1250
+      ],
+      "mustShow": [
+        "F5",
+        "F27"
+      ]
+    },
+    {
+      "name": "主卧错位回程",
+      "point": [
+        8240,
+        5210
+      ],
+      "lookAt": [
+        9200,
+        3000,
+        1250
+      ],
+      "observe": true,
+      "gazeOverride": [
+        9480,
+        3300,
+        1250
+      ]
+    },
+    {
+      "name": "主卧退出",
+      "point": [
+        7820,
+        6590
+      ],
+      "gazeOverride": [
+        9000,
+        6750,
+        1200
+      ]
+    },
+    {
+      "name": "主卫",
+      "point": [
+        8800,
+        6750
+      ],
+      "roomId": "Z6",
+      "lookAt": [
+        9900,
+        7090,
+        1100
+      ]
+    },
+    {
+      "name": "主卫错位回程",
+      "point": [
+        8820,
+        6970
+      ],
+      "gazeOverride": [
+        8880,
+        7570,
+        1000
+      ]
+    },
+    {
+      "name": "书房入口",
+      "point": [
+        7720,
+        7560
+      ],
+      "gazeOverride": [
+        8460,
+        11860,
+        1200
+      ]
+    },
+    {
+      "name": "书房",
+      "point": [
+        7860,
+        8760
+      ],
+      "roomId": "Z9",
+      "lookAt": [
+        8460,
+        11860,
+        1100
+      ],
+      "mustShow": [
+        "F13"
+      ]
+    },
+    {
+      "name": "书房错位回程",
+      "point": [
+        8000,
+        8900
+      ],
+      "lookAt": [
+        9020,
+        9600,
+        1100
+      ],
+      "observe": true
+    },
+    {
+      "name": "书房退出",
+      "point": [
+        7650,
+        7760
+      ],
+      "gazeOverride": [
+        7720,
+        6500,
+        1400
+      ]
+    },
+    {
+      "name": "餐区转入",
+      "point": [
+        6570,
+        6550
+      ],
+      "gazeOverride": [
+        6020,
+        7975,
+        1250
+      ]
+    },
+    {
+      "name": "餐厅西侧",
+      "point": [
+        4790,
+        8730
+      ],
+      "lookAt": [
+        6020,
+        7975,
+        1300
+      ],
+      "gazeOverride": [
+        6020,
+        7975,
+        1150
+      ]
+    },
+    {
+      "name": "厨房冰箱视角",
+      "point": [
+        5830,
+        9900
+      ],
+      "gazeOverride": [
+        6595,
+        10025,
+        1250
+      ],
+      "lookAt": [
+        6595,
+        10025,
+        1250
+      ],
+      "observe": true,
+      "mustShow": [
+        "F33",
+        "F15"
+      ]
+    },
+    {
+      "name": "厨房",
+      "point": [
+        5830,
+        10180
+      ],
+      "roomId": "Z8",
+      "lookAt": [
+        5850,
+        11840,
+        1150
+      ],
+      "mustShow": [
+        "F14",
+        "F15",
+        "F45"
+      ]
+    },
+    {
+      "name": "厨房错位回程",
+      "point": [
+        5600,
+        10180
+      ],
+      "lookAt": [
+        5070,
+        10655,
+        1100
+      ],
+      "observe": true,
+      "mustShow": [
+        "F14"
+      ]
+    },
+    {
+      "name": "出门",
+      "point": [
+        3950,
+        9850
+      ],
+      "gazeOverride": [
+        3950,
+        8200,
+        1400
+      ]
+    }
+  ],
+  "validationRadiusMm": 160,
+  "slideOpenOverrides": {
+    "W02:0": 1
+  },
+  "cameraKeys": [
+    {
+      "atStop": "入户",
+      "offsetFrames": 0,
+      "targetMm": [
+        4700,
+        5500,
+        1300
+      ]
+    },
+    {
+      "atStop": "玄关",
+      "offsetFrames": 0,
+      "targetMm": [
+        4700,
+        5500,
+        1300
+      ]
+    },
+    {
+      "atStop": "洗手台转入",
+      "offsetFrames": 0,
+      "targetMm": [
+        2550,
+        6490,
+        1050
+      ]
+    },
+    {
+      "atStop": "洗手台",
+      "offsetFrames": 0,
+      "targetMm": [
+        2550,
+        6490,
+        1050
+      ]
+    },
+    {
+      "atStop": "公卫进入",
+      "offsetFrames": 0,
+      "targetMm": [
+        780,
+        6070,
+        750
+      ]
+    },
+    {
+      "atStop": "公卫",
+      "offsetFrames": 0,
+      "targetMm": [
+        780,
+        6070,
+        750
+      ]
+    },
+    {
+      "atStop": "公卫浅入回转",
+      "offsetFrames": 0,
+      "targetMm": [
+        780,
+        6070,
+        750
+      ]
+    },
+    {
+      "atStop": "公卫退出",
+      "offsetFrames": 0,
+      "targetMm": [
+        2620,
+        3800,
+        1250
+      ]
+    },
+    {
+      "atStop": "次卧",
+      "offsetFrames": 0,
+      "targetMm": [
+        1240,
+        3150,
+        950
+      ]
+    },
+    {
+      "atStop": "次卧靠窗",
+      "offsetFrames": 0,
+      "targetMm": [
+        2440,
+        1700,
+        1350
+      ]
+    },
+    {
+      "atStop": "推拉门通行",
+      "offsetFrames": 0,
+      "targetMm": [
+        3800,
+        1150,
+        1300
+      ]
+    },
+    {
+      "atStop": "阳台右侧通道",
+      "offsetFrames": 0,
+      "targetMm": [
+        6040,
+        1010,
+        1050
+      ]
+    },
+    {
+      "atStop": "阳台",
+      "offsetFrames": -18,
+      "targetMm": [
+        6040,
+        1010,
+        950
+      ]
+    },
+    {
+      "atStop": "阳台洗衣区",
+      "offsetFrames": -18,
+      "targetMm": [
+        6040,
+        1010,
+        950
+      ]
+    },
+    {
+      "atStop": "阳台洗衣区",
+      "offsetFrames": 0,
+      "targetMm": [
+        6040,
+        1010,
+        950
+      ]
+    },
+    {
+      "atStop": "客厅入口",
+      "offsetFrames": 0,
+      "targetMm": [
+        3850,
+        3600,
+        1100
+      ],
+      "yawDegrees": 110,
+      "pitchDegrees": -4
+    },
+    {
+      "atStop": "客厅入口",
+      "offsetFrames": 14,
+      "targetMm": [
+        3850,
+        3600,
+        1100
+      ],
+      "yawDegrees": 110,
+      "pitchDegrees": -4
+    },
+    {
+      "atStop": "客厅",
+      "offsetFrames": 0,
+      "targetMm": [
+        6700,
+        3850,
+        1150
+      ],
+      "yawDegrees": 75,
+      "pitchDegrees": -6
+    },
+    {
+      "atStop": "客厅",
+      "offsetFrames": 20,
+      "targetMm": [
+        6700,
+        3850,
+        1150
+      ],
+      "yawDegrees": 75,
+      "pitchDegrees": -6
+    },
+    {
+      "atStop": "客厅转出",
+      "offsetFrames": 0,
+      "targetMm": [
+        6020,
+        7975,
+        1000
+      ],
+      "yawDegrees": 65,
+      "pitchDegrees": -4
+    },
+    {
+      "atStop": "餐厨关系视角",
+      "offsetFrames": 0,
+      "targetMm": [
+        6020,
+        7975,
+        1000
+      ],
+      "yawDegrees": 55,
+      "pitchDegrees": -4
+    },
+    {
+      "atStop": "餐厨转向入口",
+      "offsetFrames": 0,
+      "targetMm": [
+        7820,
+        5900,
+        1350
+      ],
+      "yawDegrees": 5,
+      "pitchDegrees": -7
+    },
+    {
+      "atStop": "共享入口",
+      "offsetFrames": 0,
+      "targetMm": [
+        9400,
+        3350,
+        1150
+      ]
+    },
+    {
+      "atStop": "主卧",
+      "offsetFrames": 0,
+      "targetMm": [
+        9400,
+        3350,
+        1150
+      ]
+    },
+    {
+      "atStop": "主卧错位回程",
+      "offsetFrames": 0,
+      "targetMm": [
+        9150,
+        1750,
+        1100
+      ]
+    },
+    {
+      "atStop": "主卧退出",
+      "offsetFrames": 0,
+      "targetMm": [
+        9400,
+        3350,
+        1150
+      ]
+    },
+    {
+      "atStop": "主卧退出",
+      "offsetFrames": 12,
+      "targetMm": [
+        9650,
+        7190,
+        650
+      ]
+    },
+    {
+      "atStop": "主卫",
+      "offsetFrames": 0,
+      "targetMm": [
+        9650,
+        7190,
+        650
+      ]
+    },
+    {
+      "atStop": "主卫错位回程",
+      "offsetFrames": 0,
+      "targetMm": [
+        9650,
+        7190,
+        650
+      ]
+    },
+    {
+      "atStop": "书房入口",
+      "offsetFrames": 0,
+      "targetMm": [
+        8460,
+        11860,
+        1000
+      ]
+    },
+    {
+      "atStop": "书房",
+      "offsetFrames": 0,
+      "targetMm": [
+        8460,
+        11860,
+        1000
+      ]
+    },
+    {
+      "atStop": "书房错位回程",
+      "offsetFrames": 0,
+      "targetMm": [
+        8460,
+        11860,
+        1000
+      ]
+    },
+    {
+      "atStop": "书房退出",
+      "offsetFrames": 0,
+      "targetMm": [
+        8460,
+        11860,
+        1000
+      ]
+    },
+    {
+      "atStop": "书房退出",
+      "offsetFrames": 22,
+      "targetMm": [
+        7720,
+        10500,
+        1000
+      ]
+    },
+    {
+      "atStop": "餐区转入",
+      "offsetFrames": 0,
+      "targetMm": [
+        6200,
+        9800,
+        1200
+      ]
+    },
+    {
+      "atStop": "餐厅西侧",
+      "offsetFrames": 0,
+      "targetMm": [
+        6200,
+        9800,
+        1200
+      ]
+    },
+    {
+      "atStop": "厨房冰箱视角",
+      "offsetFrames": 0,
+      "targetMm": [
+        6595,
+        10300,
+        1150
+      ]
+    },
+    {
+      "atStop": "厨房",
+      "offsetFrames": 0,
+      "targetMm": [
+        5850,
+        11840,
+        950
+      ]
+    },
+    {
+      "atStop": "厨房错位回程",
+      "offsetFrames": 0,
+      "targetMm": [
+        5070,
+        10655,
+        950
+      ]
+    },
+    {
+      "atStop": "厨房错位回程",
+      "offsetFrames": 20,
+      "targetMm": [
+        5070,
+        10655,
+        950
+      ]
+    },
+    {
+      "atStop": "厨房错位回程",
+      "offsetFrames": 26,
+      "targetMm": [
+        6020,
+        7975,
+        1200
+      ]
+    },
+    {
+      "atStop": "出门",
+      "offsetFrames": -30,
+      "targetMm": [
+        4700,
+        5500,
+        1250
+      ]
+    },
+    {
+      "atStop": "出门",
+      "offsetFrames": 0,
+      "targetMm": [
+        4700,
+        5500,
+        1250
+      ]
+    }
+  ],
+  "chapters": [
+    {
+      "name": "入户与洗手台",
+      "from": "入户",
+      "to": "公卫进入",
+      "seconds": 6,
+      "subject": "玄关、公区关系、外置洗手台"
+    },
+    {
+      "name": "公卫",
+      "from": "公卫进入",
+      "to": "公卫退出",
+      "seconds": 4,
+      "subject": "马桶、淋浴与干湿关系"
+    },
+    {
+      "name": "次卧",
+      "from": "公卫退出",
+      "to": "阳台右侧通道",
+      "seconds": 5,
+      "subject": "床、衣柜、通往阳台的实际通道"
+    },
+    {
+      "name": "阳台",
+      "from": "阳台右侧通道",
+      "to": "客厅入口",
+      "seconds": 4.5,
+      "subject": "左侧休闲、右侧洗衣柜"
+    },
+    {
+      "name": "客餐厅",
+      "from": "客厅入口",
+      "to": "共享入口",
+      "seconds": 7,
+      "subject": "阳台返回后沿餐桌、厨房方向介绍空间关系，顺着主线转入主卧；沙发电视在入户时介绍"
+    },
+    {
+      "name": "主卧",
+      "from": "共享入口",
+      "to": "主卧退出",
+      "seconds": 6.5,
+      "subject": "床、双层窗帘、定制梳妆台"
+    },
+    {
+      "name": "主卫",
+      "from": "主卧退出",
+      "to": "书房入口",
+      "seconds": 4,
+      "subject": "台盆、马桶、淋浴"
+    },
+    {
+      "name": "书房",
+      "from": "书房入口",
+      "to": "餐区转入",
+      "seconds": 6,
+      "subject": "定制书桌、书柜与多功能使用"
+    },
+    {
+      "name": "餐厨转入",
+      "from": "餐区转入",
+      "to": "厨房冰箱视角",
+      "seconds": 4.5,
+      "subject": "沿通道转入厨房，餐桌只作为路径背景"
+    },
+    {
+      "name": "厨房",
+      "from": "厨房冰箱视角",
+      "to": "厨房错位回程",
+      "toOffsetFrames": 26,
+      "seconds": 6.5,
+      "subject": "冰箱、台面、水槽、双灶"
+    },
+    {
+      "name": "离场",
+      "from": "厨房错位回程",
+      "fromOffsetFrames": 26,
+      "to": "出门",
+      "seconds": 3,
+      "subject": "清楚回到玄关和出口"
+    }
+  ]
+}

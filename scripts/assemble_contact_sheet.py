@@ -64,12 +64,12 @@ def assemble(spec: dict, spec_path: Path, output: Path, manifest: Path) -> dict:
             row, col = divmod(index, columns)
             cell_x = padding + col * (cell_width + padding)
             label_y = padding + row * (label_height + cell_image_height + padding)
-            x = cell_x + (cell_width - image.width) // 2
+            paste_x = cell_x + (cell_width - image.width) // 2
             y = label_y + label_height + (cell_image_height - image.height) // 2
-            sheet.paste(image.convert("RGB"), (x, y))
+            sheet.paste(image.convert("RGB"), (paste_x, y))
             draw.text((cell_x + cell_width / 2, label_y + label_height / 2), record["label"],
                       fill="#111111", anchor="mm", font=text_font)
-            record.update(placement={"x": x, "y": y, "width": image.width, "height": image.height},
+            record.update(placement={"x": paste_x, "y": y, "width": image.width, "height": image.height},
                           sha256_after=file_sha(Path(record["path"])))
             require(record["sha256_before"] == record["sha256_after"], f"source changed during assembly: {record['path']}")
         with __import__("tempfile").TemporaryDirectory() as temp_dir:

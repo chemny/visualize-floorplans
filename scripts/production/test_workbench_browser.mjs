@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+// Isolated synthetic-case checks; never attaches to the user's browser/profile.
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {pathToFileURL} from 'node:url';
+const args=process.argv.slice(2),arg=k=>args[args.indexOf(k)+1];
+for(const k of ['--playwright-module','--browser','--base-url','--out','--fixture-dir'])if(!args.includes(k))throw Error('Missing '+k);
+const {chromium}=await import(pathToFileURL(path.resolve(arg('--playwright-module'))).href);
+const output=path.resolve(arg('--out'));fs.mkdirSync(output,{recursive:true});
+const browser=await chromium.launch({executablePath:arg('--browser'),headless:true});const results=[];
+try{
+ for(const shape of ['rectangle','concave','stress']){
+  const ctx=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:2,acceptDownloads:true});const page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const url=arg('--base-url')+'/synthetic-beta4-'+shape+'.html';await page.goto(url);try{await page.waitForFunction(()=>window.homeStudio?.ready)}catch(error){fs.writeFileSync(path.join(output,shape+'-failed.json'),JSON.stringify({errors,error:error.message},null,2));throw error;}
+  const checks=[];
+  assert.equal(await page.evaluate(()=>homeStudio.workbenchRevision),'0.2.0-beta.4');checks.push('version');
+  assert.equal(await page.locator('#fixtureLightsToggle').count(),0);assert.equal(await page.locator('dialog[open]').count(),0);checks.push('removed fixture toggle and no entry modal');
+  const original=await page.evaluate(()=>homeStudio.getState());
+  await page.evaluate(()=>{const s=homeStudio.getState();s.furniture[0].rot=37;s.rooms[Object.keys(s.rooms)[0]].mat='wood';homeStudio.importScheme(JSON.stringify(s))});
+  const edited=await page.evaluate(()=>homeStudio.getState());await page.reload();await page.waitForFunction(()=>homeStudio?.ready);assert.deepEqual(await page.evaluate(()=>homeStudio.getState()),edited);checks.push('edit/autosave/reload');
+  await page.evaluate(()=>homeStudio.undo()); // New session history empty: must not damage saved state.
+  assert.deepEqual(await page.evaluate(()=>homeStudio.getState()),edited);checks.push('empty history safe');
+  const serialized=await page.evaluate(()=>homeStudio.serializeScheme());await page.evaluate(raw=>homeStudio.importScheme(raw),JSON.stringify(original));await page.evaluate(raw=>homeStudio.importScheme(raw),serialized);assert.deepEqual(await page.evaluate(()=>homeStudio.getState()),edited);checks.push('JSON import/export roundtrip');
+  if(shape==='rectangle'){
+   await page.evaluate(()=>homeStudio.toggleWall('partition'));assert.equal(await page.evaluate(()=>homeStudio.areaStatus().status),'pending-repartition');assert(await page.locator('#areaStatusNotice').isVisible());await page.evaluate(()=>homeStudio.undo());assert.equal(await page.evaluate(()=>homeStudio.areaStatus().status),'source-partitions');checks.push('demolition warning and undo');
+  }
+  await page.screenshot({path:path.join(output,shape+'-2d.png')});await page.evaluate(()=>homeStudio.setView('3d'));await page.waitForFunction(()=>homeStudio.performanceStatus().sourceLights>0);await page.waitForTimeout(900);
+  const before=await page.evaluate(()=>homeStudio.performanceStatus().slots);
+  await page.evaluate(()=>{const c=homeStudio.get3D().camera;c.position.x+=.2;c.rotation.y+=.1});await page.waitForTimeout(150);assert.deepEqual(await page.evaluate(()=>homeStudio.performanceStatus().slots),before);checks.push('fixed illumination across camera changes');
+  await page.evaluate(()=>homeStudio.setLighting('night'));await page.waitForTimeout(100);const night=await page.evaluate(()=>homeStudio.performanceStatus().slots);assert(night.every(s=>s.intensity>0));await page.screenshot({path:path.join(output,shape+'-night.png')});
+  await page.evaluate(()=>homeStudio.setLighting('day'));await page.waitForTimeout(100);assert.deepEqual(await page.evaluate(()=>homeStudio.performanceStatus().slots),before);checks.push('night/day fixture continuity');
+  const bundle=await page.evaluate(()=>homeStudio.getProductionBundle());assert.equal(bundle.roomGeometryStatus.status,'source-partitions');assert.deepEqual(bundle.state.furniture,edited.furniture);checks.push('production bundle scheme parity');
+  await page.evaluate(()=>homeStudio.setCameraMode('walk'));await page.waitForTimeout(100);assert.equal(await page.locator('dialog[open]').count(),0);assert(await page.locator('#joy').isVisible());assert(await page.locator('#walkToolbar').isVisible());checks.push('walk controls and no modal');
+  const pose=await page.evaluate(()=>homeStudio.get3D().camera.position.toArray());await page.keyboard.down('w');await page.waitForTimeout(200);await page.keyboard.up('w');await page.waitForTimeout(150);const moved=await page.evaluate(()=>homeStudio.get3D().camera.position.toArray());assert.notDeepEqual(moved,pose);checks.push('keyboard walk');
+  await page.keyboard.press('Escape');assert(await page.evaluate(()=>homeStudio.walkStatus().paused));await page.keyboard.press('Space');assert(!(await page.evaluate(()=>homeStudio.walkStatus().paused)));checks.push('pause/resume shortcuts');
+  await page.evaluate(()=>{homeStudio.get3D().renderer.domElement.requestPointerLock=()=>Promise.reject(new DOMException('Synthetic permission denial','NotAllowedError'))});await page.locator('#walkLock').click();await page.waitForFunction(()=>homeStudio.walkStatus().unavailable);assert(!(await page.locator('#walkLock').isVisible()));assert(await page.locator('#joy').isVisible());assert.equal(await page.evaluate(()=>homeStudio.walkStatus().diagnostic.error.message),'Synthetic permission denial');checks.push('simulated lock refusal hides button and restores controls');
+  await page.evaluate(()=>homeStudio.setCameraMode('orbit'));await page.waitForTimeout(800);checks.push('return to orbit');
+  const metrics=await page.evaluate(async()=>{const times=[],t0=performance.now();return new Promise(resolve=>{function tick(t){times.push(t);if(t-t0<2000)requestAnimationFrame(tick);else{const dt=times.slice(1).map((t,i)=>t-times[i]);resolve({fps:1000/(dt.reduce((n,x)=>n+x,0)/dt.length),pixelRatio:homeStudio.performanceStatus().pixelRatio,renderer:homeStudio.get3D().renderer.info.render})}}requestAnimationFrame(tick)})});
+  const movingMetrics=await page.evaluate(async()=>{const camera=homeStudio.get3D().camera,original=camera.position.clone(),times=[],t0=performance.now();return new Promise(resolve=>{function tick(t){camera.position.x+=.0005;times.push(t);if(t-t0<2000)requestAnimationFrame(tick);else{camera.position.copy(original);const dt=times.slice(1).map((t,i)=>t-times[i]);resolve({fps:1000/(dt.reduce((n,x)=>n+x,0)/dt.length),pixelRatio:homeStudio.performanceStatus().pixelRatio})}}requestAnimationFrame(tick)})});
+  const memoryBefore=await page.evaluate(()=>({...homeStudio.get3D().renderer.info.memory}));
+  for(let i=0;i<12;i++){await page.evaluate(i=>{const s=homeStudio.getState();s.furniture[0].rot=37+i%2;homeStudio.importScheme(JSON.stringify(s))},i);await page.waitForTimeout(40)}
+  await page.evaluate(raw=>homeStudio.importScheme(raw),JSON.stringify(edited));await page.waitForTimeout(100);
+  const memoryAfter=await page.evaluate(()=>({...homeStudio.get3D().renderer.info.memory}));assert(memoryAfter.geometries<=memoryBefore.geometries+4);checks.push('repeated edit geometry memory bounded');
+  const downloadWait=page.waitForEvent('download');await page.evaluate(()=>document.getElementById('saveHtml').click());const download=await downloadWait;const exported=path.join(path.resolve(arg('--fixture-dir')),shape+'-exported.html');await download.saveAs(exported);await page.goto(arg('--base-url')+'/'+shape+'-exported.html');await page.waitForFunction(()=>homeStudio?.ready);assert.deepEqual(await page.evaluate(()=>homeStudio.getState()),edited);assert.equal(await page.locator('dialog[open]').count(),0);checks.push('exported standalone HTML reopens correctly');
+  assert.deepEqual(errors,[]);results.push({shape,checks,metrics,movingMetrics,memoryBefore,memoryAfter,errors});await ctx.close();
+ }
+ const touch=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:2});const page=await touch.newPage();await page.goto(arg('--base-url')+'/synthetic-beta4-rectangle.html');await page.waitForFunction(()=>homeStudio?.ready);await page.evaluate(()=>homeStudio.setView('3d'));await page.waitForFunction(()=>homeStudio.performanceStatus().sourceLights>0);await page.waitForTimeout(900);await page.evaluate(()=>homeStudio.setCameraMode('walk'));await page.waitForTimeout(200);assert(await page.locator('#joy').isVisible());assert(!(await page.locator('#walkLock').isVisible()));assert.equal(await page.locator('dialog[open]').count(),0);await page.screenshot({path:path.join(output,'touch-walk.png')});results.push({shape:'mobile-emulation',checks:['joystick visible','optional lock hidden','no entry modal'],scope:'Chromium device emulation, not a physical phone'});await touch.close();
+ const report={pass:true,results,scope:'Fresh synthetic cases in isolated Chromium. Does not inspect the blocked user file tab or certify embedded pointer-lock permissions, actual Windows or physical mobile hardware.'};fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+}finally{await browser.close()}

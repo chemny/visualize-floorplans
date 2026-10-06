@@ -234,7 +234,9 @@ Create access topology before generating a 3D view. A route is optional:
 }
 ```
 
-When and only when a video or property-tour deliverable is requested, add:
+When and only when a video or property-tour deliverable is requested, add a
+route. A complete tour retains the existing outside-to-outside form (the
+`full_tour` mode is implicit for older records):
 
 ```json
 {
@@ -260,6 +262,38 @@ When and only when a video or property-tour deliverable is requested, add:
   }
 }
 ```
+
+For a short indoor segment, use this form instead. `route_render_points` are
+coordinates on the current confirmed plan, not invented access edges:
+
+```json
+{
+  "tour_route": {
+    "mode": "indoor_segment",
+    "start_zone": "central-public-zone",
+    "end_zone": "central-public-zone",
+    "start_label": "客厅起点",
+    "end_label": "餐厅终点",
+    "camera_facing": "toward dining area",
+    "steps": []
+  },
+  "route_render_points": [[500, 500], [500, 600]]
+}
+```
+
+For an indoor segment between distinct zones, `steps` must list real confirmed
+access points from `start_zone` to `end_zone` in order. Keep `outside` in the
+underlying access graph, but do not insert it into an indoor route. With
+`validate_route.py --recognition ...`, same-zone path segments are checked
+against the zone polygon; furniture clearance still requires visual review.
+
+For a tour beginning at the entry and ending indoors, use
+`mode: "entry_to_interior"`, `entry_access`, `end_zone`,
+`required_visit_zones`, and ordered `steps`. The first step comes from
+`outside`; the final step reaches `end_zone`. Omit `exit_access` and never
+insert a return to `outside` solely to pass validation. The validator reports
+access edges traversed more than once so unavoidable dead-end returns can be
+distinguished from unnecessary backtracking.
 
 Every zone requires source evidence. Unknown function is represented by
 `unassigned_space`, not by creating a plausible room. Every route step must use

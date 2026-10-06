@@ -332,6 +332,104 @@ class WorkflowTest(unittest.TestCase):
         with self.assertRaises(ROUTE_MODULE.TopologyError):
             ROUTE_MODULE.validate_topology(topology)
 
+    def indoor_topology(self) -> dict:
+        topology = self.valid_topology()
+        topology["tour_route"] = {
+            "mode": "indoor_segment",
+            "start_zone": "living",
+            "end_zone": "living",
+            "steps": [],
+        }
+        topology["route_render_points"] = [[10, 10], [20, 10], [30, 20]]
+        return topology
+
+    def test_indoor_segment_in_one_zone_needs_no_fictitious_access(self) -> None:
+        recognition = {"zones": [{"id": "living", "render_polygon":
+                                  [[0, 0], [40, 0], [40, 40], [0, 40]]}]}
+        result = ROUTE_MODULE.validate_topology(self.indoor_topology(),
+                                                recognition=recognition)
+        self.assertEqual(result["route_mode"], "indoor_segment")
+        self.assertEqual(result["route_step_count"], 0)
+        self.assertIn("same_zone_polygon", result["geometry_check"])
+
+    def test_indoor_segment_rejects_path_leaving_concave_zone(self) -> None:
+        recognition = {"zones": [{"id": "living", "render_polygon":
+                                  [[0, 0], [40, 0], [40, 10], [10, 10],
+                                   [10, 40], [0, 40]]}]}
+        topology = self.indoor_topology()
+        topology["route_render_points"] = [[5, 35], [35, 5]]
+        with self.assertRaisesRegex(ROUTE_MODULE.TopologyError,
+                                    "leaves its zone polygon"):
+            ROUTE_MODULE.validate_topology(topology, recognition=recognition)
+
+    def test_indoor_segment_rejects_fake_exterior_access(self) -> None:
+        topology = self.indoor_topology()
+        topology["tour_route"]["entry_access"] = "entry"
+        with self.assertRaises(ROUTE_MODULE.TopologyError):
+            ROUTE_MODULE.validate_topology(topology)
+
+    def test_indoor_cross_zone_requires_real_confirmed_opening(self) -> None:
+        topology = self.indoor_topology()
+        topology["tour_route"]["end_zone"] = "bedroom"
+        with self.assertRaisesRegex(ROUTE_MODULE.TopologyError, "requires access steps"):
+            ROUTE_MODULE.validate_topology(topology)
+        topology["tour_route"]["steps"] = [
+            {"order": 1, "from": "living", "to": "bedroom", "via": "bedroom-door"}
+        ]
+        self.assertEqual(ROUTE_MODULE.validate_topology(topology)["route_step_count"], 1)
+
+    def test_entry_to_interior_visits_required_zones_without_fake_exit(self) -> None:
+        topology = self.valid_topology()
+        topology["tour_route"] = {
+            "mode": "entry_to_interior",
+            "entry_access": "entry",
+            "end_zone": "bedroom",
+            "required_visit_zones": ["living", "bedroom"],
+            "steps": [
+                {"order": 1, "from": "outside", "to": "living", "via": "entry"},
+                {"order": 2, "from": "living", "to": "bedroom", "via": "bedroom-door"},
+            ],
+        }
+        result = ROUTE_MODULE.validate_topology(topology)
+        self.assertEqual(result["route_mode"], "entry_to_interior")
+        self.assertEqual(result["repeated_access"], {})
+        self.assertIsNone(result["exit_access"])
+        topology["tour_route"]["required_visit_zones"].append("outside")
+        with self.assertRaises(ROUTE_MODULE.TopologyError):
+            ROUTE_MODULE.validate_topology(topology)
+
+    def test_entry_to_interior_rejects_missing_room_and_return_outside(self) -> None:
+        topology = self.valid_topology()
+        topology["tour_route"] = {
+            "mode": "entry_to_interior",
+            "entry_access": "entry",
+            "end_zone": "living",
+            "required_visit_zones": ["living", "bedroom"],
+            "steps": [{"order": 1, "from": "outside", "to": "living", "via": "entry"}],
+        }
+        with self.assertRaisesRegex(ROUTE_MODULE.TopologyError, "misses a required"):
+            ROUTE_MODULE.validate_topology(topology)
+        topology["tour_route"]["required_visit_zones"] = ["living"]
+        topology["tour_route"]["steps"].extend([
+            {"order": 2, "from": "living", "to": "outside", "via": "entry"},
+            {"order": 3, "from": "outside", "to": "living", "via": "entry"},
+        ])
+        with self.assertRaisesRegex(ROUTE_MODULE.TopologyError, "cannot return outside"):
+            ROUTE_MODULE.validate_topology(topology)
+
+    def test_full_tour_requires_exit_and_all_declared_rooms(self) -> None:
+        topology = self.valid_topology()
+        topology["tour_route"]["required_visit_zones"] = ["living", "bedroom"]
+        result = ROUTE_MODULE.validate_topology(topology)
+        self.assertEqual(result["exit_access"], "entry")
+        self.assertEqual(result["route_step_count"], 4)
+        topology["tour_route"]["steps"] = [
+            {"order": 1, "from": "outside", "to": "living", "via": "entry"},
+            {"order": 2, "from": "living", "to": "outside", "via": "entry"},
+        ]
+        with self.assertRaisesRegex(ROUTE_MODULE.TopologyError, "misses a required"):
+            ROUTE_MODULE.validate_topology(topology)
+
     def test_ontology_contains_industry_roles_and_no_invention_rule(self) -> None:
         ontology = (
             Path(__file__).parents[1] / "references" / "residential-space-ontology.md"

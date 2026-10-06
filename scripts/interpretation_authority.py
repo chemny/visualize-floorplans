@@ -90,8 +90,8 @@ def inspect_bundle(data, manifest_path):
         raise ValueError(f"topdown_base_svg is invalid XML: {exc}") from exc
     require(svg_root.tag.rsplit("}", 1)[-1] == "svg", "topdown_base_svg root element must be svg")
     require(paths["source_image"] == resolve(root, data["input_image"]), "source_image differs from input_image")
-    recognition = json.loads(paths["recognition"].read_text())
-    topology = json.loads(paths["topology"].read_text())
+    recognition = json.loads(paths["recognition"].read_text(encoding='utf-8'))
+    topology = json.loads(paths["topology"].read_text(encoding='utf-8'))
     validate_recognition(recognition)
     validate_access(topology)
     from PIL import Image
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     parser.add_argument("--manifest", required=True, type=Path)
     args = parser.parse_args()
     try:
-        data = json.loads(args.manifest.read_text())
+        data = json.loads(args.manifest.read_text(encoding='utf-8'))
         bundle = inspect_bundle(data, args.manifest)
         print(json.dumps({"status": "candidate_only", "artifact_sha256": {k: v["sha256"] for k,v in bundle.items()},
                           "facts_sha256": object_digest(project_facts(data))}, indent=2))

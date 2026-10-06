@@ -1,0 +1,5 @@
+# Preserve upstream runtime and selected reference artifacts byte for byte.
+assets/h5/engine.js -whitespace
+assets/h5/runtime/three.core.js -whitespace
+assets/reference-cases/jujian-champagne-pearl/workbench/index.html -whitespace
+assets/reference-cases/jujian-champagne-pearl/drawings/*.svg -whitespace

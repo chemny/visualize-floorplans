@@ -1,4 +1,4 @@
 interface:
-  display_name: "Floorplan Visualizer"
-  short_description: "Confirm floor plans and create coordinated renovation previews"
-  default_prompt: "Use $visualize-floorplans in three stages: first reconstruct my floor plan, compare it with the source, and record my confirmation of zones plus doors and windows; then help me choose or specify one renovation scheme and create only the images I need; if I request video, confirm the route afterward and clearly distinguish a real validated continuous walkthrough from an unverified or substitute presentation."
+  display_name: "Floor Visualization"
+  short_description: "Review plans, edit H5 2D/3D schemes and prepare interior walkthroughs"
+  default_prompt: "Use $visualize-floorplans to compare the source floor plan and furniture reference, confirm structure and layout, then build an editable H5 renovation workbench. Keep case data separate from reusable tools. Export one versioned actual-mesh bundle for renders and any requested camera preflight. Preserve scoped approvals, use H5 by default, and keep Blender and Seedance optional. Use case-local source calibration, hash-bound AI image/camera reviews and subject time-window checks. Keep technical, geometry, visual and explicit human acceptance separate; never promote diagnostic previews. Package accepted local results only after current quality gates and report deferred verification accurately."

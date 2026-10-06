@@ -28,10 +28,12 @@ calling it a usable MVP.
 - [ ] No kitchen, study, bedroom, bathroom, balcony, or other zone is invented.
 - [ ] Final labels use industry roles rather than unresolved ordinal names.
 - [ ] Functional labels and access overlays do not alter the 2D base geometry.
-- [ ] When video is requested, the tour route has an explicit entry, ordered
-      stops, and explicit exit.
-- [ ] When video is requested, every route step uses a confirmed door or passage
-      and no arrow crosses a wall.
+- [ ] When video is requested, record whether the route is a complete
+      outside-to-outside tour, an entry-to-interior tour, or an indoor segment
+      with explicit start/end positions and camera facing.
+- [ ] When video is requested, every cross-zone route step uses a confirmed
+      door or passage. Same-zone movement has no invented access step; its drawn
+      line stays inside the zone and visibly avoids furniture.
 - [ ] When video is requested, route topology passes `scripts/validate_route.py`.
 - [ ] Uncertain room assignments are visibly distinguished from confirmed facts.
 - [ ] Room count matches confirmed manifest.

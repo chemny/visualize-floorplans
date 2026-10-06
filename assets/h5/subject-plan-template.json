@@ -1,0 +1,17 @@
+{
+  "schema": "floor-visualization-subject-plan/1.0",
+  "schemeSha256": "",
+  "tourSha256": "",
+  "purpose": "Homeowner renovation proposal: major furniture, custom storage and room function",
+  "policy": {
+    "sampleHz": 2,
+    "minContinuousSeconds": 2,
+    "minVisibleSamples": 3,
+    "minVisibleFraction": 0.03,
+    "minScreenAreaFraction": 0.01,
+    "maxCloseArchitectureRatio": 0.6,
+    "maxBadCompositionFraction": 0.25
+  },
+  "chapters": [],
+  "instructions": "Fill agreed chapters with id, purpose, startSeconds, endSeconds and subjects (actual stable object IDs). Empty chapters intentionally fail. Thresholds are configurable design checks, not construction standards. Do not copy example apartment stops."
+}

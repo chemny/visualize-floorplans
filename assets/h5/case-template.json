@@ -1,0 +1,44 @@
+{
+  "schema": "floor-visualization-case/1.0",
+  "caseId": "replace-with-unique-case-id",
+  "title": "Floor Visualization",
+  "model": {
+    "title": "填写户型名称",
+    "width": null,
+    "depth": null,
+    "height": null,
+    "footprint": [],
+    "rooms": []
+  },
+  "initialState": {
+    "caseId": "replace-with-unique-case-id",
+    "version": 12,
+    "style": "champagne_pearl",
+    "styleCustom": true,
+    "rooms": {},
+    "walls": [],
+    "furniture": [],
+    "ceilings": [],
+    "wallFinishes": {},
+    "doorStyles": {},
+    "demolished": [],
+    "doors": {},
+    "measures": [],
+    "productionApprovals": {}
+  },
+  "entranceOpenings": [],
+  "areaMetadata": {
+    "gross": null,
+    "grossSource": "",
+    "suite": null,
+    "note": "建筑面积由房主或正式资料提供；套内轮廓概算与地面净面积分别记录"
+  },
+  "presentation": {
+    "renderProfile": {
+      "id": "clean-interior/1.0",
+      "hiddenTypes": ["acwall", "aircon", "floordrain", "accesshatch", "switchplate", "socketplate", "equipmentoutlet", "exhaustvent", "towelrail", "paperholder", "curtainrail", "transition"]
+    }
+  },
+  "referenceNote": "参考图用于结构和布局校核；未标尺寸为设计初值",
+  "references": {}
+}

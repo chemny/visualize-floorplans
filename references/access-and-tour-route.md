@@ -70,16 +70,35 @@ Run `scripts/validate_access.py` and obtain user confirmation of the access map
 and schedule. If the request is only for still renovation images, do not create
 route arrows, visit order, entry/exit sequence, or a tour-route approval step.
 
-## 6. Design one property-tour route for video or presentation
+## 6. Design a route for video or presentation
 
-Define:
+Choose the route mode before adding steps:
+
+- `full_tour` enters from `outside` and returns to `outside`. This is the
+  existing property-tour mode and remains the default for older records.
+- `entry_to_interior` enters through a confirmed exterior access point, visits
+  the declared interior zones, and ends in one of them. Do not add a fake exit
+  merely to satisfy the complete-tour format. Count unavoidable retraced
+  access edges and choose an order that minimizes them.
+- `indoor_segment` starts and ends in confirmed interior zones. Declare
+  `start_zone`, `end_zone`, and at least two `route_render_points`. Omit
+  `entry_access` and `exit_access`. A move within one zone has `steps: []`;
+  never invent a doorway to represent motion inside an open room. A move between
+  zones lists each real, confirmed access point in ordered `steps`.
+
+For either mode, confirm the actual start/end positions, camera facing,
+approximate pace, and intended visible furniture. A zone graph cannot prove
+that the camera avoids walls or furniture. Check the drawn path against the
+current approved structure and furniture layout before presenting it.
+
+For a complete property tour, define:
 
 - confirmed entry access point;
 - ordered room visit sequence;
 - confirmed exit access point;
 - one continuous list of zone-to-zone steps.
 
-Default sequence when access permits:
+Default complete-tour sequence when access permits:
 
 1. enter through the confirmed entrance;
 2. introduce foyer and public living/dining spaces;
@@ -95,13 +114,14 @@ and exit through the same door.
 
 ## 7. Validate before drawing
 
-Run:
+Run for a complete tour, or add `--recognition /absolute/path/recognition.json`
+to check same-zone indoor route points against its confirmed zone polygon:
 
 ```bash
 python3 scripts/validate_route.py --topology /absolute/path/topology.json
 ```
 
-Reject the route when:
+Reject a complete tour when:
 
 - the first step does not enter from `outside` through the declared entrance;
 - the last step does not return to `outside` through the declared exit;
@@ -112,8 +132,49 @@ Reject the route when:
   non-traversable element;
 - an arrow would visually cross a wall.
 
+For `entry_to_interior`, require the first step from `outside` through
+`entry_access`, a confirmed interior `end_zone`, and explicit
+`required_visit_zones`. Reject a return to `outside` or an omitted required
+zone. The validator reports repeated access IDs; their necessity must be
+explained from the actual floor-plan graph.
+
+Reject an indoor segment when its endpoint zones are unconfirmed, a cross-zone
+step lacks a confirmed opening, or a same-zone path leaves its zone polygon.
+The polygon check does not certify furniture clearance or camera width. Inspect
+the approved furniture plan; record any unmeasured clearance as unresolved.
+
 Draw arrows only after the graph validator passes. Use deterministic geometric
 drawing on the fixed 2D base for doors, labels, and route lines, but deliver the
 overlay as PNG only; its topology JSON remains the structured authority. Do not
 create a separate SVG deliverable or ask an image model to redraw the underlying
 floor-plan geometry.
+
+For a same-size confirmed plan and furniture image, `render_route_preview.py`
+draws an indoor path on both images. It verifies the plan, furniture, and
+recognition SHA256 hashes against `reference_sha256` in the topology record, and performs
+the polygon check before writing the PNG:
+
+```bash
+python3 scripts/render_route_preview.py --plan /absolute/path/confirmed-plan.png \
+  --furniture /absolute/path/confirmed-furniture.png \
+  --topology /absolute/path/indoor-route.json \
+  --recognition /absolute/path/recognition.json \
+  --output /absolute/path/route-preview.png
+```
+
+The preview is for route confirmation. It does not prove a camera-width path,
+furniture clearance, or a continuous video.
+
+For an `entry_to_interior` itinerary, `render_tour_overview.py` places numbered
+camera stops on the confirmed plan and lists their intended first-person views.
+It checks the stop coordinates against the recognition zone polygons and binds
+the plan, furniture reference, and recognition file by SHA256. The numbered
+overview is a visit-order proposal, not a drawn collision-free camera path:
+
+```bash
+python3 scripts/render_tour_overview.py --plan /absolute/path/confirmed-plan.png \
+  --furniture /absolute/path/confirmed-furniture.png \
+  --recognition /absolute/path/recognition.json \
+  --topology /absolute/path/entry-tour.json \
+  --output /absolute/path/tour-overview.png
+```
