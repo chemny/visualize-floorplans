@@ -1,5 +1,57 @@
 # Changelog
 
+## 0.2.0-beta.5 · workbench reliability and presentation · 2026-10-06
+
+- Follow-up: apply thin-TV legacy defaults across styles rather than only the
+  reference case. Ceiling diffuser emission, fixed lighting, native resolution
+  and presentation cuts already share common implementations.
+
+- Follow-up: champagne style revision 6 removes warm wood-grain cabinet
+  finishes in favor of champagne lacquer or pearl white. Apply approved case
+  living/dining/entrance marble and cabinet colors once to cached schemes.
+
+- Follow-up: add independent dining/coffee tabletop accessories and scoped
+  kitchen-corner decor. Preserve body-height normalization, picking and walk
+  footprint; batch opaque accessory surfaces separately. Kitchen fixtures and
+  working space remain authoritative for placement.
+
+- Follow-up: add subtle champagne upholstery/headboards and partial cabinet
+  fronts; retain pearl base, plain floors and lighting. Later revision 6 replaces wood finishes.
+  Silver metallic fridge finish uses fine brushed relief; TV depth is 35 mm.
+  Upgrade untouched champagne defaults while preserving custom palette choices.
+
+- Follow-up: presentation cut clips architecture, doors/windows and opening
+  trims only; keep complete furniture to prioritize layout/decoration. Preserve
+  closed architectural caps, fixed lights, picking and full-height/walk restore.
+
+- Follow-up: render wall cuts as unlit black; round/square/panel ceiling
+  diffusers emit on their side faces and use omnidirectional fixed illumination.
+  Preserve fixture envelopes, group budgets and native pixel ratio.
+
+- Follow-up: remove adaptive render-resolution reductions and the DPR2 cap.
+  Render at native display pixel ratio during idle/motion/high frame cost.
+  Retain batching, on-change rendering and fixed light groups.
+
+- Test furniture collision against standing-body height instead of ignoring all
+  furniture mounted above 1100 mm.
+- Merge plain opaque static parts within one furniture body/material; preserve
+  actual triangle surfaces, dimensions, picking and production export.
+- Render camera/scene changes immediately; skip repeated GPU and label rendering
+  when idle, and cache unchanged shadow maps.
+- Add fixed, capped indoor-shadow trials independent of viewpoint. Keep them
+  disabled by default pending case-specific visual review; no new UI toggle.
+- Extend synthetic collision, dimension, shadow-budget and idle-render checks.
+- Rebuild the reference workbench while preserving scheme, original inputs,
+  selected AI images and older media bytes. Media re-export deferred by user.
+- Consolidate reusable rendering, persistence and floor-connection safeguards in
+  `references/workbench-reliability-rules.md`; retain case-specific choices in case data.
+- Isolate independent HTML export caches; restore edits after refresh.
+- Add validated finish-only connection patches with synchronized 2D/3D and
+  production export; report their areas without changing room boundaries.
+- Reduce uniform lighting fill and night amplification; the example uses one
+  fixed 512-pixel dining-shadow trial and local ceiling presentation compensation.
+- Published technical evidence remains distinct from fresh case visual acceptance.
+
 ## 0.2.0-beta.4 · local workbench stabilization · 2026-10-06
 
 - Added shared version identity in HTML/build evidence and a matching local archive.

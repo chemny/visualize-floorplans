@@ -5,3 +5,6 @@ export function persistScheme(storage,key,state,validate){
  storage.setItem(key,raw);return{saved:true,backupWarning};
 }
 export function decodeScheme(raw,validate){return validate(JSON.parse(raw));}
+
+// Caller supplies a document-scoped cache; a corrupt cache is reported, never silently ignored.
+export function restoreScheme(raw,seed,validate){return raw?decodeScheme(raw,validate):seed?validate(seed):null;}

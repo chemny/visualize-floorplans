@@ -2,29 +2,30 @@
   "schema": "floor-visualization-reference-case/1.0",
   "title": "居间 · 香槟珍珠",
   "entrypoint": "index.html",
-  "workbenchVersion": "0.2.0-beta.4",
+  "workbenchVersion": "0.2.0-beta.5",
   "scope": "curated final outputs and supplied references; no intermediate versions or audit history",
   "representations": {
     "currentWorkbench": "workbench/index.html",
     "currentCase": "data/case.json",
     "currentScheme": "data/scheme.json",
     "mediaSourceSchemeSha256": "7b9ba276f95077d7b1c9974a03035274811275dcd52bfa0a712c7e4c995c376e",
-    "images": "selected concept images, retained bytes; not regenerated with beta.4 lighting/materials",
-    "tour": "selected H5 walkthrough, retained bytes; not Seedance",
-    "drawings": "selected handoff drawings; not re-exported with beta.4",
-    "mesh": "existing tour source, not re-exported with beta.4",
-    "acceptance": "source-artifact acceptance is not transferred to current beta.4 preview"
+    "images": "selected concept images, retained bytes; not regenerated with current lighting/materials",
+    "tour": "selected older H5 walkthrough; current re-export deferred by user; not Seedance",
+    "drawings": "selected older handoff drawings; current re-export deferred",
+    "mesh": "existing tour source; current re-export deferred",
+    "acceptance": "source-artifact acceptance is not transferred to current beta.5 preview",
+    "currentRendering": "native display pixel ratio without adaptive reductions or DPR cap; collision and batching/on-change rendering updated; generic indoor shadows disabled by default; current case trials one fixed 512-pixel dining pendant shadow pending visual review; unlit black wall cuts and omnidirectional ceiling diffusers; architectural presentation cut with complete furniture, closed architectural caps and full-model restoration; champagne finish revision 6, brushed silver fridge and 35 mm TV; dining/coffee accessories and scoped kitchen-corner decor; living/dining/entrance plain marble and champagne/pearl cabinets; common TV and lighting behavior shared across styles; isolated independent-HTML persistence and explicit material-following floor connection patches, connection area separately reported; reduced global fill and night gain, local ceiling finish lift"
   },
   "files": [
     {
       "path": "README.md",
-      "bytes": 2292,
-      "sha256": "ec402bacac78567983baeab5e0159176142574c8876d66a981045de821654e4e"
+      "bytes": 3332,
+      "sha256": "09ac6a7985e95a0aab5556e882573e7be1981066a12a634721a4987be3101fdd"
     },
     {
       "path": "data/case.json",
-      "bytes": 153005,
-      "sha256": "a569f81760f52192de513923b036e6bee31aff6472cf44a2665f3580b127a7a9"
+      "bytes": 158555,
+      "sha256": "e8293155d369c69126bac24783430cbb86ccad6f61321f3ede2dc7736f620b9c"
     },
     {
       "path": "data/media-source-mesh.json.gz",
@@ -38,8 +39,8 @@
     },
     {
       "path": "data/scheme.json",
-      "bytes": 132252,
-      "sha256": "d4a5d777cb840aaab9bec0aa7ed174208b5232d932462e49aeeea5b54ab12d11"
+      "bytes": 132442,
+      "sha256": "99a7494a0c5f614fa46fff0a9be1417dcd8aa71dbd6a74fca597200350976493"
     },
     {
       "path": "drawings/家具布局.png",
@@ -133,8 +134,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 7689,
-      "sha256": "5bb4686d0d6d3094ecbebb6dbf4df1c8fceb9f77c000f9ab1aa5674d0e831b7b"
+      "bytes": 8430,
+      "sha256": "51af3223866fb17f2f80d7610b13d68148906e3b1e818d107ddc1d7aa341015b"
     },
     {
       "path": "inputs/家具参考.png",
@@ -188,9 +189,14 @@
     },
     {
       "path": "workbench/index.html",
-      "bytes": 4778618,
-      "sha256": "ad56b7f2c58bcf95338a6516f3a80991bd54994c10c9973ed1bfcd47a095c1da"
+      "bytes": 4800135,
+      "sha256": "d6c9db2b70346fac97c8f2d3aa5164eab3c8f07f4c33c83c553def9e920837ed"
+    },
+    {
+      "path": "workbench/index.build.json",
+      "bytes": 2261,
+      "sha256": "ec4ef51b2d85ececcf065ef9a9435297ae71a1b2f5725cd930f7b6d6640188f8"
     }
   ],
-  "indexedBytes": 53853669
+  "indexedBytes": 53884968
 }

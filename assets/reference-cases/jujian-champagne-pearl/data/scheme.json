@@ -104,7 +104,7 @@
       "w": 3000,
       "d": 880,
       "h": 850,
-      "color": "#edeae3",
+      "color": "#d9cbb8",
       "id": "F1",
       "x": 3790,
       "y": 3350,
@@ -142,7 +142,7 @@
       "w": 2500,
       "d": 400,
       "h": 450,
-      "color": "#f2f0eb",
+      "color": "#dfcfb7",
       "id": "F3",
       "x": 6690,
       "y": 3300,
@@ -219,7 +219,7 @@
       "w": 480,
       "d": 500,
       "h": 850,
-      "color": "#edeae3",
+      "color": "#d9cbb8",
       "id": "F7",
       "x": 5520,
       "y": 7280,
@@ -238,7 +238,7 @@
       "w": 480,
       "d": 500,
       "h": 850,
-      "color": "#edeae3",
+      "color": "#d9cbb8",
       "id": "F8",
       "x": 6420,
       "y": 7280,
@@ -257,7 +257,7 @@
       "w": 480,
       "d": 500,
       "h": 850,
-      "color": "#edeae3",
+      "color": "#d9cbb8",
       "id": "F9",
       "x": 5520,
       "y": 8670,
@@ -276,7 +276,7 @@
       "w": 480,
       "d": 500,
       "h": 850,
-      "color": "#edeae3",
+      "color": "#d9cbb8",
       "id": "F10",
       "x": 6420,
       "y": 8670,
@@ -335,7 +335,7 @@
       "w": 1340,
       "d": 520,
       "h": 750,
-      "color": "#f2f0eb",
+      "color": "#dfcfb7",
       "id": "F13",
       "x": 8460,
       "y": 11860,
@@ -379,6 +379,9 @@
       "detailAssembly": "whole-home-detail-v11.1",
       "assemblyOptions": {
         "backsplash": true
+      },
+      "tabletopDecor": {
+        "xMm": -630
       }
     },
     {
@@ -403,6 +406,9 @@
       "detailAssembly": "whole-home-detail-v11.1",
       "assemblyOptions": {
         "backsplash": true
+      },
+      "tabletopDecor": {
+        "xMm": 100
       }
     },
     {
@@ -546,7 +552,7 @@
       "type": "tv",
       "name": "客厅电视",
       "w": 1450,
-      "d": 90,
+      "d": 35,
       "h": 820,
       "color": "#3d4340",
       "id": "F25",
@@ -559,7 +565,8 @@
       "cx": 6810,
       "cy": 3300,
       "standOnly": false,
-      "detailAssembly": "whole-home-detail-v11.1"
+      "detailAssembly": "whole-home-detail-v11.1",
+      "thinDisplayRevision": 1
     },
     {
       "type": "wardrobe",
@@ -587,7 +594,7 @@
       "w": 1520,
       "d": 470,
       "h": 750,
-      "color": "#f2f0eb",
+      "color": "#dfcfb7",
       "id": "F27",
       "x": 9120,
       "y": 1450,
@@ -614,7 +621,7 @@
       "w": 450,
       "d": 460,
       "h": 850,
-      "color": "#edeae3",
+      "color": "#d9cbb8",
       "id": "F28",
       "x": 9120,
       "y": 2090,
@@ -653,7 +660,7 @@
       "w": 450,
       "d": 450,
       "h": 850,
-      "color": "#edeae3",
+      "color": "#d9cbb8",
       "id": "F30",
       "x": 8460,
       "y": 11180,
@@ -715,7 +722,7 @@
       "w": 600,
       "d": 650,
       "h": 1800,
-      "color": "#d8ddda",
+      "color": "#bfc4c8",
       "id": "F33",
       "x": 6595,
       "y": 10025,
@@ -776,7 +783,7 @@
       "w": 760,
       "d": 800,
       "h": 800,
-      "color": "#edeae3",
+      "color": "#d9cbb8",
       "id": "F36",
       "x": 5830,
       "y": 820,
@@ -816,7 +823,7 @@
       "w": 450,
       "d": 400,
       "h": 450,
-      "color": "#f2f0eb",
+      "color": "#dfcfb7",
       "id": "F38",
       "x": 470,
       "y": 2020,
@@ -836,7 +843,7 @@
       "w": 450,
       "d": 450,
       "h": 450,
-      "color": "#f2f0eb",
+      "color": "#dfcfb7",
       "id": "F39",
       "x": 470,
       "y": 4020,
@@ -856,7 +863,7 @@
       "w": 450,
       "d": 450,
       "h": 450,
-      "color": "#f2f0eb",
+      "color": "#dfcfb7",
       "id": "F40",
       "x": 10230,
       "y": 2100,
@@ -876,7 +883,7 @@
       "w": 450,
       "d": 450,
       "h": 450,
-      "color": "#f2f0eb",
+      "color": "#dfcfb7",
       "id": "F41",
       "x": 10230,
       "y": 4470,
@@ -5494,7 +5501,7 @@
   "measures": [],
   "doors": {},
   "styleCustom": false,
-  "styleColorRevision": 4,
+  "styleColorRevision": 6,
   "ceilings": [
     {
       "id": "C-KITCHEN",
@@ -5744,5 +5751,6 @@
       "recordedAt": "2026-10-06T04:55:30.752637+00:00",
       "caseApproval": "全屋开灯与白色顶面导览确认"
     }
-  }
+  },
+  "caseFinishRevision": "pearl-cabinet-marble-1"
 }

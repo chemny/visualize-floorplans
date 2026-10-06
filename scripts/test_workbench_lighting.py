@@ -28,7 +28,7 @@ class WorkbenchLighting(unittest.TestCase):
             with self.assertRaises(ValueError):validate_case(c)
     def test_build_evidence_version_and_lighting(self):
         with tempfile.TemporaryDirectory() as d:
-            p=Path(d);c=p/'中文案例.json';c.write_text(json.dumps(self.case,ensure_ascii=False),encoding='utf-8');out=p/'新版本.html';build(c,out);meta=json.loads(out.with_suffix('.build.json').read_text(encoding='utf-8'));self.assertEqual(meta['workbenchVersion'],'0.2.0-beta.4');self.assertEqual(meta['lightingCheck']['status'],'pass');self.assertIn('templateSha256',meta)
+            p=Path(d);c=p/'中文案例.json';c.write_text(json.dumps(self.case,ensure_ascii=False),encoding='utf-8');out=p/'新版本.html';build(c,out);meta=json.loads(out.with_suffix('.build.json').read_text(encoding='utf-8'));self.assertEqual(meta['workbenchVersion'],json.loads((Path(__file__).parent.parent/'assets/h5/version.json').read_text(encoding='utf-8'))['version']);self.assertEqual(meta['lightingCheck']['status'],'pass');self.assertIn('templateSha256',meta)
 
     def test_unsupported_component_rejected_before_build(self):
         self.case['initialState']['furniture'][0]['type']='unsupported_fixture'

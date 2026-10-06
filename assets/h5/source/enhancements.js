@@ -30,7 +30,7 @@ else if(['table','desk','roundtable'].includes(f.type)){if(f.type==='roundtable'
 else if(['coffee','sidetable'].includes(f.type)){cyl(w/2,.025,0,h-.0125,0,stone,d/w);cyl(w*.18,h-.025,0,(h-.025)/2,0,lacquer,d/w);cyl(w*.25,.016,0,.008,0,gold,d/w);}
 else if(f.type==='rug'){box(w,h,d,0,h/2,0,material(f.color,'rug'),.003);}
 else if(f.type==='plant'){cyl(w*.25,h*.3,0,h*.15,0,white);for(let i=0;i<10;i++){const a=i*2.4,yy=h*(.44+(i%4)*.13),x=Math.cos(a)*w*.2,z=Math.sin(a)*d*.2;box(.008,yy,.008,x/2,yy/2,z/2,material('#69765c'),.002);const leaf=new T.Mesh(new T.SphereGeometry(w*.23,16,12),material(i%2?'#62735b':'#8b997d'));leaf.scale.set(1,.16,.5);leaf.position.set(x,yy,z);leaf.rotation.set(.2,a,.2);group.add(leaf);}}
-else if(f.type==='tv'){box(w,h,d,0,h/2,0,dark,.008);box(w-.028,h-.028,.005,0,h/2,d/2+.003,new T.MeshPhysicalMaterial({color:'#192b2e',roughness:.16,metalness:.2}),.003);}
+else if(f.type==='tv'){box(w,h,Math.max(.01,d-.005),0,h/2,-.0025,dark,.004);box(w-.028,h-.028,.005,0,h/2,d/2-.0025,new T.MeshPhysicalMaterial({color:'#192b2e',roughness:.16,metalness:.2}),.003);}
 else if(f.type==='hob'){box(w,.015,d,0,h-.0075,0,dark,.008);for(const x of[-w*.25,w*.25]){const burner=cyl(Math.min(w*.18,d*.27),.01,x,h,0,dark);burner.userData.burner=true;const ring=new T.Mesh(new T.TorusGeometry(w*.13,.003,8,32),gold);ring.rotation.x=Math.PI/2;ring.position.set(x,h+.009,0);group.add(ring);}}
 else if(f.type==='sinkInsert'){
  const count=f.basins||1,bw=Math.min(.78,(w-.1)/count-(count===2?.045:0)),bd=Math.min(.36,d*.66),depth=.17,centers=count===2?[-w*.24,w*.24]:[0],inner=material('#9aaba9','metal');
@@ -68,7 +68,7 @@ else{const kind=f.type==='bookshelf'?'bookshelf':f.type==='wardrobe'?'wardrobe':
     const n=Math.max(1,Math.round(w/.6));for(let i=0;i<n;i++){const x=-w/2+(i+.5)*w/n;box(w/n-.006,hh-.012,.018,x,low+hh/2,z+depth/2,lacquer,.003);box(w/n*.5,.01,.022,x,low+.055,z+depth/2+.02,gold,.003);}
     const light=new T.MeshStandardMaterial({color:'#fff6e4',emissive:'#ffe7be',emissiveIntensity:.65});box(w-.05,.01,.025,0,low-.007,-d/2+depth-.035,light,.003);
    }
-   if(f.accessories!==false&&w>=.8){box(.28,.016,Math.min(.22,d*.4),-w/2+.22,h+.008,0,oak,.005);for(let i=0;i<3;i++)cyl(.035,.10+i*.015,w/2-.12-i*.10,h+.05+i*.007,-d*.27,material(['#c5bbaa','#e5ded1','#9f8c76'][i]));}
+   if(f.accessories!==false&&!f.tabletopDecor&&w>=.8){box(.28,.016,Math.min(.22,d*.4),-w/2+.22,h+.008,0,oak,.005);for(let i=0;i<3;i++)cyl(.035,.10+i*.015,w/2-.12-i*.10,h+.05+i*.007,-d*.27,material(['#c5bbaa','#e5ded1','#9f8c76'][i]));}
   }
  }else box(w,.03,d,0,h-.015,0,kind==='bookshelf'?oak:lacquer,.003);
 }

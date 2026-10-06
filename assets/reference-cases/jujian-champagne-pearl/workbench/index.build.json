@@ -1,0 +1,92 @@
+{
+  "caseId": "jujian-beta4-review-20261006",
+  "caseSha256": "e8293155d369c69126bac24783430cbb86ccad6f61321f3ede2dc7736f620b9c",
+  "engineSha256": "219436f8559d679f67d0c1046c222436bd1bbe61690c0c02836e4dfa0a337d72",
+  "htmlSha256": "d6c9db2b70346fac97c8f2d3aa5164eab3c8f07f4c33c83c553def9e920837ed",
+  "status": "built",
+  "humanAcceptance": "not inferred from build",
+  "sourceSchemeSha256": "7b9ba276f95077d7b1c9974a03035274811275dcd52bfa0a712c7e4c995c376e",
+  "validation": "input contract only; no visual or cross-floorplan regression",
+  "workbenchVersion": "0.2.0-beta.5",
+  "templateSha256": "975c2929f9802b462f97235301ae41657cc69642c879218e71b46c7ad43cfe9a",
+  "lightingCheck": {
+    "status": "pass",
+    "coverage": [
+      {
+        "roomId": "Z1",
+        "mainRequired": true,
+        "mainIds": [
+          "R12-L-Z1"
+        ],
+        "fixtureCount": 1
+      },
+      {
+        "roomId": "Z2",
+        "mainRequired": true,
+        "mainIds": [
+          "R12-L-Z2"
+        ],
+        "fixtureCount": 3
+      },
+      {
+        "roomId": "Z3",
+        "mainRequired": true,
+        "mainIds": [
+          "R12-L-Z3"
+        ],
+        "fixtureCount": 1
+      },
+      {
+        "roomId": "Z4",
+        "mainRequired": true,
+        "mainIds": [
+          "V9-DL",
+          "PERF-MAIN-LIVING"
+        ],
+        "fixtureCount": 15
+      },
+      {
+        "roomId": "Z5",
+        "mainRequired": true,
+        "mainIds": [
+          "R12-L-Z5"
+        ],
+        "fixtureCount": 3
+      },
+      {
+        "roomId": "Z6",
+        "mainRequired": true,
+        "mainIds": [
+          "R12-L-Z6"
+        ],
+        "fixtureCount": 1
+      },
+      {
+        "roomId": "Z7",
+        "mainRequired": true,
+        "mainIds": [
+          "PERF-MAIN-ENTRY"
+        ],
+        "fixtureCount": 3
+      },
+      {
+        "roomId": "Z8",
+        "mainRequired": true,
+        "mainIds": [
+          "R12-L-Z8"
+        ],
+        "fixtureCount": 3
+      },
+      {
+        "roomId": "Z9",
+        "mainRequired": true,
+        "mainIds": [
+          "R12-L-Z9"
+        ],
+        "fixtureCount": 1
+      }
+    ],
+    "warnings": [],
+    "scope": "Input checks only; actual emitting-face occlusion and room brightness require mesh/visual inspection."
+  }
+}

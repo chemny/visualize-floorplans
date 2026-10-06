@@ -13,12 +13,15 @@ version. Structure, layout and finish decisions remain traceable across outputs.
 
 AI-generated capability illustration based on the bundled case references. Explore the real workbench, drawings and tour in the complete reference case below; AI concept images and the editable 3D scene are distinct outputs.
 
-**Local Beta version: 0.2.0-beta.4.** Adds reusable interaction regression,
-room-area pending detection after wall edits, main-light coverage warnings,
-case-configurable marble and modular runtime logic. Rectangle, concave and
-furnished lighting stress fixtures are exercised separately from client visual
-acceptance. Windows, physical mobile devices and generative final video remain
-unverified. Earlier validation runs were local; this release includes the curated reference case. See [current checks](references/beta4-workbench-validation.md).
+**Beta version: 0.2.0-beta.5.** Native display resolution is retained during movement and slow frames; automatic resolution reductions are removed. Fixes walk collision with low hanging
+cabinets, batches opaque parts within each furniture body and skips unchanged
+GPU rendering. Fixed local-shadow comparisons are available but disabled by
+default pending case-specific visual review. Synthetic technical checks do not
+approve a client apartment. Retained tour/drawings/mesh have not been re-exported.
+Windows graphics runtime, physical phones and generative final video remain
+unverified. See [current checks](references/beta5-workbench-validation.md).
+
+Independent HTML exports now restore subsequent edits after refresh and isolate each exported file's saved data. Explicit connection-band finishes follow adjacent-room materials in both 2D and 3D, with their area reported separately. Lighting uses reduced uniform fill; the example retains a single fixed dining-shadow trial. See [workbench reliability rules](references/workbench-reliability-rules.md). The existing bilingual capability illustrations remain previews of the workflow, not screenshots of every latest adjustment.
 
 Read [quality gates](references/h5-quality-gates.md) before source interpretation,
 AI interiors, homeowner camera planning or accepted delivery. Technical,

@@ -2,14 +2,14 @@
 name: visualize-floorplans
 description: Review dimensioned floor plans and furniture references, build editable offline H5 2D/3D renovation workbenches, coordinate interior concept images, and create deterministic homeowner camera preflights. Use when the user requests floor-plan confirmation, furniture and finish editing, scheme export, walkthrough planning and local handoff. Preserve structural evidence and versioned approvals. Concept design is not measured CAD or construction documentation; Seedance is a separate optional branch.
 metadata:
-  version: "0.2.0-beta.4"
+  version: "0.2.0-beta.5"
 ---
 
 # Visualize Floorplans
 
 ## Bundled reference case
 
-For a concrete capability preview, open `assets/reference-cases/jujian-champagne-pearl/index.html` when the user asks to see an example. Read its brief `README.md` for representation boundaries; do not load the mesh or all images unless needed. It contains supplied references, a current beta.4 workbench, selected concept images/drawings, scheme data and an H5 tour. This is a case-specific example, not a shared default apartment or fresh acceptance of every representation. Copy case input into a new project before editing; do not modify the bundled example. Existing image/video/mesh sources differ from the newest lighting/material demo. The page uses relative links and does not open automatically when the Skill is loaded.
+For a concrete capability preview, open `assets/reference-cases/jujian-champagne-pearl/index.html` when the user asks to see an example. Read its brief `README.md` for representation boundaries; do not load the mesh or all images unless needed. It contains supplied references, a current beta.5 workbench, selected concept images/drawings, scheme data and an H5 tour. This is a case-specific example, not a shared default apartment or fresh acceptance of every representation. Copy case input into a new project before editing; do not modify the bundled example. Existing image/video/mesh sources differ from the newest lighting/material demo. The page uses relative links and does not open automatically when the Skill is loaded.
 
 ## Required quality gates
 
@@ -22,23 +22,14 @@ pass. Formal handoff/package use `--accepted --bundle --quality-review` and
 require technical, geometry, visual and explicit human acceptance separately.
 Diagnostic previews remain available with failures and pending statuses visible.
 
-## Local workbench safeguards · beta.4
+## Workbench reliability rules
 
-Use bundled `assets/h5/version.json` as the build identity. Rebuild before packaging
-shared-source changes; retain independent case acceptance. Run installed-source
-regression via `scripts/release_smoke.py`, including interaction modules. Use
-`production/synthetic_cases.py` and `test_workbench_browser.mjs` for isolated
-cross-shape UI checks with existing browser dependencies; report emulated mobile
-separately from physical-device and Windows checks.
-
-Wall geometry edits mark original room/floor partitions and their areas as
-pending; undoing to the original geometry clears that state. Do not silently
-rename, merge or split rooms. Repartition requires a separately confirmed layout.
-Build evidence reports room main-light coverage and placement warnings; never
-invent approved fixture positions. `mainLightingRequired:false` exempts an
-explicit nonfunctional region. Actual mesh emission/occlusion remains a gate.
-Keep material presentation case-local: `presentation.materials.marble.veins:false`
-uses plain marble consistently in 2D/3D. Material changes invalidate style scopes.
+Before H5 source maintenance, read `references/workbench-reliability-rules.md`.
+It governs body-height collision, dimension-preserving batching, native
+resolution, on-change rendering, presentation cuts, common component behavior,
+fixed room lighting, independent export persistence and finish-only connection
+patches. Keep room repartition separately confirmed. Rendering tests do not
+transfer visual acceptance to the actual case or older media.
 
 ## Local beta entrypoint
 
@@ -422,46 +413,7 @@ failures to the future structured-geometry track.
 
 ## Bundled resources
 
-- `scripts/plan_project.py`: validate a manifest and compile deterministic Image
-  2 task prompts without calling an external API.
-- `scripts/plan_delivery.py`: compile the client-facing base package, adaptive
-  views, semantic camera intents, and a delivery-review template.
-- `scripts/delivery_state.py`: bind layout/image acceptance to files, gate
-  execution and live review, and permit local handoff without duplicate approval.
-- `scripts/validate_delivery.py`: enforce per-image structural checks and
-  package-level multi-image consistency before final export.
-- `scripts/test_workflow.py`: local regression tests for validation, dependency
-  ordering, and structural constraints.
-- `scripts/test_interpretation.py`: synthetic input-completion, overlay geometry,
-  cross-file authority, and changed-file regression tests.
-- `scripts/interpretation_authority.py`: inspect evidence bundles and candidate
-  content hashes; does not grant user approval or replace source comparison.
-- `scripts/validate_access.py`: validate confirmed room connectivity, swing-door
-  direction, and sliding-door metadata without requiring a tour route.
-- `scripts/validate_route.py`: reject discontinuous routes and steps that do not
-  use confirmed doors or passages.
-- `scripts/validate_recognition.py`: reject unsupported doors, windows, bay
-  windows, traversable gaps, physical dashed lines, and semantic zones without
-  geometry evidence.
-- `scripts/render_interpretation.py`: render deterministic access and zoning
-  overlays on the fixed 2D base without asking an image model to redraw walls.
-- `scripts/render_floorplan.py`: render generic structured wall/access geometry
-  to independent SVG elements, then export the exact same revision to PNG.
-- `scripts/render_furniture_layout.py`: render reusable top-view furniture
-  symbols and reject declared wall, furniture-overlap, and door-swing conflicts.
-- `scripts/assemble_contact_sheet.py`: copy complete confirmed image pixels into
-  a labelled canvas without cropping, resizing, or generative redraw.
-- `scripts/vector_tools.py`: shared validation, geometry, atomic-write, and
-  deterministic SVG-to-PNG support for the drawing tools.
-- `assets/project-template.json`: copy and fill for a new project.
-- `assets/sample-project.json`: runnable sample manifest for dry-run verification.
-- `assets/sample-topology.json`: runnable access graph and ordered tour-route
-  validation sample.
-- `assets/sample-recognition.json`: synthetic recognition-record example for
-  local validation; not a user-confirmed production plan.
-- `assets/floorplan-input-template.json`, `assets/furniture-layout-input-template.json`,
-  and `assets/contact-sheet-input-template.json`: case-neutral structured inputs;
-  fill them in a run directory rather than editing the templates in place.
+See `references/bundled-resource-index.md` for scripts, templates and their roles.
 
 ## Completion report
 

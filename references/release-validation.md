@@ -1,4 +1,4 @@
-Current local workbench snapshot: **0.2.0-beta.4**. See [beta.4 verification](beta4-workbench-validation.md). The reports below describe historical snapshots. Publication is now explicitly requested by the user; Windows runtime testing remains deferred under the agreed compatibility-only scope.
+Current workbench snapshot: **0.2.0-beta.5**. See [beta.5 verification](beta5-workbench-validation.md) and [workbench reliability rules](workbench-reliability-rules.md). The reports below describe historical snapshots. Publication is now explicitly requested by the user; Windows runtime testing remains deferred under the agreed compatibility-only scope.
 
 # Beta release validation · 0.2.0-beta.3
 

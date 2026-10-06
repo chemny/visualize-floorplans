@@ -11,6 +11,7 @@ ROOT = HERE.parent.parent
 ASSETS = ROOT / 'assets/h5'
 import quality
 from lighting_checks import lighting_report
+from floor_connection_checks import check_floor_connections
 
 def read(path):
     return json.loads(Path(path).read_text(encoding='utf-8'))
@@ -58,6 +59,11 @@ def validate_case(case):
         ids.add(r['id']); points(r['poly'],'room '+r['id'])
         if not isinstance(r.get('at'),list) or len(r['at'])!=2 or not all(map(finite,r['at'])): raise ValueError('Explicit room label point at:[x,y] is required')
     if set(s['rooms']) != ids: raise ValueError('model.rooms and initialState.rooms must correspond')
+    connection_ids=set()
+    for c in m.get('floorConnections',[]):
+        if not isinstance(c.get('id'),str) or c['id'] in connection_ids or c['id'] in ids: raise ValueError('Unique floor connection IDs are required')
+        connection_ids.add(c['id']); points(c['poly'],'floor connection '+c['id'])
+        if c.get('materialRoomId') not in ids: raise ValueError('Floor connection requires an existing material room')
     if s.get('caseId') != case['caseId']: raise ValueError('State and case IDs must match')
     wall_ids=set(); opening_ids=set()
     for w in s['walls']:
@@ -73,6 +79,7 @@ def validate_case(case):
             if o['kind'] not in ('door','sliding','window') or not all(map(finite,(o['at'],o['width']))) or o['at']<previous-.1 or o['width']<=0 or o['at']+o['width']>length+.1: raise ValueError('Invalid or overlapping opening in '+w['id'])
             previous=o['at']+o['width']; opening_ids.add(o.get('id',w['id']))
     if not set(case.get('entranceOpenings',[])).issubset(wall_ids|opening_ids): raise ValueError('Unknown entrance opening ID')
+    check_floor_connections(m,s['walls'])
     furniture_ids=set();known_types=set(read(ASSETS/'component-types.json')['types'])
     for f in s['furniture']:
         if f.get('type') not in known_types: raise ValueError('Unsupported furniture type: '+str(f.get('type')))

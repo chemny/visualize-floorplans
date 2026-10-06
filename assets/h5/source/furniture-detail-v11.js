@@ -1,3 +1,4 @@
+import {tabletopDecor} from './tabletop-decor.js';
 import * as T from 'three';
 import {refinedFurniture,material,rigid,soft,pillow,lineMesh,roundedLoop,finishGroup,projectedUV,addMesh} from './soft-furniture-v10.js';
 export const FULL_REVISION='whole-home-detail-v11.1';
@@ -45,7 +46,7 @@ function cupboard(g,f,m){
   }
  }else{
   for(let i=0;i<n;i++){const x=-w/2+t+(i+.5)*pw,rows=f.type==='nightstand'?2:1,dh=(h-bottom-t)/rows;
-   for(let k=0;k<rows;k++){const y=bottom+(k+.5)*dh;rigid(g,pw-.004,dh-.004,.019,[x,y,front],m.body,'cabinet-door',.0018);
+   for(let k=0;k<rows;k++){const y=bottom+(k+.5)*dh;rigid(g,pw-.004,dh-.004,.019,[x,y,front],(f.finishSpec?.id==='champagne_pearl'&&f.type==='wardrobe'&&i===n-1?m.champagne:m.body),'cabinet-door',.0018);
     if(f.type==='wardrobe')rod(g,[x+pw*.3,Math.min(1.04,h*.52)-.105,d/2-.004],[x+pw*.3,Math.min(1.04,h*.52)+.105,d/2-.004],.0025,m.metal,'wardrobe-pull');
     else rigid(g,pw*.5,.007,.004,[x,y+dh*.26,d/2-.003],m.metal,'cabinet-pull',.001);
    }
@@ -142,6 +143,8 @@ export function wholeHomeFurniture(f,base){
  if(!FULL_TYPES.includes(f.type))return null;
  const root=new T.Group(),m=veneer(f);let g=new T.Group();
  m.body.roughness=f.finishSpec?.lacquerRoughness??.46;
+ m.champagne=material(f.finishes?.champagne||f.color,'plain','cabinet',f.finishSpec);
+ if(f.type==='fridge'){m.body=material(f.color,'metal','appliance-metal',f.finishSpec);m.body.roughness=.42;m.body.metalness=.78;m.body.userData.finishRole='appliance-metal';}
  m.stone.roughness=f.finishSpec?.stoneRoughness??.40;
  m.ceramic.userData.finishRole='ceramic';m.glass.userData.finishRole='glass';
  if(['bed','sofa','sofabed','armchair'].includes(f.type)){g=refinedFurniture(f);g.userData.bodyForDimensions=true;}
@@ -159,5 +162,6 @@ export function wholeHomeFurniture(f,base){
  g.name='furniture-body-v11';root.add(g);markOwned(g);carryAccessories(root,base,f);
  if(f.type==='dresser'){const a=new T.Group();a.name='dressing-table-accessories';a.userData.accessories=true;const w=f.w/1000,d=f.d/1000,y=f.h/1000,z=-d/2+.065;const mirror=new T.Mesh(new T.CircleGeometry(.28,64),new T.MeshPhysicalMaterial({color:'#dce1dd',metalness:.94,roughness:.08,side:T.DoubleSide}));mirror.position.set(0,y+.36,z);mirror.scale.y=1.10;a.add(mirror);const rim=addMesh(a,new T.TorusGeometry(.286,.007,10,64),m.metal,'dressing-mirror-frame',[0,y+.36,z]);rim.scale.y=1.10;rod(a,[0,y,z],[0,y+.085,z],.008,m.metal,'mirror-stand');rigid(a,.18,.012,.10,[0,y+.006,z+.01],m.metal,'mirror-base',.004);rigid(a,.22,.012,.13,[-w*.31,y+.006,0],m.stone,'cosmetic-tray',.012);for(let i=0;i<3;i++)cylinder(a,.018,.065+i*.012,[-w*.31+(i-1)*.045,y+.015,0],m.ceramic,'cosmetic-bottle');markOwned(a);root.add(a);}
 
+ const decor=tabletopDecor(f,m);if(decor){markOwned(decor);root.add(decor);}
  root.userData.detailAssembly=FULL_REVISION;root.userData.furniture=f.id;return root;
 }

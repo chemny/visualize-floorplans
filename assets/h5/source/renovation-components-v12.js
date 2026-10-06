@@ -48,8 +48,8 @@ export function renovationModel(f,p,night=false){
  const C=(r,b,x=0,y=0,z=0,m=shell)=>{const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,b,32),m);o.position.set(x,y+b/2,z);g.add(o);return o;};
  const slats=()=>{B(w,h,d);for(let i=0;i<Math.min(24,Math.max(3,Math.floor(w/.035)));i++){const x=-w*.45+w*.9*i/(Math.min(24,Math.max(3,Math.floor(w/.035)))-1);B(.012,.002,d*.7,x,.002,0,dark);}};
  switch(f.type){
- case 'ceilinground': C(w/2,h*.9,0,h*.1);C(w*.46,h*.1,0,-.0006,0,glow);break;
- case 'ceilingsquare':case 'lightpanel': B(w,h,d);B(w*.93,h*.12,d*.88,0,-.0006,0,glow);break;
+ case 'ceilinground': C(w/2,h*.22,0,h*.78);C(w/2,h*.78,0,0,0,glow);break;
+ case 'ceilingsquare':case 'lightpanel': B(w,h*.22,d,0,h*.78);B(w,h*.78,d,0,0,0,glow);break;
  case 'spotlight':C(w/2,h);C(w*.34,.003,0,-.0006,0,glow);break;
  case 'linearlight':case 'ledstrip':case 'cabinetlight': B(w,h,d);B(w*.97,h*.12,d*.75,0,-.0006,0,glow);break;
  case 'cove':B(w,h,.015,0,0,-d/2+.0075);B(w,.018,d,0,h-.018);B(w,h*.35,.015,0,h*.65,d/2-.0075);break;

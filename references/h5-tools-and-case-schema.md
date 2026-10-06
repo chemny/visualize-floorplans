@@ -55,6 +55,7 @@ review. The blank template intentionally fails build: it cannot fabricate walls.
   browser storage, panel preferences and drawing modes are isolated per case.
 - `model`: `width`, `depth`, `height` in mm, `footprint` polygon, `rooms` array.
   A room needs `id`, `name`, `poly`, and explicit `at:[x,y]` label position.
+- `model.floorConnections`: optional explicit finish-only patches `{id,poly,materialRoomId}`. Keep them outside room polygons and walls, without mutual overlap. They follow the named room material in 2D/3D; report their floor area separately, include it once in material totals, and preserve the existing room/ownership area basis. These are reviewed case geometry, never inferred room merges. Export their geometry and invalidate finish approval when it changes.
 - `initialState.rooms`: matching room IDs with `{name,mat}`. Floor material keys
   are `wood`, `walnut`, `tile800`, `tile600`, `marble`, `antislip`, `terrazzo`,
   `carpet`. Room names and materials are editable.
@@ -95,6 +96,11 @@ review. The blank template intentionally fails build: it cannot fabricate walls.
 - `presentation.renderProfile.hiddenTypes`: presentation-only visibility.
   Optional `catalogHiddenTypes` and `editorHiddenTypes` override curation.
   Optional `render.shadowFixtureIds` limits costly shadow maps by actual IDs.
+  `render.indoorShadowBudget` is 0 by default, 1 or 2 for a reviewed local-shadow
+  trial; `render.indoorShadowMapSize` accepts 512 or 1024 (default 1024).
+  `render.batchFurniture:false` opts out of opaque within-object batching.
+  Rendering diagnostics expose `homeStudio.renderStatus()`; temporary
+  `homeStudio.setShadowPreview(true/false)` does not change stored scheme data.
 - `references.plan` / `references.furniture`: optional PNG paths relative to
   the case file. They are embedded into the HTML. No private case is distributed
   with the Skill. `referenceNote` explains case-specific resolutions.
@@ -167,3 +173,5 @@ it does not prove the new generic template's portability or fidelity.
 - Runtime modules isolate pointer diagnostics, storage, labels, material presentation, area state and fixed spatial lighting. Existing source-maintenance dependency flags are unchanged.
 
 Run `scripts/release_smoke.py --out NEW_EMPTY_DIR --node NODE_EXECUTABLE` for Python, subject and interaction module checks. With existing Chromium/Playwright, create synthetic fixtures with `scripts/production/synthetic_cases.py --out NEW_DIR`, serve that directory locally, then invoke `test_workbench_browser.mjs --playwright-module MODULE --browser EXECUTABLE --base-url URL --fixture-dir NEW_DIR --out NEW_REPORT_DIR`. It uses new isolated contexts; do not point it at a blocked user browser page as a workaround. The browser script emits screenshots, FPS and resource counts and tests export/reopen. Emulated touch is not physical-phone certification.
+
+Independent HTML exports use a fresh document storage identity: first open reads the embedded seed, later opens restore edits from that document cache. New exports never borrow another document or the base case cache. Legacy exports without an identity keep their original seed behavior until re-exported with the updated engine. Local browser storage is origin/browser specific; exporting is still required to transfer new edits to another computer.
