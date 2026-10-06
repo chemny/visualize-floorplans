@@ -7,6 +7,12 @@ references, edit one H5 renovation
 scheme, then create interior concepts and a camera preflight from that same
 version. Structure, layout and finish decisions remain traceable across outputs.
 
+## Preview
+
+![Visualize Floorplans: reference plans, editable 2D/3D and walkthroughs](assets/visualize-floorplans-hero-en.png)
+
+AI-generated capability illustration based on the bundled case references. Explore the real workbench, drawings and tour in the complete reference case below; AI concept images and the editable 3D scene are distinct outputs.
+
 **Local Beta version: 0.2.0-beta.4.** Adds reusable interaction regression,
 room-area pending detection after wall edits, main-light coverage warnings,
 case-configurable marble and modular runtime logic. Rectangle, concave and
@@ -20,15 +26,9 @@ geometry, visual and explicit human acceptance remain separate. A raw preview
 manifest cannot grant acceptance. Install the matching release archive or current repository revision; older
 archives do not contain these quality gates.
 
-## Preview
+## Complete reference case
 
 ![Selected living-room concept from the reference case](assets/reference-cases/jujian-champagne-pearl/images/living-wide.png)
-
-Selected concept output from the bundled reference case. Open the case to compare
-its supplied references, editable workbench and continuous H5 tour. Concept images
-do not certify measured reconstruction accuracy.
-
-## Complete reference case
 
 [Open the Jujian · Champagne Pearl case](assets/reference-cases/jujian-champagne-pearl/index.html): supplied references, 13 concept images, an editable offline 2D/3D workbench, scheme drawings and a 56-second H5 tour, approximately 54 MB.
 

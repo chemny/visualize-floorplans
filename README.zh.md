@@ -5,16 +5,17 @@
 面向房主的装修方案工作流：先联合核对户型图和家具参考，再在同一套可编辑
 二维、三维方案上确定布局、配色、室内效果和镜头，让每份结果都有明确的依据。
 
-**本地 Beta 版本：0.2.0-beta.4。** 已固化交互回归检查、墙体变化后的面积待确认提示、主灯覆盖检查、案例材质配置，并拆分运行模块。矩形、凹形及家具照明压力场景分别验证；结果不代替当前户型的视觉确认。Windows、实体手机和生成式最终视频仍未实测；本版收录完整参考案例；既有验证报告描述当时的本地测试。详见[本轮验证](references/beta4-workbench-validation.md)。
-
 ## 预览
 
-![参考案例选定客厅效果](assets/reference-cases/jujian-champagne-pearl/images/living-wide.png)
+![户型装修可视化：原始户型、二维布局、三维漫游与概念效果](assets/visualize-floorplans-hero-zh.png)
 
-展示内置案例已选定的客厅概念效果。打开案例可对照原始素材、可编辑工作台和连续导览。
-概念图不代表实测还原精度或施工图。
+根据案例参考素材生成的能力展示示意。下方完整案例提供真实工作台、图纸和导览；AI 概念效果与可编辑三维场景是不同的输出。
+
+**本地 Beta 版本：0.2.0-beta.4。** 已固化交互回归检查、墙体变化后的面积待确认提示、主灯覆盖检查、案例材质配置，并拆分运行模块。矩形、凹形及家具照明压力场景分别验证；结果不代替当前户型的视觉确认。Windows、实体手机和生成式最终视频仍未实测；本版收录完整参考案例；既有验证报告描述当时的本地测试。详见[本轮验证](references/beta4-workbench-validation.md)。
 
 ## 完整参考案例
+
+![参考案例选定客厅概念效果](assets/reference-cases/jujian-champagne-pearl/images/living-wide.png)
 
 [打开「居间 · 香槟珍珠」案例](assets/reference-cases/jujian-champagne-pearl/index.html)：原始参考、13张效果图、可编辑2D/3D工作台、方案图纸和56秒导览，约54MB。
 
