@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0 · version label update · 2026-10-06
+
+- Remove the beta suffix from the current Skill, workbench and package version identity.
+- Rebuild the final reference workbench; no geometry, lighting or feature changes.
+- Historical beta records and unverified platform/visual scopes remain explicit.
+
 ## 0.2.0-beta.5 · workbench reliability and presentation · 2026-10-06
 
 - Follow-up: apply thin-TV legacy defaults across styles rather than only the

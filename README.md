@@ -13,7 +13,7 @@ version. Structure, layout and finish decisions remain traceable across outputs.
 
 AI-generated capability illustration based on the bundled case references. Explore the real workbench, drawings and tour in the complete reference case below; AI concept images and the editable 3D scene are distinct outputs.
 
-**Beta version: 0.2.0-beta.5.** Native display resolution is retained during movement and slow frames; automatic resolution reductions are removed. Fixes walk collision with low hanging
+**Version: 0.2.0.** Native display resolution is retained during movement and slow frames; automatic resolution reductions are removed. Fixes walk collision with low hanging
 cabinets, batches opaque parts within each furniture body and skips unchanged
 GPU rendering. Fixed local-shadow comparisons are available but disabled by
 default pending case-specific visual review. Synthetic technical checks do not

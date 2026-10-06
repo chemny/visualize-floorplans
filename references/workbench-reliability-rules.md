@@ -2,7 +2,7 @@
 
 Read before modifying H5 editing, rendering, persistence, floor coverage or delivery behavior. These are reusable implementation rules, not the bundled apartment's dimensions or palette approval.
 
-## Rendering and walk safeguards · beta.5
+## Rendering and walk safeguards
 
 Walk collision uses the vertical overlap of the furniture body and a standing
 viewer (eye height plus 150 mm head allowance); do not skip all hanging objects
@@ -40,7 +40,7 @@ case-specific review. A configured fixed set is capped at two lights; all other
 lights stay on. Never select lights by camera position. Compare shadow artifacts
 and cost before adopting the trial. See `references/beta5-workbench-validation.md`.
 
-## Local workbench safeguards · beta.4
+## Local workbench safeguards
 
 Use bundled `assets/h5/version.json` as the build identity. Rebuild before packaging
 shared-source changes; retain independent case acceptance. Run installed-source

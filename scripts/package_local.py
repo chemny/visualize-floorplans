@@ -17,7 +17,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--out',required=True);args=parser.parse_args();out=Path(args.out).resolve()
     manifest=out.with_suffix('.manifest.json')
     if out.exists() or manifest.exists():raise SystemExit('Use a new archive name; existing artifacts are preserved')
-    version=json.loads((ROOT/'assets/h5/version.json').read_text(encoding='utf-8'))['version']
+    metadata=json.loads((ROOT/'assets/h5/version.json').read_text(encoding='utf-8'));version=metadata['version']
     for name in ['SKILL.md','README.md','README.zh.md']:
         if version not in (ROOT/name).read_text(encoding='utf-8'):raise SystemExit('Version mismatch in '+name)
     records=[];out.parent.mkdir(parents=True,exist_ok=True)
@@ -26,6 +26,6 @@ def main():
             data=p.read_bytes();entry='visualize-floorplans/'+rel.as_posix();z.writestr(entry,data);records.append({'path':rel.as_posix(),'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)})
     with zipfile.ZipFile(out) as z:
         if z.testzip():raise SystemExit('ZIP integrity failed')
-    report={'version':version,'channel':'local-beta','files':records,'archiveSha256':hashlib.sha256(out.read_bytes()).hexdigest(),'scope':'Source snapshot only, no case acceptance or platform certification','published':False}
+    report={'version':version,'channel':metadata.get('channel','default'),'files':records,'archiveSha256':hashlib.sha256(out.read_bytes()).hexdigest(),'scope':'Source snapshot only, no case acceptance or platform certification','published':False}
     manifest.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8');print(json.dumps({'archive':str(out),'manifest':str(manifest),'version':version,'files':len(records)},ensure_ascii=False))
 if __name__=='__main__':main()

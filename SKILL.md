@@ -2,14 +2,14 @@
 name: visualize-floorplans
 description: Review dimensioned floor plans and furniture references, build editable offline H5 2D/3D renovation workbenches, coordinate interior concept images, and create deterministic homeowner camera preflights. Use when the user requests floor-plan confirmation, furniture and finish editing, scheme export, walkthrough planning and local handoff. Preserve structural evidence and versioned approvals. Concept design is not measured CAD or construction documentation; Seedance is a separate optional branch.
 metadata:
-  version: "0.2.0-beta.5"
+  version: "0.2.0"
 ---
 
 # Visualize Floorplans
 
 ## Bundled reference case
 
-For a concrete capability preview, open `assets/reference-cases/jujian-champagne-pearl/index.html` when the user asks to see an example. Read its brief `README.md` for representation boundaries; do not load the mesh or all images unless needed. It contains supplied references, a current beta.5 workbench, selected concept images/drawings, scheme data and an H5 tour. This is a case-specific example, not a shared default apartment or fresh acceptance of every representation. Copy case input into a new project before editing; do not modify the bundled example. Existing image/video/mesh sources differ from the newest lighting/material demo. The page uses relative links and does not open automatically when the Skill is loaded.
+For a concrete capability preview, open `assets/reference-cases/jujian-champagne-pearl/index.html` when the user asks to see an example. Read its brief `README.md` for representation boundaries; do not load the mesh or all images unless needed. It contains supplied references, a current 0.2.0 workbench, selected concept images/drawings, scheme data and an H5 tour. This is a case-specific example, not a shared default apartment or fresh acceptance of every representation. Copy case input into a new project before editing; do not modify the bundled example. Existing image/video/mesh sources differ from the newest lighting/material demo. The page uses relative links and does not open automatically when the Skill is loaded.
 
 ## Required quality gates
 
@@ -31,7 +31,7 @@ fixed room lighting, independent export persistence and finish-only connection
 patches. Keep room repartition separately confirmed. Rendering tests do not
 transfer visual acceptance to the actual case or older media.
 
-## Local beta entrypoint
+## Local workbench entrypoint
 
 For H5 interface changes, read `references/h5-interaction-presentation.md`.
 Preserve direct joystick/keyboard/drag walk without blocking entry modals;

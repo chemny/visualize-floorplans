@@ -1,13 +1,13 @@
 {
   "caseId": "jujian-beta4-review-20261006",
   "caseSha256": "e8293155d369c69126bac24783430cbb86ccad6f61321f3ede2dc7736f620b9c",
-  "engineSha256": "219436f8559d679f67d0c1046c222436bd1bbe61690c0c02836e4dfa0a337d72",
-  "htmlSha256": "d6c9db2b70346fac97c8f2d3aa5164eab3c8f07f4c33c83c553def9e920837ed",
+  "engineSha256": "1a5bba5e3cc703868fcadb653e0065e1a06ad7687fd5528378ace91866f846cc",
+  "htmlSha256": "6991ded113cc86c875fb82237c8e343a668b984299d955f67393c43fadf91c2f",
   "status": "built",
   "humanAcceptance": "not inferred from build",
   "sourceSchemeSha256": "7b9ba276f95077d7b1c9974a03035274811275dcd52bfa0a712c7e4c995c376e",
   "validation": "input contract only; no visual or cross-floorplan regression",
-  "workbenchVersion": "0.2.0-beta.5",
+  "workbenchVersion": "0.2.0",
   "templateSha256": "975c2929f9802b462f97235301ae41657cc69642c879218e71b46c7ad43cfe9a",
   "lightingCheck": {
     "status": "pass",

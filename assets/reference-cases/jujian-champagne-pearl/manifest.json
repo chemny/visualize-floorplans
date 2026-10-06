@@ -2,7 +2,7 @@
   "schema": "floor-visualization-reference-case/1.0",
   "title": "居间 · 香槟珍珠",
   "entrypoint": "index.html",
-  "workbenchVersion": "0.2.0-beta.5",
+  "workbenchVersion": "0.2.0",
   "scope": "curated final outputs and supplied references; no intermediate versions or audit history",
   "representations": {
     "currentWorkbench": "workbench/index.html",
@@ -13,14 +13,14 @@
     "tour": "selected older H5 walkthrough; current re-export deferred by user; not Seedance",
     "drawings": "selected older handoff drawings; current re-export deferred",
     "mesh": "existing tour source; current re-export deferred",
-    "acceptance": "source-artifact acceptance is not transferred to current beta.5 preview",
+    "acceptance": "source-artifact acceptance is not transferred to current 0.2.0 preview",
     "currentRendering": "native display pixel ratio without adaptive reductions or DPR cap; collision and batching/on-change rendering updated; generic indoor shadows disabled by default; current case trials one fixed 512-pixel dining pendant shadow pending visual review; unlit black wall cuts and omnidirectional ceiling diffusers; architectural presentation cut with complete furniture, closed architectural caps and full-model restoration; champagne finish revision 6, brushed silver fridge and 35 mm TV; dining/coffee accessories and scoped kitchen-corner decor; living/dining/entrance plain marble and champagne/pearl cabinets; common TV and lighting behavior shared across styles; isolated independent-HTML persistence and explicit material-following floor connection patches, connection area separately reported; reduced global fill and night gain, local ceiling finish lift"
   },
   "files": [
     {
       "path": "README.md",
-      "bytes": 3332,
-      "sha256": "09ac6a7985e95a0aab5556e882573e7be1981066a12a634721a4987be3101fdd"
+      "bytes": 3330,
+      "sha256": "a8c067fa5ba648893cda00c3b5cf60703224d1d35dc167b55ad5ffa3e0e383ef"
     },
     {
       "path": "data/case.json",
@@ -134,8 +134,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 8430,
-      "sha256": "51af3223866fb17f2f80d7610b13d68148906e3b1e818d107ddc1d7aa341015b"
+      "bytes": 8429,
+      "sha256": "ca93e6743fc448f82b56ab59e30feb818051a0e8166f51d24f6a86e95cd5c1d2"
     },
     {
       "path": "inputs/家具参考.png",
@@ -189,14 +189,14 @@
     },
     {
       "path": "workbench/index.html",
-      "bytes": 4800135,
-      "sha256": "d6c9db2b70346fac97c8f2d3aa5164eab3c8f07f4c33c83c553def9e920837ed"
+      "bytes": 4800104,
+      "sha256": "6991ded113cc86c875fb82237c8e343a668b984299d955f67393c43fadf91c2f"
     },
     {
       "path": "workbench/index.build.json",
-      "bytes": 2261,
-      "sha256": "ec4ef51b2d85ececcf065ef9a9435297ae71a1b2f5725cd930f7b6d6640188f8"
+      "bytes": 2254,
+      "sha256": "c8d82deb40a783dfc3b6dc268e3bd6d6aba7445f8855437d47359d8e6f25dd19"
     }
   ],
-  "indexedBytes": 53884968
+  "indexedBytes": 53884927
 }
