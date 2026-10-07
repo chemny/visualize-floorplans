@@ -2,7 +2,8 @@ import * as T from 'three';
 import {DEFAULT} from './data.js';
 const len=w=>Math.hypot(w.b[0]-w.a[0],w.b[1]-w.a[1]);
 export function endpointPadding(w,all,end){const p=end?w.b:w.a,l=len(w),horizontal=Math.abs(w.b[1]-w.a[1])<.01,axis=horizontal?0:1,k=1-axis,out=(end?1:-1)*(w.b[axis]-w.a[axis])/l;let pad=0;for(const n of all){if(n===w||n.demolished)continue;const nh=Math.abs(n.b[1]-n.a[1])<.01;if(horizontal===nh)continue;const delta=n.a[axis]-p[axis];if(Math.abs(delta)>n.t/2+.1)continue;const lo=Math.min(n.a[k],n.b[k]),hi=Math.max(n.a[k],n.b[k]);if(p[k]>=lo-w.t/2-.1&&p[k]<=hi+w.t/2+.1)pad=Math.max(pad,n.t/2+delta*out);}return pad;}
-export function intervals(w){let at=0,out=[];for(const o of [...w.opens].sort((a,b)=>a.at-b.at)){if(o.at>at)out.push([at,o.at]);at=Math.max(at,o.at+o.width);}if(at<len(w))out.push([at,len(w)]);return out;}
+export {validateRemovedIntervals,openingRemoved,intervals} from './wall-edits.js';
+import {openingRemoved,intervals} from './wall-edits.js';
 // All rectangles have the same winding. A single nonzero fill forms their union,
 // so an adjacent wall cannot paint a differently colored end cap over it.
 export function solidPlanPath(rects){return rects.map(r=>`M${r.x0} ${r.y0}H${r.x1}V${r.y1}H${r.x0}Z`).join('');}
@@ -21,7 +22,7 @@ export function planOutline(rects){
 }
 export function wallRect(w,a,b,all){const l=len(w),dx=(w.b[0]-w.a[0])/l,dy=(w.b[1]-w.a[1])/l;if(a===0)a-=endpointPadding(w,all,false);if(Math.abs(b-l)<.1)b+=endpointPadding(w,all,true);const p=[w.a[0]+a*dx,w.a[1]+a*dy],q=[w.a[0]+b*dx,w.a[1]+b*dy];return {x0:Math.min(p[0],q[0])-(Math.abs(dy)*w.t/2),x1:Math.max(p[0],q[0])+(Math.abs(dy)*w.t/2),y0:Math.min(p[1],q[1])-(Math.abs(dx)*w.t/2),y1:Math.max(p[1],q[1])+(Math.abs(dx)*w.t/2),wall:w.id};}
 function prism(w,a,b,z0,z1,all){return {...wallRect(w,a,b,all),z0,z1,wall:w.id,interval:[a,b]};}
-export function wallPrisms(all){const out=[];for(const w of all){if(w.demolished)continue;if(Math.abs(w.a[0]-w.b[0])>.1&&Math.abs(w.a[1]-w.b[1])>.1)throw Error('墙体请使用水平或垂直方向');for(const[a,b]of intervals(w))out.push(prism(w,a,b,0,w.height,all));for(const o of w.opens){const sill=o.sillHeight??850;if(o.kind==='window'&&sill>0)out.push(prism(w,o.at,o.at+o.width,0,sill,all));const head=o.kind==='window'?sill+(o.height??1350):(o.height||2100)+50;if(w.height>head)out.push(prism(w,o.at,o.at+o.width,head,w.height,all));}}return out;}
+export function wallPrisms(all){const out=[];for(const w of all){if(w.demolished)continue;if(Math.abs(w.a[0]-w.b[0])>.1&&Math.abs(w.a[1]-w.b[1])>.1)throw Error('墙体请使用水平或垂直方向');for(const[a,b]of intervals(w))out.push(prism(w,a,b,0,w.height,all));for(const o of w.opens){if(openingRemoved(w,o))continue;const sill=o.sillHeight??850;if(o.kind==='window'&&sill>0)out.push(prism(w,o.at,o.at+o.width,0,sill,all));const head=o.kind==='window'?sill+(o.height??1350):(o.height||2100)+50;if(w.height>head)out.push(prism(w,o.at,o.at+o.width,head,w.height,all));}}return out;}
 export function unionWalls(all,mat){const prisms=wallPrisms(all),unique=k=>[...new Set(prisms.flatMap(p=>[p[k+'0'],p[k+'1']]))].sort((a,b)=>a-b),xs=unique('x'),ys=unique('y'),zs=unique('z'),nx=xs.length-1,ny=ys.length-1,nz=zs.length-1,occupied=new Uint8Array(nx*ny*nz),index=(x,y,z)=>(z*ny+y)*nx+x;
  const xi=new Map(xs.map((v,i)=>[v,i])),yi=new Map(ys.map((v,i)=>[v,i])),zi=new Map(zs.map((v,i)=>[v,i]));
  for(const p of prisms)for(let z=zi.get(p.z0);z<zi.get(p.z1);z++)for(let y=yi.get(p.y0);y<yi.get(p.y1);y++)for(let x=xi.get(p.x0);x<xi.get(p.x1);x++)occupied[index(x,y,z)]=1;

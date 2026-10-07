@@ -32,8 +32,10 @@ export const RENOVATION_SPECS=[
  def('paperholder','纸巾架',160,100,150,650,'wall','metal'),
  def('walllamp','壁灯',180,120,260,1450,'wall','metal',true),
  def('tablelamp','台灯',240,240,400,750,'surface','metal',true),
+ def('wallart','装饰画',1400,35,750,1400,'wall','metal'),
  def('mirrorpanel','镜面',600,40,800,1100,'wall','glass'),
  def('mirrorlight','镜前灯',600,60,40,1900,'wall','metal',true),
+ def('robotvacuum','扫地机',350,350,100,0,'floor','frame'),
  def('wallpanel','护墙板',1200,30,1100,0,'wall','wood')
 ];
 export const RENOVATION_MAP=Object.fromEntries(RENOVATION_SPECS.map(s=>[s.type,s]));
@@ -48,6 +50,7 @@ export function renovationModel(f,p,night=false){
  const C=(r,b,x=0,y=0,z=0,m=shell)=>{const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,b,32),m);o.position.set(x,y+b/2,z);g.add(o);return o;};
  const slats=()=>{B(w,h,d);for(let i=0;i<Math.min(24,Math.max(3,Math.floor(w/.035)));i++){const x=-w*.45+w*.9*i/(Math.min(24,Math.max(3,Math.floor(w/.035)))-1);B(.012,.002,d*.7,x,.002,0,dark);}};
  switch(f.type){
+ case 'robotvacuum':C(Math.min(w,d)/2,h*.82);C(Math.min(w,d)*.17,h*.18,0,h*.82);B(w*.32,.004,d*.05,0,h*.82+.001,0,metal);break;
  case 'ceilinground': C(w/2,h*.22,0,h*.78);C(w/2,h*.78,0,0,0,glow);break;
  case 'ceilingsquare':case 'lightpanel': B(w,h*.22,d,0,h*.78);B(w,h*.78,d,0,0,0,glow);break;
  case 'spotlight':C(w/2,h);C(w*.34,.003,0,-.0006,0,glow);break;
@@ -76,6 +79,10 @@ export function renovationModel(f,p,night=false){
  case 'paperholder':B(w*.8,h*.7,d*.6,0,h*.1,d*.15,material('ceramic'));B(w,.008,d,0,h-.008,0,metal);B(w*.1,h,d*.3,-w*.45,0,-d*.35,metal);break;
  case 'walllamp':B(w,h,d*.6);B(w*.85,h*.02,d*.5,0,0,d*.25,glow);break;
  case 'tablelamp':C(w*.42,h*.07,0,0,0,metal);C(.009,h*.6,0,0,0,metal);C(w/2,h*.33,0,h*.67);C(w*.45,.004,0,h*.67-.0006,0,glow);break;
+ case 'wallart': {
+  B(w,h,d,0,0,0,metal);const face=d/2+.001;B(w-.035,h-.035,.002,0,.0175,face,material('canvas','#f2eee5'));
+  B(w*.32,h*.53,.001,-w*.20,h*.20,face+.002,material('paint','#c4ad88'));B(w*.25,h*.32,.001,w*.19,h*.16,face+.003,material('paint','#dbcebb'));B(w*.10,h*.40,.001,w*.11,h*.35,face+.004,material('paint','#aeb3a3'));break;
+ }
  case 'mirrorpanel':B(w,h,d,0,0,0,metal);B(w-.025,h-.025,.003,0,.0125,d/2+.002,material('glass','#d9e4e3',{metalness:.88,roughness:.07}));break;
  case 'mirrorlight':B(w,h,d,0,0,0,metal);B(w*.95,h*.8,.003,0,h*.1,d/2+.002,glow);break;
  }
@@ -84,6 +91,7 @@ export function renovationModel(f,p,night=false){
 }
 export function renovationSymbol(type,w,d,c){
  const s='stroke="#666158" stroke-width="1" vector-effect="non-scaling-stroke"',r=(fill=c)=>`<rect x="${-w/2}" y="${-d/2}" width="${w}" height="${d}" fill="${fill}" ${s}/>`;
+ if(type==='robotvacuum')return `<ellipse rx="${w/2}" ry="${d/2}" fill="${c}" ${s}/><ellipse rx="${w*.17}" ry="${d*.17}" fill="#777" ${s}/>`;
  if(['ceilinground','spotlight','tablelamp'].includes(type))return `<ellipse rx="${w/2}" ry="${d/2}" fill="${c}" ${s}/><path d="M${-w*.25} 0H${w*.25}M0 ${-d*.25}V${d*.25}" ${s}/>`;
  if(['ceilingsquare','lightpanel'].includes(type))return r()+`<path d="M${-w*.3} ${-d*.3}L${w*.3} ${d*.3}M${w*.3} ${-d*.3}L${-w*.3} ${d*.3}" ${s}/>`;
  if(['airvent','returnvent','exhaustvent','floordrain'].includes(type))return r()+[-.3,-.15,0,.15,.3].map(a=>`<path d="M${-w*.4} ${d*a}H${w*.4}" ${s}/>`).join('');

@@ -1,4 +1,16 @@
-Current workbench snapshot: **0.2.0**. See [beta.5 verification](beta5-workbench-validation.md) and [workbench reliability rules](workbench-reliability-rules.md). The reports below describe historical snapshots. Publication is now explicitly requested by the user; Windows runtime testing remains deferred under the agreed compatibility-only scope.
+# Release review · 0.2.1 · 2026-10-07
+
+Current Skill and shared H5 engine identity: **0.2.1**. Codex/macOS executes the
+Python and Node regression suite. Windows receives static path, UTF-8, subprocess
+and browser-file review, not Windows runtime certification. Claude Code and
+OpenClaw discovery and host image integrations remain untested. The owner
+explicitly accepted publishing with these boundaries disclosed. Historical
+reports below retain their original scope and do not certify newer behavior.
+
+The release includes reusable workflow, furniture rules, editing, local project
+save/confirmation and portable exports. A different-floorplan test was completed
+locally as a concept workflow, but its private source and media are excluded from
+this public release. The previously authorized bundled reference is preserved.
 
 # Beta release validation · 0.2.0-beta.3
 

@@ -1,5 +1,18 @@
 # Furniture layout and local-revision gate
 
+Follow `guided-user-workflow.md`: missing furniture references do not block
+layout design. Everyday living convenience is the default; do not require
+ranking abstract storage/work/activity categories. Ask only concrete layout-changing
+constraints, and accept no special requirements. Use the round-1 needs to prepare the layout and function/circulation
+review together, then collect round-2 decisions in one batch with recommendations.
+Continue drafting, checking and correcting before that presentation.
+
+Read `furniture-placement-principles.md` for placement and room-composition rules.
+Use the same H5 state for the editable confirmation workbench and exported plan/
+layout drawings; follow `guided-user-workflow.md`. Independent renderers remain
+a fallback when H5 cannot represent the source, with explicit limitations and
+migration parity before any later workbench.
+
 ## 1. Confirm use before rendering style
 
 Use the confirmed structure/access base to propose a legible top-down furniture
@@ -33,9 +46,13 @@ construction and allowable depth for qualified verification.
 
 Review the actual drawing, including objects in use rather than footprints only:
 
-- Completeness: each required function has equipment or an explicit omission;
+- Completeness: use the whole-home inventory in furniture-placement-principles.md,
+  verifying IDs, room, drawing representation and actual mesh presence for essentials;
+  each required function has equipment or an explicit omission;
   no unnecessary cabinet has been silently made mandatory.
-- Doors: hinge, swing, closure, jamb/return and handle-side obstructions remain
+- Doors: proposed room doors normally open inward; compare hinge sides so the
+  open leaf rests near a receiving wall, with explicit reasons for exceptions.
+  Check the actual 3D pose as well as the 2D sweep. Hinge, swing, closure, jamb/return and handle-side obstructions remain
   consistent with the approved access map; furniture does not block an opening.
 - Circulation: entry and room-to-room paths remain continuous, including access
   to kitchen and outdoor spaces. An arrow alone is not proof of a clear path.
@@ -96,3 +113,51 @@ not an automatic vision detector.
 
 Store object coordinates, room-specific preferences and particular fixture
 placements in the case, not in this Skill or long-term memory.
+
+
+## Circulation and storage anchor evidence
+
+Reject a furniture proposal if its dining group blocks a required passage in an
+occupied state. Include a case-local connected route plan with design-width
+assumptions, chair movement envelopes and wall/door obstacles; list the exact
+checked endpoints and remaining gaps in evidence. Recheck after edits.
+For viable storage corners, record back and end wall IDs, measured model gaps,
+opening avoidance and usable front access. A one-wall gap pass does not certify
+corner fitting, and a standing-area pass does not certify hinged cabinet doors.
+
+
+## Bed-size and cabinet-length evidence
+
+Before accepting a bedroom proposal, compare viable bed sizes against the room's
+actual functions and complete furniture group; do not infer a single bed from
+“secondary bedroom” alone. Record the selected size and its reason, using bed
+frame outer dimensions or explicitly marking that selection remains pending.
+For storage, derive length from a continuous finished-wall run and record both
+corner anchors, opening/installation allowances and front operating space.
+Distinguish along-wall end clearance from passage width. Recheck daily and
+converted guest layouts after resizing. Case dimensions are not universal
+minimums; see `furniture-placement-principles.md` for the generation workflow.
+
+
+For double beds, verify headboard back orientation and contact with the actual
+finished solid wall; explain any necessary installation exception. Check both
+bedside positions when space allows. Record desk/chair and sofa/coffee-table
+edge distances and operating states. A rotated wall-adjacent dining table must
+retain usable household seats and occupied circulation. Do not certify an
+outward entry swing when exterior corridor geometry is unavailable.
+
+
+Check curtain travel and stacking envelopes before locating window-side furniture
+or furniture beside a curtained balcony slider. Record selection assumptions.
+Entry storage is optional and must be justified by household needs and available
+space; inventory completeness must not force a shoe cabinet into the entry route.
+
+
+Dimension displays use integer millimetres while geometry retains precision.
+Default to exterior overall/positioning chains with a consistent font size;
+merge short adjacent spans without changing chain endpoints or total length.
+Avoid internal dimension annotations in the furniture presentation. Distinguish
+original drawing readings from model-derived dimensions; do not force an
+unreconciled source chain onto inconsistent geometry. Regenerate displayed chains when their supporting geometry changes, and verify
+segment sums against their declared endpoints. Detailed opening dimensions are
+reserved for a separately requested technical drawing.

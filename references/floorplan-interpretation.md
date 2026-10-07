@@ -5,6 +5,16 @@ image. Review structure/functions and doors/windows/connectivity as two scopes,
 which may share one complete presentation and one explicit confirmation. A tour route is optional and belongs to
 the later video branch.
 
+## User interaction policy
+
+Follow `guided-user-workflow.md`. Complete source reading, dimension extraction,
+reconstruction and self-checks continuously before presenting one round-1 plan
+review and essential-needs checklist. Sections 5 and 7 are internal review scopes,
+not two default user interruptions. Display them together and ask only missing
+consequential questions. Reuse supplied answers; do not ask users to transcribe
+readable source dimensions. Source gaps that genuinely block reconstruction may
+require one early clarification batch; do independent work while awaiting replies.
+
 ## 1. Establish image coordinates
 
 - Refer to `top`, `bottom`, `left`, and `right` as they appear in the uploaded

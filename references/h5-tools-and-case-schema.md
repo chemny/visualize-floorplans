@@ -65,7 +65,9 @@ review. The blank template intentionally fails build: it cannot fabricate walls.
   are not engineering verification.
 - An opening has `{id,kind,at,width,swing,hingeEnd,angle}` plus optional
   `sillHeight`, `height`, `entry`. `at` is measured along the wall start→end,
-  not an absolute room coordinate. `kind` is `door`, `sliding`, or `window`.
+  not an absolute room coordinate. `hingeEnd` is `start` or `end`; `swing` is
+  +1 or -1; `angle` is the opening extent in degrees (5–100, normally 90), not
+  the current closed pose. `kind` is `door`, `sliding`, or `window`.
   `entranceOpenings` explicitly names entrance opening/wall IDs. The structure
   drawing keeps that door symbol and shows other doors as blank openings.
 - `furniture`: stable `id`, `type`, `name`, `cx,cy,w,d,h,elevation,rot,color`.

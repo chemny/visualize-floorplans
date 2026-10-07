@@ -74,3 +74,11 @@ confirmation record; see `design-and-revisions.md`.
 
 Regenerate the example from its JSON using render_furniture_layout.py with a
 new output stem; the renderer deliberately refuses overwriting existing files.
+
+## Shared-workbench drawing authority
+
+For an H5-supported source, use the canonical H5 case and its current furniture
+drawing export. Preserve the drawing language below where supported, but never
+redraw positions to imitate an example. Use the Python drawing fallback only
+when H5 cannot represent the source, disclosing limitations and checking migration
+parity before a later workbench. PNG must render the exact exported SVG.

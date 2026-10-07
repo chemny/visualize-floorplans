@@ -92,6 +92,12 @@ an ordinary preview manifest cannot grant acceptance with a boolean.
    import, and test local-file browsing, drawing switches, 2D/3D, image links,
    video playback, narrow layout, and absence of external dependencies for an
    offline package. Hash copied assets and validate the archive contents.
+   A freshly built diagnostic HTML with a fixed initial seed is not necessarily
+   a portable editable deliverable. Create the standalone copy through the
+   workbench's current-scheme HTML export so it receives an isolated document
+   storage identity. Test a real edit, Save, reload, and download/reopen in a
+   fresh browser context; scheme equality on first open alone cannot prove save
+   persistence. Preserve the original approved scheme during these tests.
 6. Record representation differences honestly. An older accepted AI image can
    retain its own source scheme and lighting profile; do not rebind it to a new
    scheme hash or claim it was regenerated. List the changed scopes and current

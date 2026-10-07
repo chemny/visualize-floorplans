@@ -1,11 +1,33 @@
 ---
 name: visualize-floorplans
-description: Review dimensioned floor plans and furniture references, build editable offline H5 2D/3D renovation workbenches, coordinate interior concept images, and create deterministic homeowner camera preflights. Use when the user requests floor-plan confirmation, furniture and finish editing, scheme export, walkthrough planning and local handoff. Preserve structural evidence and versioned approvals. Concept design is not measured CAD or construction documentation; Seedance is a separate optional branch.
+description: Start from one floor-plan image with optional furniture/style references, build editable offline H5 2D/3D renovation workbenches, coordinate interior concept images, and create deterministic homeowner camera preflights. Use when the user requests floor-plan confirmation, furniture and finish editing, scheme export, walkthrough planning and local handoff. Preserve structural evidence and versioned approvals. Concept design is not measured CAD or construction documentation; Seedance is a separate optional branch.
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
 ---
 
 # Visualize Floorplans
+
+## Default guided user workflow
+
+Read `references/guided-user-workflow.md` before starting a new case.
+One plan is enough to start; furniture and style references are optional.
+Use three concentrated decision rounds: (1) reconstructed plan/access and essential
+needs, (2) furniture/function layout, (3) style and agreed output views. Use the same diagnostic H5 workbench from round 1, refine its canonical data
+through layout/style, and export confirmation drawings from it. Then
+produce the final workbench and agreed images continuously and present them together
+for final output review. Keep exact-scope approvals and all quality gates;
+three decision rounds are not automatic acceptance of final outputs.
+Batch missing consequential questions with recommended options and reasons.
+Before asking an undecided user to select a style, show an actual style comparison
+image and run `scripts/check_style_selection.py` as specified in
+`references/style-selection-gate.md`. Text-only substitution requires an explicit
+user waiver; tool/state blockers must be reported rather than silently skipping
+the comparison. Diagnostic preset values are not user style choices.
+Read dimensions, draw, self-check and repair without asking users to repeat
+“continue”. A progress update must not end authorized work within a round.
+Only genuine dependencies or consequential decisions justify a pause.
+These interaction rounds coordinate the technical stages below; optional video
+is not the third user decision round.
 
 ## Bundled reference case
 
@@ -22,6 +44,18 @@ pass. Formal handoff/package use `--accepted --bundle --quality-review` and
 require technical, geometry, visual and explicit human acceptance separately.
 Diagnostic previews remain available with failures and pending statuses visible.
 
+## Wall-backed furniture generation
+
+Apply the wall-contact section in `references/furniture-placement-principles.md`
+when generating or revising furniture layouts. Anchor cabinet backs and mounted
+TVs to actual finished wall faces, record installation exceptions, and audit the
+relationship after edits. Use `scripts/wall_anchor_layout.py` for deterministic
+placement and checking; floor/door collision passes alone do not prove adjacency.
+Protect connected passage strips including pulled-out dining chairs before placing
+the dining group. Prefer viable two-wall cabinet corners and check front access.
+Use `scripts/layout_access_checks.py` and the corner-anchor helpers for generation
+and review; these are not persistent automatic editor constraints.
+
 ## Workbench reliability rules
 
 Before H5 source maintenance, read `references/workbench-reliability-rules.md`.
@@ -33,7 +67,16 @@ transfer visual acceptance to the actual case or older media.
 
 ## Local workbench entrypoint
 
+For collaborative editing use `references/project-save-confirm.md`: local project
+Save and version-bound Confirm and continue coexist. The Agent launches/opens the
+project service and awaits a stage-specific confirmation during an active task;
+the service cannot wake an ended task. Portable HTML retains independent saving.
+Never treat an old seed as recovered browser edits or use this service to bypass
+an existing access denial.
+
 For H5 interface changes, read `references/h5-interaction-presentation.md`.
+Chinese room/passage display names must be at most three characters; retain
+functional explanations separately and validate model/state naming before build.
 Preserve direct joystick/keyboard/drag walk without blocking entry modals;
 pointer lock is optional. Keep case parity and new-interface visual acceptance
 separate from earlier scheme approvals.
@@ -46,14 +89,6 @@ H5 is the default deterministic engine; Blender is optional via
 `run_production.py --engine blender`. Never hardcode case coordinates, palette
 selections, lamp counts, floor areas or approval evidence in the shared engine.
 Keep the existing approved case unchanged during generic-template maintenance.
-
-Version 0.2.0-beta.3 adds local quality gates after the initial implementation closeout. Source/entrypoint/package
-checks are distinct from visual acceptance. See `references/local-beta-status.md`
-for exactly what has been checked and what remains deferred. Do not describe
-unrun cross-floorplan, full regression or Seedance work as completed. There is no
-requirement to expand this closeout into optional recognition, automatic layout,
-construction documentation or public publishing.
-
 
 Prefer the structured H5 workflow when an editable 2D/3D workbench is available:
 
@@ -71,13 +106,9 @@ technical result and user acceptance per case; neither validates a Seedance
 generation chain. Preserve the accepted subset and distinguish current drawings
 from older accepted AI images with different lighting or source revisions.
 
-Without a structured workbench, use the existing three-stage concept workflow:
-
-1. reconstruct and confirm the floor plan;
-2. confirm a furniture/equipment layout, choose or specify one renovation direction, generate coordinated images, and
-   revise the affected results until the scheme is confirmed;
-3. only when requested, confirm a route and attempt a genuinely continuous
-   walkthrough video that remains consistent with the confirmed scheme.
+Without a structured workbench, reconstruct and confirm the floor plan, then
+confirm furniture and a design direction before coordinated image generation.
+A route and genuinely continuous video remain a separately requested branch.
 
 The original plan remains the structural authority. Floor-plan reconstruction,
 comparison against the source, and user confirmation are mandatory before any
@@ -91,7 +122,7 @@ acceptance are verified per case.
 
 ## Scope and stopping point
 
-This is a concept-workflow beta, not a verified architectural reconstruction
+This is a concept workflow, not a verified architectural reconstruction
 engine. Room-perspective images may drift despite preflight. User acceptance,
 visual structural review, and automated file checks are separate facts. If the
 user stops generation, hand off only the accepted subset with rejected and
@@ -149,7 +180,8 @@ Do not reopen unchanged approvals or add deliverables just to keep going.
    the entire drawing in one semantic pass.
    Record the readable/partial/critical-missing assessment and follow the
    completion branch in `references/floorplan-interpretation.md` for gaps.
-2. Generate a clean orthographic 2D top-down reference plan as an editable SVG
+2. Establish the canonical H5 case for supported geometry, then generate a clean
+   orthographic 2D top-down reference plan as an editable SVG
    plus a same-revision PNG preview. When structured geometry is available, read
    `references/deterministic-drawing-tools.md` and use `render_floorplan.py`;
    do not copy coordinates from the bundled furniture example. Preserve visible
@@ -163,7 +195,10 @@ Do not reopen unchanged approvals or add deliverables just to keep going.
    access element and record swing direction or sliding evidence. Validate the
    recognition and access artifacts with `validate_recognition.py` and
    `validate_access.py`.
-4. Present the reconstructed plan beside the source and perform the self-check
+4. Complete the reconstruction and self-check before the round-1 question batch.
+   Present structure/functions and access together by default. Collect only
+   missing consequential household needs with recommended choices.
+   Present the reconstructed plan beside the source and perform the self-check
    described in `references/floorplan-interpretation.md`. Ask the user to correct
    only wrong or uncertain items. One confirmation may cover both
    `structure_and_zones` and `access_elements` when both were fully shown;
@@ -203,7 +238,12 @@ Use a dimensioned black-and-white orthographic linework layout by default for
 this review, following `references/furniture-layout-template.md` and its bundled
 approved PNG/SVG example. Reuse its drafting language, not its apartment geometry
 or furniture positions. Deliver an editable SVG plus its same-revision PNG
-preview. For structured input, use `render_furniture_layout.py` and resolve its
+preview. For H5-supported structured input, edit the canonical case/workbench and export
+its structure/furniture SVG+PNG modes rather than independently redrawing. Read
+`references/furniture-placement-principles.md` and apply its layout-synthesis sequence
+before choosing furniture coordinates. Compare wall anchors and operating states
+internally, and record room-level review evidence before presentation. If H5 cannot represent the source,
+use the explicit drawing fallback with limitations; `render_furniture_layout.py` resolves its
 wall, furniture-overlap, and door-swing conflicts before presentation. Its checks
 do not certify unmeasured clearance or construction feasibility. This is a
 conceptual reference, not measured CAD.
@@ -220,9 +260,12 @@ Do not repurpose `approve-primary` to approve a layout proposal.
 1. Let the user specify a style or choose from the 12 defaults in
    `assets/project-template.json`: 现代简约、原木奶油、现代轻奢、现代新中式、
    中古现代、轻东方宋式、克制法式优雅、意式克制奢华、香槟珍珠、米兰暖灰、
-   巴黎装饰艺术、奶油雕塑感. For undecided users, default to three same-room
-   2x2 boards (A–D, E–H, I–L), with identical layout/camera/daylight across all
-   boards. Read `references/design-and-revisions.md` for comparison execution.
+   巴黎装饰艺术、奶油雕塑感. For undecided users, recommend three suitable directions and one
+   preferred choice with a reason, using the same layout/camera/daylight for
+   a single comparison board when available. Follow
+   `references/guided-user-workflow.md` for the host-tool three-option branch;
+   the legacy planner still supports only 4/8/12-option boards. Read
+   `references/design-and-revisions.md` for expanded comparison execution.
    These are design directions, not popularity rankings. Preserve a user's
    smaller requested comparison; never require comparison after selection.
    Use `selected_style: custom` with `custom_style.name` and
@@ -417,20 +460,5 @@ See `references/bundled-resource-index.md` for scripts, templates and their role
 
 ## Completion report
 
-Report:
-
-- confirmed and uncertain structural facts;
-- reconstructed plan SVG and same-revision PNG preview paths;
-- furniture-layout SVG and same-revision PNG preview paths;
-- approved door/window schedule and access-map path;
-- selected or custom style, plus comparison-board paths only when used;
-- generated views and their reference chain;
-- structural-lock registry plus each asset's `must_not_change` constraints;
-- planned base-package and floor-plan-adaptive deliverables;
-- planned and actual asset kinds, including approved exceptions;
-- camera intent and must-show elements for every client-facing image;
-- structural-gate and multi-image consistency-gate results;
-- failed quality gates;
-- output paths and sizes;
-- route and video artifacts only when that optional branch was requested;
-- whether results remain conceptual or were upgraded by a structured 3D system.
+Read `references/completion-report.md` and report confirmed scopes, uncertainties,
+quality failures, agreed artifacts and their reference chains.

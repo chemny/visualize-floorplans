@@ -4,6 +4,13 @@ Paths below resolve from the Skill root. Consult when selecting a helper script 
 
 ## Bundled resources
 
+- `scripts/project_service.py`: loopback project save, conflict detection,
+  stage-bound confirmation and bounded Agent waits. See `project-save-confirm.md`.
+
+- `scripts/check_style_selection.py`: check case-local visual selection evidence
+  before asking for a style choice or starting selected-style production. Read
+  `references/style-selection-gate.md`; this does not inspect image semantics.
+
 - `scripts/plan_project.py`: validate a manifest and compile deterministic Image
   2 task prompts without calling an external API.
 - `scripts/plan_delivery.py`: compile the client-facing base package, adaptive
@@ -44,3 +51,16 @@ Paths below resolve from the Skill root. Consult when selecting a helper script 
 - `assets/floorplan-input-template.json`, `assets/furniture-layout-input-template.json`,
   and `assets/contact-sheet-input-template.json`: case-neutral structured inputs;
   fill them in a run directory rather than editing the templates in place.
+
+## Example and historical validation resources
+
+- `assets/reference-cases/jujian-champagne-pearl/data`: example scheme and retained media-source metadata.
+- `assets/reference-cases/jujian-champagne-pearl/images`: thirteen selected concepts, linked by its case index.
+- `assets/reference-cases/jujian-champagne-pearl/licenses`: retained upstream notices.
+- `assets/reference-cases/jujian-champagne-pearl/tour`: the retained tour and its route/source records.
+- `assets/reference-cases/jujian-champagne-pearl/manifest.json`: per-file purpose and hash index.
+- `assets/reference-cases/jujian-champagne-pearl/workbench/index.build.json`: retained example build evidence.
+- `assets/renovation-concept-showcase.png`: historical concept illustration.
+- `references/beta4-workbench-validation.md`: historical bounded checks, not current acceptance.
+- `references/release-validation.md`: current release boundaries and historical evidence.
+- `references/local-beta-status.md`: historical technical and visual scope limitations.

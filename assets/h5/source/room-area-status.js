@@ -1,5 +1,5 @@
 // Room polygons remain source authority until a new partition is confirmed.
-const geometry=w=>({a:w.a,b:w.b,t:w.t,demolished:!!w.demolished});
+const geometry=w=>({a:w.a,b:w.b,t:w.t,demolished:!!w.demolished,removedIntervals:w.removedIntervals||[]});
 export function roomAreaStatus(original,current){
  const before=new Map(original.map(w=>[w.id,JSON.stringify(geometry(w))]));
  const after=new Map(current.map(w=>[w.id,JSON.stringify(geometry(w))]));

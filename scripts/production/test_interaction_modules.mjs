@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Reusable no-browser regression checks; no host permission requests.
-import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {fileURLToPath,pathToFileURL} from 'node:url';
+import vm from 'node:vm';import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {fileURLToPath,pathToFileURL} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..'),base=path.join(root,'assets/h5/source');
 const load=n=>import(pathToFileURL(path.join(base,n)).href);
 const {roomAreaStatus}=await load('room-area-status.js'),{recordPointerLockFailure,pointerLockContext}=await load('pointer-lock-diagnostics.js'),{marbleHasVeins,marbleVeinSVG,paintMarbleVeins}=await load('material-presentation.js'),{persistScheme,decodeScheme,restoreScheme}=await load('scheme-storage.js'),{sceneLabelPoint}=await load('room-labels.js'),{createLightingRuntime}=await load('lighting-runtime.js');
@@ -62,4 +62,51 @@ const {productionScopes,createProductionBundle}=await load('production-contract.
 const model={width:1000,depth:1000,height:2800,footprint:[[0,0],[1000,0],[1000,1000],[0,1000]],walls:[wall]};
 test('production: material presentation bound to style scope',()=>assert.equal(productionScopes(state,model,[],{}).style.materialPresentation.marble.veins,false));
 const bundle=await createProductionBundle(state,model,[],{});test('production: area status and material configuration survive export',()=>{assert.equal(bundle.roomGeometryStatus.status,'source-partitions');assert.equal(bundle.materialPresentation.marble.veins,false)});
+
+
+const wallEdits=await import('../../assets/h5/source/wall-edits.js');
+const partition={id:'partition',a:[0,0],b:[2000,0],opens:[{at:800,width:600}],removedIntervals:[[300,600]]};
+test('demolition: partial removal preserves both solid spans and existing aperture',()=>{wallEdits.validateRemovedIntervals(partition);assert.deepEqual(wallEdits.intervals(partition),[[0,300],[600,800],[1400,2000]]);});
+test('demolition: removing entire aperture also removes its header/fixture flag',()=>{const p={...partition,removedIntervals:[[700,1500]]};wallEdits.validateRemovedIntervals(p);assert(wallEdits.openingRemoved(p,p.opens[0]));assert.deepEqual(wallEdits.intervals(p),[[0,700],[1500,2000]]);});
+test('demolition: reject truncated aperture and invalid ranges',()=>{for(const ranges of [[[700,1000]],[[0,2100]],[[100,150],[120,200]],[[100,120]]])assert.throws(()=>wallEdits.validateRemovedIntervals({...partition,removedIntervals:ranges}));});
+test('area: partial removal marks pending and restored state clears it',()=>{assert.equal(roomAreaStatus([wall],[{...wall,removedIntervals:[[100,500]]}]).status,'pending-repartition');assert.equal(roomAreaStatus([wall],[{...wall,removedIntervals:[]}]).status,'source-partitions');});
+
+test('UI contract: Save in header, save timestamp in footer, quick door/wall actions in popup',()=>{const html=fs.readFileSync(path.join(root,'assets/h5/template.html'),'utf8'),app=fs.readFileSync(path.join(base,'app.js'),'utf8');assert(html.slice(html.indexOf('<header>'),html.indexOf('</header>')).includes('id="saveScheme"'));assert(!html.slice(html.indexOf('<aside class="right"'),html.indexOf('</aside>',html.indexOf('<aside class="right"'))).includes('id="saveScheme"'));assert(html.slice(html.indexOf('<footer>')).includes('id="savedState"'));assert(app.includes("STORE+':saved-at'"));assert(app.includes('id="quickRemoveWall"'));assert(app.slice(app.indexOf('const quickObjectFab=renderFab')).includes('id="flipDoorHinge"'));});
+test('TV projection: wall mount omits stand, tabletop version retains it',()=>{
+ const app=fs.readFileSync(path.join(base,'app.js'),'utf8');
+ const section=app.slice(app.indexOf('const ST ='),app.indexOf('const NOLABEL ='));
+ const draw=new Function(section+';return furnSVG;')();
+ assert.equal((draw('tv',1200,35,'#222',{mount:'wall'}).match(/<rect/g)||[]).length,1);
+ assert.equal((draw('tv',1200,35,'#222',{}).match(/<rect/g)||[]).length,2);
+});
+
+const {planRevisionMigration,findPreviousScheme}=await load('scheme-migration.js');
+const {exportSchemeSeed}=await load('scheme-storage.js');
+test('storage: write/read mismatch is reported as failure',()=>{const broken={getItem:()=>null,setItem:()=>{}};assert.throws(()=>persistScheme(broken,'case',state,validate),/读取不一致/);});
+test('portable HTML seed: current edits roundtrip and script terminators are escaped',()=>{const edited={...state,furniture:[{id:'a',cx:4321,name:'</script><script>oops'}]};const raw=exportSchemeSeed(edited,validate);assert(!raw.includes('</script>'));assert.deepEqual(JSON.parse(raw),edited);assert.deepEqual(restoreScheme(null,JSON.parse(raw),validate),edited);});
+const baseMigration={caseId:'old',furniture:[{id:'sofa',type:'sofa',cx:100,cy:100,w:1000,d:500,color:'#ffffff'}],rooms:{r:{name:'书房',mat:'wood'}},walls:[],ceilings:[],doorStyles:{},productionApprovals:{}};
+test('revision: user movement survives while newer room label stays',()=>{const previous=structuredClone(baseMigration),current=structuredClone(baseMigration);previous.furniture[0].cx=600;current.caseId='new';current.rooms.r.name='客厅';const p=planRevisionMigration(baseMigration,previous,current);assert.equal(p.state.furniture[0].cx,600);assert.equal(p.state.rooms.r.name,'客厅');assert.equal(p.state.caseId,'new');assert.equal(p.conflicts.length,0);});
+test('revision: competing furniture edits retain new value and expose old user value',()=>{const previous=structuredClone(baseMigration),current=structuredClone(baseMigration);previous.furniture[0].cx=600;current.furniture[0].cx=900;const p=planRevisionMigration(baseMigration,previous,current);assert.equal(p.state.furniture[0].cx,900);assert.equal(p.conflicts[0].userEdit,600);});
+test('revision: added/deleted furniture supported; generated assemblies are excluded',()=>{const previous=structuredClone(baseMigration),current=structuredClone(baseMigration);previous.furniture=[{id:'chair',type:'chair',cx:400,w:500,d:500},{id:'generated',assemblyOwner:{kind:'room'},type:'trim'}];const p=planRevisionMigration(baseMigration,previous,current);assert.deepEqual(p.state.furniture.map(f=>f.id),['chair']);});
+test('revision: inspect declared predecessors only, keep corrupt raw and all old caches',()=>{const s=storage();const old={...baseMigration};s.setItem('floor-visualization:old',JSON.stringify(old));s.setItem('floor-visualization:bad','{bad');s.setItem('floor-visualization:unrelated',JSON.stringify({...old,caseId:'unrelated'}));const p=findPreviousScheme(s,[{caseId:'old',baseline:baseMigration},{caseId:'bad',baseline:baseMigration}],'new');assert.equal(p.candidate.revision,'old');assert.equal(p.errors.length,1);assert.equal(s.getItem('floor-visualization:bad'),'{bad');});
+test('UI: explicit browser save, portable download, optional migration and export isolation',()=>{const app=fs.readFileSync(path.join(base,'app.js'),'utf8'),html=fs.readFileSync(path.join(root,'assets/h5/template.html'),'utf8');assert(app.includes('保存到当前浏览器；最后保存：'));assert(html.includes('下载工作台'));assert(app.includes('exportSchemeSeed(state,fixState)'));assert(app.includes('if(EXPORT_ID||recovery'));assert(app.includes('if(hadOwnScheme)return'));assert(html.includes('id="recoverEdits" hidden'));assert(app.includes('requestAnimationFrame(checkPreviousEdits)'));});
+
+const interactionSource=fs.readFileSync(path.join(base,'app.js'),'utf8');
+test('dimensions: short-span merge preserves total and endpoints',()=>{
+ const code=interactionSource.slice(interactionSource.indexOf('function mergeDimensionSpans('),interactionSource.indexOf('function renderDims(){'));const ctx={};vm.createContext(ctx);vm.runInContext(code,ctx);
+ for(const segs of [[100,200,900,50],[50,80],[800,100,200,900],[800.125,40.5,60]]){const merged=ctx.mergeDimensionSpans(segs,650);assert.equal(merged.reduce((a,b)=>a+b,0),segs.reduce((a,b)=>a+b,0));assert(merged.length===1||merged.every(v=>v>=650));}
+});
+test('library: More Components opens desktop/narrow panes without toggling closed',()=>{
+ const drawerCode=interactionSource.slice(interactionSource.indexOf('function drawer(which, open){'),interactionSource.indexOf('function syncPaneBtns(){'));
+ const match=interactionSource.match(/contextButton\('更多组件',\(\)=>\{([\s\S]*?)\}\);/);assert(match);
+ for(const narrow of [false,true])for(const alreadyOpen of [false,true]){
+  const els={};for(const k of ['.app','aside.lib','aside.right']){const flags=new Set(k==='aside.lib'&&alreadyOpen?['open']:[]);els[k]={classList:{toggle:(v,on)=>on?flags.add(v):flags.delete(v),remove:v=>flags.delete(v),contains:v=>flags.has(v)}};}
+  const ctx={$:k=>els[k],narrow:()=>narrow,panes:{hideLib:true,hidePanel:false},localStorage:{setItem(){}},PANES:'test',syncPaneBtns(){},syncStyleUI(){ctx.styleSynced=true;},renderPanel(){},toast(){},libraryPage:'styles'};
+  vm.createContext(ctx);vm.runInContext(drawerCode+';'+match[1],ctx);assert.equal(ctx.libraryPage,'furniture');assert.equal(ctx.panes.hideLib,false);assert.equal(els['aside.lib'].classList.contains('open'),narrow);assert.equal(els['.app'].classList.contains('hide-lib'),false);assert(ctx.styleSynced);
+ }
+});
+test('copy: independent identity, selection and shared mutation history',()=>{
+ const code=interactionSource.slice(interactionSource.indexOf('function duplicateSel(){'),interactionSource.indexOf('// 新放下的家具'));
+ const original={id:'bed',cx:1000,cy:2000,w:1500,d:2000};const ctx={ui:{sel:{kind:'furn',id:'bed'}},state:{furniture:[original]},uid:()=> 'copy',getF:()=>original,mutate(fn){fn();ctx.mutations=(ctx.mutations||0)+1;}};vm.createContext(ctx);vm.runInContext(code+';duplicateSel();',ctx);assert.equal(ctx.state.furniture.length,2);assert.equal(ctx.state.furniture[1].id,'copy');assert.equal(ctx.ui.sel.id,'copy');assert.equal(original.cx,1000);assert.equal(ctx.mutations,1);
+});
 console.log(JSON.stringify({pass:true,count:passed.length,checks:passed},null,2));

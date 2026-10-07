@@ -83,3 +83,52 @@ Indoor shadows remain opt-in case trials: fixed IDs, small maps, bounded count a
 Check current files directly before claiming a browser restriction. If a tool rejects access, report its concrete reason and stop that blocked operation; never bypass through another browser or serving a copy. User-supplied screenshots can support visual discussion, but are not evidence that the edited version was inspected.
 
 Keep synthetic tests, actual-case visual acceptance, emulator checks, platform reviews and physical-device tests separate. Rebuild the engine and delivery files after source changes; verify manifests and current/bundled parity. Keep old images, tours and mesh sources labelled by their actual revision instead of inheriting new acceptance. Preserve diagnostic history outside the curated reference case.
+
+## Wall and floor junction review
+
+Check a door-carrying wall segment against its adjacent wall axes and finished
+faces; do not mix centerline and inner-face coordinates. Flag unintended offsets
+before layout review. Compare each floor polygon with actual wall inner faces in
+2D and 3D. Explicit reviewed finish patches can fill uncovered perimeter bands
+without changing room-area polygons; reject overlaps with walls or other rooms.
+Keep source calibration uncertainty visible rather than hiding it behind precise
+labels.
+
+
+## Browser save, portable output and revision migration
+
+Collaborative project mode is documented in `project-save-confirm.md`. Its Save
+writes the project file; Confirm and continue binds that saved version. Browser
+cache saving remains distinct in portable mode. Do not show project-save success
+until the service acknowledges the write, or carry a service token into exports.
+
+State explicitly that browser Save does not rewrite the original HTML. Verify
+current snapshot readback after writing; failures must never receive a saved
+status. Keep a clearly named download-current-scheme HTML action that embeds the
+validated edited state, escapes script terminators, carries a fresh export storage
+identity and reports export errors. Exported documents never consult project
+predecessor caches; their seed yields only to their own later saves.
+
+For code/presentation-only fixes with unchanged baseline geometry, preserve the
+case ID and actual entry-file path so the browser can reopen its existing cache.
+Keep a recoverable original file before replacing the local entry. When a new
+layout baseline requires a revision ID, keep a stable project identity and declare
+compatible predecessor IDs with their source baseline states. Inspect only those
+caches; do not scan arbitrary homes or silently import another export. Older raw
+cache must remain intact, including corrupt data.
+
+Compare old default, saved user state and new default by stable object IDs and
+fields. Transfer edits only when they do not compete with a new default change;
+list conflicts explicitly and retain old values in a downloadable review. Let the
+user initiate migration from a nonblocking optional action, validate its result,
+reset old design approvals, preserve undo and leave old caches unchanged. Filter
+runtime-owned assemblies and regenerate them rather than duplicate them. A
+migration validation failure does not authorize partial silent data loss.
+Do not automatically save fresh defaults before checking for predecessor edits.
+
+Browser storage availability and file-origin scoping vary by host. If old caches
+are inaccessible, explain the need to export from the old page; no cross-file,
+cross-browser or cross-device recovery guarantee can be inferred from unit tests.
+Actual save/reopen and portable-download/reopen checks must be distinguished from
+source/storage-helper tests. Never claim a user's current edits were read or
+preserved unless their actual data was inspected or the same cache reopened.

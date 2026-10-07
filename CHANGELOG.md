@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.2.1 · layout and workbench editing · 2026-10-07
+
+- Add editable wall art to a distinct decor catalog and keep it visible in
+  furniture layout and 3D instead of treating it as a construction detail.
+- Require an isolated current-scheme HTML export and actual save/reload and
+  download/reopen checks for portable editable delivery.
+
+- Add optional loopback project persistence and stage-bound Confirm and continue,
+  with atomic save, previous snapshot, stale-tab conflicts and bounded Agent waits.
+
+- Require displayed style comparisons before undecided-user selection; gate both
+  host and legacy paths with file-bound evidence and explicit fallback waivers.
+
+- Generalize bed sizing, wall/corner storage, curtain allowances and optional entry storage.
+- Add reviewed predecessor migration and portable current-scheme export; preserve browser save semantics.
+- Provide concise object actions, Copy and 2D context insertion with explicit library opening.
+- Compact the furniture pane across desktop and narrow windows.
+- Use integer exterior dimension labels, one font size and total-preserving short-span merging.
+- Technical regression checks do not certify browser visual acceptance or source dimension closure.
+
+### Guided user workflow
+
+- Use everyday living convenience as the default; replace abstract priority
+  ranking with optional concrete special needs and respect no extra requirements.
+
+- Start from one floor-plan image; furniture and style references are optional.
+- Consolidate input/design decisions into plan and needs, furniture/functions,
+  and style/output scope; keep final output acceptance separate.
+- Continue authorized drafting and self-checks between concentrated question
+  batches, offering recommendations and reusing unchanged approvals.
+- Show six default styles in one eye-level interior comparison through host tools; retain the legacy
+  4/8/12-option planner contract without changing runtime behavior.
+
+
 ## 0.2.0 · version label update · 2026-10-06
 
 - Remove the beta suffix from the current Skill, workbench and package version identity.
@@ -173,3 +207,30 @@
 - Include the provider-authorized full reference case and preserve original upstream notices. Clarify current demo versus retained media sources.
 - Exclude uncurated historical furniture-reference files from distributable archives; keep local originals.
 - Fresh macOS source, Python, Node subject and interaction regressions pass. Windows physical/runtime checks remain deferred as agreed.
+
+## Local unified confirmation workflow · 2026-10-06
+
+- Add placement principles covering headboard/entry sightlines, bedside functions, wall anchors and guest states.
+- Use one canonical H5 case from the first confirmation round; derive structure/layout drawings from current state.
+- Preserve source uncertainty, scoped approvals and reference-case revision boundaries. No GitHub publication.
+- Fix furniture labels to distinguish single beds from double beds by width.
+- Derive entrance annotations from case openings instead of retained example coordinates.
+
+## Local door and equipment review · 2026-10-07
+
+- Require inward-opening preference, receiving-wall/hinge review and explicit door exceptions.
+- Add whole-home essential-equipment inventory with separate 2D/state/mesh checks.
+- Case-specific door relocation and equipment additions remain unaccepted design proposals.
+
+### Local layout and editing revision — 2026-10-07
+
+- Require room-level wall-anchor comparison and functional furniture groups before choosing layout coordinates; review daily and guest operating states from the same workbench.
+- Separate removable door leaves from locked structural apertures; add direct hinge/swing controls and keep passages after leaf deletion.
+- Support full-height partial removal for editable partitions with shared plan/3D/export state, undo and room-area invalidation. Omit demolition traces from the current view.
+- Add persistent sidebar Save action with validated success feedback. Browser-local persistence is distinct from design acceptance.
+
+### Local quick-menu and geometry correction — 2026-10-07
+
+- Put door hinge/swing/delete actions and whole-wall removal in the selected-object popup, separate from properties.
+- Move Save to top-right navigation; show persisted last-save timestamp in bottom-right status.
+- Add review rules for carrier-wall alignment and floor coverage to wall faces; retain source room polygons when explicit finish patches fill edges.

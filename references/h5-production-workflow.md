@@ -11,11 +11,15 @@ unverified generative final are separate stages.
 
 ## Authority and stages
 
-1. Review original dimensioned plan and furniture reference together. The plan
-   controls structure; the furniture reference suggests object placement. Record
+1. Start from the original floor plan. Furniture/style references are optional;
+   when absent, propose layout and style using `guided-user-workflow.md`.
+   When supplied, review references together. The plan controls structure;
+   furniture references suggest placement. Record
    conflicts and accepted resolutions. Unlabelled dimensions/ceiling heights are
    assumptions. Black drawing marks do not certify engineering bearing status.
-2. Establish the scheme in the H5 workbench. Confirm structure, furniture layout,
+2. Establish the scheme in the H5 workbench starting at plan confirmation.
+   Refine that same data through furniture and style decisions; export structure
+   and furniture drawings from its current state, never redraw them independently. Confirm structure, furniture layout,
    and style separately against content hashes. Reuse an existing recorded user
    approval only for the unchanged displayed scope. Node replay of delivered
    defaults must identify itself; it is not the user's unsaved browser state.

@@ -6,6 +6,13 @@ requested scope: one room edit needs only its affected locks and adjacent
 views; a whole-home set needs all planned views. Generation remains
 probabilistic, so a completed preflight does not replace output inspection.
 
+For style-selection previews, first read `style-selection-gate.md`, check actual
+host generation capability and retain the current confirmed layout reference.
+After generating, inspecting and displaying the board, run the selection check
+before asking the user to choose. For selected-style production, run the same
+check with `--production` before the first call. Do not treat a diagnostic
+workbench preset or a text recommendation as explicit user selection.
+
 ## 1. Establish one current authority chain
 
 - Identify the original plan, latest user-confirmed reconstructed version,

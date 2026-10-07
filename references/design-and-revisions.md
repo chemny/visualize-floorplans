@@ -27,10 +27,15 @@ require a new reviewed run; do not fabricate retrospective gate success.
 
 New projects use the 12 `style_options` in `assets/project-template.json`.
 Keep four-option historical manifests compatible; do not silently change an
-existing selected scheme. Undecided users receive three boards of four options,
-not 12 whole-home image packages. Use `outputs.style_preview: style_comparison_boards`.
-The script supports 4/8/12 options; a smaller set follows the user's scope.
-A direct choice skips the comparison.
+existing selected scheme. Follow `guided-user-workflow.md` for the default
+three-direction recommendation and host-tool comparison; a direct choice skips
+comparison. The legacy script supports only 4/8/12 options, rendered as four-panel
+boards, with `outputs.style_preview: style_comparison_boards`. These are expanded
+comparisons when requested, not the default first-use questionnaire. Do not send
+three options into that script or silently pad the user's selection scope.
+Both paths must pass `references/style-selection-gate.md` before presenting a
+style-selection question, and again before selected-style production. A planned
+prompt or a text shortlist is not a generated and displayed comparison board.
 
 The expanded catalog consolidates case variants rather than treating aliases as
 new styles: 现代雅奢 stays under 现代轻奢; 当代东方 under 现代新中式;

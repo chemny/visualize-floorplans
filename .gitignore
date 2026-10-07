@@ -15,3 +15,6 @@ node_modules/
 # Historical case assets: preserve locally, do not stage for public release.
 assets/furniture-layout-reference/furniture-layout-linework-v9.png
 assets/furniture-layout-reference/furniture-layout-linework-v9.svg
+
+# Local unused cover draft; localized approved covers are published.
+assets/visualize-floorplans-hero.png
