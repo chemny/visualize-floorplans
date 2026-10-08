@@ -1,0 +1,11 @@
+{
+  "status": "accepted_by_user",
+  "scope": "Displayed 57-second video; no automatic acceptance of future changes or formal quality gates",
+  "recordedAt": "2026-10-08T12:03:14.822644+00:00",
+  "videoSha256": "ca1ebe22383ad540db7cb537fb86e3bd22d83a0d70d2eba0b7446258352ee897",
+  "tourSha256": "364e52b481c106b93e24de1142f56324cec79aec92fbdf35b3da4872e84d75a2",
+  "internalContinuousPlaybackReview": "pending; browser tool rejected local file protocol",
+  "technicalEvidence": "1368 contiguous frames, 57 seconds, 1280x720, 24fps; zero sampled mesh hits; subject and decode checks pass",
+  "formalQualityGateStatus": "not asserted",
+  "acceptanceBasis": "Explicit user confirmation of the displayed final video; conversation evidence retained in the local project."
+}

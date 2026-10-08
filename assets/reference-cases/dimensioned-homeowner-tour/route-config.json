@@ -1,0 +1,989 @@
+{
+  "cameraKeys": [
+    {
+      "atStop": "入户",
+      "targetMm": [
+        9563.379,
+        2193.1343,
+        1450
+      ],
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "入户直行",
+      "pitchDegrees": -10,
+      "targetMm": [
+        9563.379,
+        2193.1343,
+        1450
+      ],
+      "offsetFrames": 30
+    },
+    {
+      "atStop": "书房洞口转向",
+      "pitchDegrees": -10,
+      "targetMm": [
+        9563.379,
+        2193.1343,
+        1450
+      ],
+      "offsetFrames": 23
+    },
+    {
+      "atStop": "书房门口",
+      "targetMm": [
+        11500,
+        1500,
+        1450
+      ],
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "书房",
+      "targetMm": [
+        10645.591326058879,
+        1480.8330633769174,
+        1450
+      ],
+      "yawDegrees": -30,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "书房看完",
+      "targetMm": [
+        10827.117830267214,
+        1875.4247723985916,
+        1450
+      ],
+      "yawDegrees": -5,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "书房退出",
+      "targetMm": [
+        9465.70429218548,
+        3851.4001564617593,
+        1450
+      ],
+      "yawDegrees": 75,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "次卧门口",
+      "targetMm": [
+        10772.046682501226,
+        3602.6941144010757,
+        1450
+      ],
+      "yawDegrees": 15,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "次卧",
+      "targetMm": [
+        10815.433819164999,
+        4137.983279999284,
+        1450
+      ],
+      "yawDegrees": 35,
+      "pitchDegrees": -13
+    },
+    {
+      "atStop": "次卧看完",
+      "targetMm": [
+        10362.948103493101,
+        4418.280972929592,
+        1450
+      ],
+      "yawDegrees": 60,
+      "pitchDegrees": -13
+    },
+    {
+      "atStop": "次卧退出",
+      "targetMm": [
+        8908.618209060027,
+        4456.792482660572,
+        1450
+      ],
+      "yawDegrees": 120,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "厨房门口",
+      "targetMm": [
+        8196,
+        4900,
+        900
+      ],
+      "yawDegrees": 135,
+      "pitchDegrees": -15
+    },
+    {
+      "atStop": "厨房",
+      "targetMm": [
+        8196,
+        4900,
+        900
+      ],
+      "yawDegrees": 135,
+      "pitchDegrees": -15
+    },
+    {
+      "atStop": "厨房看完",
+      "targetMm": [
+        8196,
+        4900,
+        900
+      ],
+      "yawDegrees": 135,
+      "pitchDegrees": -15
+    },
+    {
+      "atStop": "厨房转出",
+      "pitchDegrees": -10,
+      "targetMm": [
+        9000,
+        2950,
+        1450
+      ],
+      "yawDegrees": 270
+    },
+    {
+      "atStop": "厨房清过门洞",
+      "yawDegrees": 270,
+      "pitchDegrees": -10,
+      "targetMm": [
+        8890,
+        2000,
+        1450
+      ]
+    },
+    {
+      "atStop": "厨房退出",
+      "targetMm": [
+        6579.589665019101,
+        3352.020143325669,
+        1450
+      ],
+      "yawDegrees": 180,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "厨房绕过冰箱",
+      "yawDegrees": 135,
+      "pitchDegrees": -10,
+      "targetMm": [
+        6360.149072334669,
+        3982.2030532185736,
+        1450
+      ]
+    },
+    {
+      "atStop": "过道",
+      "targetMm": [
+        6351.413880680732,
+        5470.7100686386975,
+        1450
+      ],
+      "yawDegrees": 110,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "卫浴门口",
+      "targetMm": [
+        6662.594769288227,
+        6240.320306370761,
+        1450
+      ],
+      "yawDegrees": 60,
+      "pitchDegrees": -27
+    },
+    {
+      "atStop": "卫生间",
+      "targetMm": [
+        6656.7100267892565,
+        6307.195285303946,
+        1450
+      ],
+      "yawDegrees": 70,
+      "pitchDegrees": -27
+    },
+    {
+      "atStop": "卫浴看完",
+      "targetMm": [
+        6017.088771710563,
+        6089.849499421532,
+        1450
+      ],
+      "yawDegrees": 80,
+      "pitchDegrees": -27
+    },
+    {
+      "atStop": "卫浴退出",
+      "targetMm": [
+        5399.855880272214,
+        5133.365171753688,
+        1450
+      ],
+      "yawDegrees": 180,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "主卧入口",
+      "targetMm": [
+        4520.035892327047,
+        4621.730523139307,
+        1450
+      ],
+      "yawDegrees": 180,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "主卧",
+      "targetMm": [
+        3570,
+        6262.836,
+        1000
+      ],
+      "yawDegrees": 124.45534114721139,
+      "pitchDegrees": -13
+    },
+    {
+      "atStop": "主卧看完",
+      "targetMm": [
+        3570,
+        6262.836,
+        1000
+      ],
+      "yawDegrees": 82.298589540381,
+      "pitchDegrees": -13
+    },
+    {
+      "atStop": "阳台门口",
+      "targetMm": [
+        1713.4271135449067,
+        5422.265660415027,
+        1450
+      ],
+      "yawDegrees": 140,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "阳台",
+      "targetMm": [
+        1460.632388583243,
+        5456.970908524046,
+        1450
+      ],
+      "yawDegrees": 140,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "阳台看完",
+      "targetMm": [
+        1905.2798305379613,
+        5633.927162394295,
+        1450
+      ],
+      "yawDegrees": 110,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "阳台转向出口",
+      "pitchDegrees": -10,
+      "targetMm": [
+        6400,
+        4200,
+        1450
+      ]
+    },
+    {
+      "atStop": "阳台退出",
+      "targetMm": [
+        6400,
+        4200,
+        1450
+      ],
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "回程直行",
+      "targetMm": [
+        6400,
+        4200,
+        1450
+      ],
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "主卧回程转出",
+      "pitchDegrees": -10,
+      "targetMm": [
+        6400,
+        4200,
+        1450
+      ]
+    },
+    {
+      "atStop": "主卧回程",
+      "targetMm": [
+        6400,
+        4200,
+        1450
+      ],
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "回程靠近出口",
+      "pitchDegrees": -10,
+      "targetMm": [
+        6400,
+        4200,
+        1450
+      ]
+    },
+    {
+      "atStop": "回程通过门洞",
+      "pitchDegrees": -10,
+      "targetMm": [
+        6175,
+        3300,
+        1450
+      ]
+    },
+    {
+      "atStop": "回程进入客厅",
+      "yawDegrees": 240,
+      "pitchDegrees": -10,
+      "targetMm": [
+        5642.860844718902,
+        2836.292902539599,
+        1450
+      ]
+    },
+    {
+      "atStop": "客厅入口",
+      "targetMm": [
+        3676.049,
+        3630.866,
+        1050
+      ],
+      "yawDegrees": 175.13256865934935,
+      "pitchDegrees": -10
+    },
+    {
+      "atStop": "客厅",
+      "targetMm": [
+        4255.254814288496,
+        1622.5081412929753,
+        1450
+      ],
+      "yawDegrees": 225,
+      "pitchDegrees": -13
+    },
+    {
+      "atStop": "客厅看完",
+      "targetMm": [
+        4764.162653880832,
+        1392.2502338638456,
+        1450
+      ],
+      "yawDegrees": 240,
+      "pitchDegrees": -13
+    },
+    {
+      "atStop": "餐厅",
+      "targetMm": [
+        7140,
+        922.985,
+        750
+      ],
+      "pitchDegrees": -22
+    },
+    {
+      "atStop": "餐厅看完",
+      "targetMm": [
+        7140,
+        922.985,
+        750
+      ],
+      "pitchDegrees": -22
+    },
+    {
+      "atStop": "离开",
+      "targetMm": [
+        8989.799675603152,
+        -1456.2066597039554,
+        1450
+      ],
+      "yawDegrees": 280,
+      "pitchDegrees": -10
+    }
+  ],
+  "chapters": [
+    {
+      "name": "入户连接",
+      "from": "入户",
+      "to": "书房门口",
+      "phase": "transit",
+      "subjects": [],
+      "minimumSeconds": 0
+    },
+    {
+      "name": "书房观看",
+      "from": "书房门口",
+      "to": "书房看完",
+      "phase": "observe",
+      "subjects": [
+        "guest-sofa",
+        "study-desk"
+      ],
+      "minimumSeconds": 2.2,
+      "timingLimits": {
+        "maximumSpeedMps": 1.0
+      }
+    },
+    {
+      "name": "书房退出与连接",
+      "from": "书房看完",
+      "to": "次卧门口",
+      "phase": "transit",
+      "subjects": [],
+      "minimumSeconds": 0
+    },
+    {
+      "name": "次卧观看",
+      "from": "次卧门口",
+      "to": "次卧看完",
+      "phase": "observe",
+      "subjects": [
+        "secondary-bed"
+      ],
+      "minimumSeconds": 2.6,
+      "timingLimits": {
+        "maximumSpeedMps": 1.0
+      }
+    },
+    {
+      "name": "次卧退出与连接",
+      "from": "次卧看完",
+      "to": "厨房门口",
+      "phase": "transit",
+      "subjects": [],
+      "minimumSeconds": 0
+    },
+    {
+      "name": "厨房观看",
+      "from": "厨房门口",
+      "to": "厨房看完",
+      "phase": "observe",
+      "subjects": [
+        "counter"
+      ],
+      "minimumSeconds": 1.7,
+      "timingLimits": {
+        "maximumSpeedMps": 1.0
+      }
+    },
+    {
+      "name": "厨房退出与连接",
+      "from": "厨房看完",
+      "to": "卫浴门口",
+      "phase": "transit",
+      "subjects": [],
+      "minimumSeconds": 0
+    },
+    {
+      "name": "卫浴观看",
+      "from": "卫浴门口",
+      "to": "卫浴看完",
+      "phase": "observe",
+      "subjects": [
+        "basin"
+      ],
+      "minimumSeconds": 1.2,
+      "timingLimits": {
+        "maximumSpeedMps": 1.0
+      }
+    },
+    {
+      "name": "卫浴退出",
+      "from": "卫浴看完",
+      "to": "卫浴退出",
+      "phase": "transit",
+      "subjects": [],
+      "minimumSeconds": 0
+    },
+    {
+      "name": "主卧连接",
+      "from": "卫浴退出",
+      "to": "主卧",
+      "phase": "transit",
+      "subjects": [],
+      "minimumSeconds": 0
+    },
+    {
+      "name": "主卧观看",
+      "from": "主卧",
+      "to": "主卧看完",
+      "phase": "observe",
+      "subjects": [
+        "main-bed",
+        "main-wardrobe"
+      ],
+      "minimumSeconds": 3.4,
+      "timingLimits": {
+        "maximumSpeedMps": 1.0
+      }
+    },
+    {
+      "name": "阳台连接",
+      "from": "主卧看完",
+      "to": "阳台门口",
+      "phase": "transit",
+      "subjects": [],
+      "minimumSeconds": 0
+    },
+    {
+      "name": "阳台观看",
+      "from": "阳台门口",
+      "to": "阳台看完",
+      "phase": "observe",
+      "subjects": [
+        "opening:E6"
+      ],
+      "minimumSeconds": 1.3,
+      "timingLimits": {
+        "maximumSpeedMps": 1.0
+      }
+    },
+    {
+      "name": "阳台退出与回程",
+      "from": "阳台看完",
+      "to": "客厅入口",
+      "phase": "transit",
+      "subjects": [],
+      "minimumSeconds": 0
+    },
+    {
+      "name": "客厅观看",
+      "from": "客厅入口",
+      "to": "客厅看完",
+      "phase": "observe",
+      "subjects": [
+        "sofa",
+        "coffee"
+      ],
+      "minimumSeconds": 4.2,
+      "timingLimits": {
+        "maximumSpeedMps": 1.0
+      }
+    },
+    {
+      "name": "餐厅连接",
+      "from": "客厅看完",
+      "to": "餐厅",
+      "phase": "transit",
+      "subjects": [],
+      "minimumSeconds": 0
+    },
+    {
+      "name": "餐厅观看",
+      "from": "餐厅",
+      "to": "餐厅看完",
+      "phase": "observe",
+      "subjects": [
+        "dining-table"
+      ],
+      "minimumSeconds": 2,
+      "timingLimits": {
+        "maximumSpeedMps": 1.0
+      }
+    },
+    {
+      "name": "离场",
+      "from": "餐厅看完",
+      "to": "离开",
+      "phase": "transit",
+      "subjects": [],
+      "minimumSeconds": 0
+    }
+  ],
+  "motionReviewLimits": {
+    "maximumSpeedMps": 1.15
+  },
+  "roomBudgets": [
+    {
+      "room": "书房",
+      "areaM2": 8.05,
+      "viewSeconds": 2.2,
+      "visualFocusAdjustmentSeconds": 0.2,
+      "doorwayReadabilityReductionSeconds": 0.2,
+      "subjects": [
+        "guest-sofa",
+        "study-desk"
+      ]
+    },
+    {
+      "room": "次卧",
+      "areaM2": 10.61,
+      "viewSeconds": 2.6,
+      "visualFocusAdjustmentSeconds": 0.1,
+      "doorwayReadabilityReductionSeconds": 0.1,
+      "subjects": [
+        "secondary-bed"
+      ]
+    },
+    {
+      "room": "厨房",
+      "areaM2": 5.34,
+      "viewSeconds": 1.7,
+      "visualFocusAdjustmentSeconds": 0,
+      "doorwayReadabilityReductionSeconds": 0,
+      "subjects": [
+        "counter"
+      ]
+    },
+    {
+      "room": "卫生间",
+      "areaM2": 4.16,
+      "viewSeconds": 1.2,
+      "visualFocusAdjustmentSeconds": 0,
+      "doorwayReadabilityReductionSeconds": 0.25,
+      "subjects": [
+        "basin"
+      ]
+    },
+    {
+      "room": "主卧",
+      "areaM2": 13.28,
+      "viewSeconds": 3.4,
+      "visualFocusAdjustmentSeconds": 0.35,
+      "doorwayReadabilityReductionSeconds": 0,
+      "subjects": [
+        "main-bed",
+        "main-wardrobe"
+      ]
+    },
+    {
+      "room": "阳台",
+      "areaM2": 4.54,
+      "viewSeconds": 1.3,
+      "visualFocusAdjustmentSeconds": 0,
+      "doorwayReadabilityReductionSeconds": 0.25,
+      "subjects": [
+        "opening:E6"
+      ]
+    },
+    {
+      "room": "客厅",
+      "areaM2": 16.31,
+      "viewSeconds": 4.2,
+      "visualFocusAdjustmentSeconds": 0.6,
+      "doorwayReadabilityReductionSeconds": 0,
+      "subjects": [
+        "sofa",
+        "coffee"
+      ]
+    },
+    {
+      "room": "餐厅",
+      "areaM2": 10.88,
+      "viewSeconds": 2,
+      "visualFocusAdjustmentSeconds": 0.35,
+      "doorwayReadabilityReductionSeconds": 0,
+      "subjects": [
+        "dining-table"
+      ]
+    }
+  ],
+  "intent": "Compact homeowner tour; original rounded path and central left30 room compositions retained; exit gaze prepared during end of observation.",
+  "connectionRefinement": {
+    "windows": [
+      [
+        145,
+        272
+      ],
+      [
+        434,
+        610
+      ],
+      [
+        950,
+        1180
+      ]
+    ],
+    "method": "Arc-length trace redistributed to overlap movement and turns; same endpoints and geometric trace",
+    "observationBudgetsUnchanged": true
+  },
+  "roomObservationOffset": {
+    "baseline": "tour-homeowner-preview-20261007/route-config.json",
+    "leftDegrees": 30,
+    "globalOffsetDegrees": 0,
+    "operation": "Absolute rebase, not cumulative offset",
+    "keys": [
+      {
+        "key": "书房门口",
+        "baselineKey": "书房门口",
+        "originalYawDegrees": 20,
+        "newYawDegrees": -10,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "书房",
+        "baselineKey": "书房",
+        "originalYawDegrees": 0,
+        "newYawDegrees": -30,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "书房看完",
+        "baselineKey": "书房",
+        "originalYawDegrees": 0,
+        "newYawDegrees": -30,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "次卧门口",
+        "baselineKey": "次卧门口",
+        "originalYawDegrees": 45,
+        "newYawDegrees": 15,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "次卧",
+        "baselineKey": "次卧",
+        "originalYawDegrees": 65,
+        "newYawDegrees": 35,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "次卧看完",
+        "baselineKey": "次卧",
+        "originalYawDegrees": 65,
+        "newYawDegrees": 35,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "厨房门口",
+        "baselineKey": "厨房",
+        "originalYawDegrees": 90,
+        "newYawDegrees": 60,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "厨房",
+        "baselineKey": "厨房",
+        "originalYawDegrees": 90,
+        "newYawDegrees": 60,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "厨房看完",
+        "baselineKey": "厨房",
+        "originalYawDegrees": 90,
+        "newYawDegrees": 60,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "卫浴门口",
+        "baselineKey": "卫生间",
+        "originalYawDegrees": 100,
+        "newYawDegrees": 70,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "卫生间",
+        "baselineKey": "卫生间",
+        "originalYawDegrees": 100,
+        "newYawDegrees": 70,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "卫浴看完",
+        "baselineKey": "卫生间",
+        "originalYawDegrees": 100,
+        "newYawDegrees": 70,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "主卧",
+        "baselineKey": "主卧",
+        "originalYawDegrees": 110,
+        "newYawDegrees": 80,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "主卧看完",
+        "baselineKey": "主卧",
+        "originalYawDegrees": 110,
+        "newYawDegrees": 80,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "阳台门口",
+        "baselineKey": "阳台",
+        "originalYawDegrees": 170,
+        "newYawDegrees": 140,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "阳台",
+        "baselineKey": "阳台",
+        "originalYawDegrees": 170,
+        "newYawDegrees": 140,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "阳台看完",
+        "baselineKey": "阳台",
+        "originalYawDegrees": 170,
+        "newYawDegrees": 140,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "客厅入口",
+        "baselineKey": "客厅入口",
+        "originalYawDegrees": 240,
+        "newYawDegrees": 210,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "客厅",
+        "baselineKey": "客厅",
+        "originalYawDegrees": 255,
+        "newYawDegrees": 225,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "客厅看完",
+        "baselineKey": "客厅",
+        "originalYawDegrees": 255,
+        "newYawDegrees": 225,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "餐厅",
+        "baselineKey": "餐厅",
+        "originalYawDegrees": 285,
+        "newYawDegrees": 255,
+        "leftOffsetDegrees": 30
+      },
+      {
+        "key": "餐厅看完",
+        "baselineKey": "餐厅",
+        "originalYawDegrees": 285,
+        "newYawDegrees": 255,
+        "leftOffsetDegrees": 30
+      }
+    ],
+    "scope": "Central room observation composition only; approach and outgoing transition keys separately tuned"
+  },
+  "pathRounding": {
+    "centersSourceFrame": [
+      143,
+      330,
+      432,
+      697,
+      784,
+      948,
+      1074,
+      1243
+    ],
+    "offsetMm": 140,
+    "smoothingSigmaFrames": 8,
+    "scope": "Local rounded reversals; no added loops; original endpoints preserved"
+  },
+  "compactConnections": {
+    "entry": "Turn toward study while moving, no added waiting",
+    "endObservation": "Prepare outgoing gaze at end of observation; retain central left30 composition",
+    "changedKeys": {
+      "书房门口": 5,
+      "书房看完": -5,
+      "书房退出": 75,
+      "次卧看完": 60,
+      "厨房看完": 90,
+      "厨房退出": 160,
+      "卫浴看完": 100,
+      "主卧看完": 100,
+      "阳台看完": 110,
+      "主卧回程": 360,
+      "客厅入口": 240,
+      "客厅看完": 240
+    },
+    "limitsUnchanged": true,
+    "positionsUnchanged": true
+  },
+  "threeLocalCorrections": {
+    "living": "Return looks toward actual TV wall, then sofa; existing watch budget",
+    "bath": "Depth above y5280 compressed to 35 percent, 1.2 second viewing, exit anticipation",
+    "main": "Inbound bed composition; return wardrobe instead of repeated bed view",
+    "roomYawPolicy": "Target-specific overrides only in the approved three scopes; other room left30 keys preserved"
+  },
+  "entryAndReturnCorrection": {
+    "entry": "Hold actual straight passage heading until source70, then smooth turn toward study opening",
+    "mainReturn": "Brief wardrobe key at1040 then face outbound passage at1075; no sustained wardrobe tracking",
+    "pathPositionsUnchanged": true,
+    "limitsUnchanged": true
+  },
+  "compositionCorrection": {
+    "eyeMm": 1600,
+    "horizontalFovDegrees": 76,
+    "dining": "Look at actual table center; locally move trace up to850mm away, pitch -22deg after actual 14deg comparison proved insufficient",
+    "kitchenPitchDegrees": -10,
+    "bathPitchDegrees": -12,
+    "livingBedroomPitchDegrees": -8,
+    "transitPitchDegrees": -5,
+    "caseOnly": true
+  },
+  "pitch5Refinement": {
+    "baseline": "tour-composition-refined-20261007",
+    "additionalDownDegrees": 5,
+    "diningPitchPreserved": true,
+    "eyeMm": 1600,
+    "livingPathOffsetMaxMm": 400,
+    "livingWindowSourceFrames": [
+      1180,
+      1300
+    ],
+    "caseOnly": true
+  },
+  "transitionCorrection": {
+    "caseOnly": true,
+    "entry": "Straight walking approach with continuous tracking through the opening, avoiding interpolated heading across the adjacent wall",
+    "kitchen": "Clear doorway and fridge before westward turn",
+    "mainReturn": "Exit-center to clear living passage targets, no washer target",
+    "pitchUnchanged": true,
+    "eyeUnchanged": true,
+    "limitsUnchanged": true,
+    "kitchenDepth": "Maximum depth beyond threshold reduced to35 percent of previous shallow visit"
+  },
+  "localRevision": {
+    "entry": "Forward view until source25; opening aligned bysource60",
+    "kitchen": "Open-side turning clearance before crossing fridge",
+    "main": "Earlier clear passage target; no washer observation",
+    "bath": "60 to95 degree small composition, -20 degree pitch; same1.2 second budget",
+    "eyeUnchanged": true,
+    "limitsUnchanged": true
+  },
+  "closeoutRevision": {
+    "baseline": "tour-clear-reviewed-20261008",
+    "scope": [
+      "entry gaze delayed until near doorway",
+      "kitchen east-side clearance and reduced exit yaw excursion",
+      "main-bedroom exit gaze follows opening before facing living"
+    ],
+    "eyeUnchanged": true,
+    "roomBudgetsUnchanged": true,
+    "caseOnly": true,
+    "entryMethod": "Approach arc stands farther from the door pier; same opening tracking, no loop or stop"
+  },
+  "clearanceCompositionRevision": {
+    "entry": "stand in open dining passage before turning through study door",
+    "kitchen": "observe 200mm farther from fridge; leave from eastern side",
+    "mainReturn": "same clear-side door target across return, not washer",
+    "caseOnly": true,
+    "eyeMm": 1600,
+    "observationBudgetsUnchanged": true
+  }
+}

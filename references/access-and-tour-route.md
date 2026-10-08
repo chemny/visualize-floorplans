@@ -1,5 +1,7 @@
 # Access topology and optional property-tour route
 
+For every homeowner route or video, first apply `homeowner-tour-method.md`: reuse the accepted subject-key camera method and profile, fill case targets, and review dynamic samples before full capture.
+
 Build and confirm access topology before any 3D generation. Build a route only
 when the user requests video or a property-tour presentation. A route is an
 ordered walk through confirmed connections, not a set of decorative arrows.

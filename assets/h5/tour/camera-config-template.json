@@ -1,0 +1,20 @@
+{
+  "schema": "homeowner-camera-config/1",
+  "method": "subject-key-curves-v1",
+  "cameraProfile": {},
+  "motionReviewLimits": {},
+  "cameraKeys": [],
+  "chapters": [],
+  "instructions": "Fill unique current-case stop markers and targetMm before use. Chapters need subject IDs, purpose and observation windows. No reference-apartment coordinates supplied.",
+  "chapterFields": {
+    "name": "case-specific chapter",
+    "from": "unique route stop",
+    "to": "later route stop",
+    "phase": "observe or transit",
+    "subjects": "stable subject IDs for observe",
+    "minimumSeconds": "case reading budget, nonnegative",
+    "repeatReason": "required when introducing a subject again",
+    "observationReason": "required for an observation during transit",
+    "motionReviewLimits": "optional case-reviewed numeric metrics, e.g. yawDirectionChanges"
+  }
+}

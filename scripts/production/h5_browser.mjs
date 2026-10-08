@@ -5,6 +5,7 @@ import path from 'node:path';
 import http from 'node:http';
 import crypto from 'node:crypto';
 import {fileURLToPath,pathToFileURL} from 'node:url';
+import {requirePreview} from './preview_gate.mjs';
 import {validateSubjectPlan,sampleIndices,summarizeChapter} from './subject_quality.mjs';
 const argv=process.argv.slice(2),command=argv[0];
 const flag=k=>argv.includes('--'+k),arg=k=>{const i=argv.indexOf('--'+k);return i<0?null:argv[i+1];};
@@ -40,7 +41,10 @@ let browser;
 const errors=[];
 try{
  browser=await playwright.chromium.launch(launch);
- const page=await browser.newPage({viewport:{width:1280,height:720}});
+ // Match the viewport to the output canvas: overflow:hidden otherwise clips
+ // screenshots wider/taller than the browser and fills the remainder with body background.
+ const outputSize=command==='export'?[1280,720]:(JSON.parse(fs.readFileSync(path.join(root,'scene.json'),'utf8')).renderSettings?.size||[1280,720]);
+ const page=await browser.newPage({viewport:{width:outputSize[0],height:outputSize[1]},deviceScaleFactor:1});
  page.on('pageerror',e=>{errors.push(e.message);console.error('PAGEERROR',e.message);});
  // Block external requests; screenshots never upload cases or request a CDN.
  await page.route('**/*',route=>{const u=route.request().url();if(u.startsWith('http://127.0.0.1:'+server.address().port+'/')||u.startsWith('data:')||u.startsWith('blob:'))return route.continue();return route.abort();});
@@ -73,6 +77,7 @@ try{
   const tour=tourPath?read(tourPath):null,viewData=viewsPath?read(viewsPath):[],views=Array.isArray(viewData)?viewData:viewData.views;
   if(!Array.isArray(views))throw Error('Views must be an array or {views:[...]}');
   if(tour&&(tour.schemeSha256!==scene.schemeSha256||!Array.isArray(tour.frames)||!tour.frames.length))throw Error('Tour hash or frame data differs from the exported scheme');
+  if(command==='capture'&&flag('full')&&tour){const [w,h]=scene.renderSettings?.size||[1280,720];if(!flag('preview')||w>1280||h>720)requirePreview(arg('preview-review'),tourPath,root);}
   if(tour?.audit?.bodyRadiusMm)await page.evaluate(mm=>window.setBodyRadiusMm(mm),tour.audit.bodyRadiusMm);
   if(viewData.schemeSha256&&viewData.schemeSha256!==scene.schemeSha256)throw Error('Views hash differs from exported scheme');
   const inputs={scene:hash(path.join(root,'scene.json')),geometry:hash(path.join(root,'geometry.bin')),renderer:hash(path.join(root,'renderer.html')),tour:tourPath?hash(tourPath):null,views:viewsPath?hash(viewsPath):null,full:flag('full')};

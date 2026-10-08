@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2 · homeowner tour methods · 2026-10-08
+
+- Reuse subject-key gaze curves, effort-based timing and bounded local corrections.
+- Require hash-bound dynamic preview reviews before production capture; separate technical checks from human acceptance.
+- Clarify shallow room visits, doorway turns, local gaze/pitch scope and tour closeout checks.
+- Include a second accepted 57-second tour example with explicit review boundaries.
+
 ## 0.2.1 · layout and workbench editing · 2026-10-07
 
 - Add editable wall art to a distinct decor catalog and keep it visible in

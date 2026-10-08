@@ -1,0 +1,507 @@
+{
+  "schemeSha256": "e6ef3175357545c7954ca52c5abd6dde2453253612a445fbe156b3295b57c5de",
+  "tourSha256": "364e52b481c106b93e24de1142f56324cec79aec92fbdf35b3da4872e84d75a2",
+  "fingerprint": "bb490c083b2ec5ae9903a7ef960d378d4120454ae7654d909e42edc5b99527f1",
+  "meshAudit": {
+    "bodyRadiusMm": 160,
+    "hits": [],
+    "slidingLeafShift": [],
+    "minimumHitMm": null,
+    "method": "2735 positions including intra-shot midpoints, 24 radial rays at three body heights, 160mm radius; cuts are not traversed"
+  },
+  "viewAudits": [],
+  "lighting": {
+    "fixtureLights": [
+      {
+        "id": "main-light-living",
+        "intensity": 1,
+        "color": [
+          1,
+          0.7529422167708612,
+          0.4793201830913402
+        ]
+      },
+      {
+        "id": "main-light-dining",
+        "intensity": 1,
+        "color": [
+          1,
+          0.7529422167708612,
+          0.4793201830913402
+        ]
+      },
+      {
+        "id": "main-light-main",
+        "intensity": 1,
+        "color": [
+          1,
+          0.7529422167708612,
+          0.4793201830913402
+        ]
+      },
+      {
+        "id": "main-light-study",
+        "intensity": 1,
+        "color": [
+          1,
+          0.7529422167708612,
+          0.4793201830913402
+        ]
+      },
+      {
+        "id": "main-light-secondary",
+        "intensity": 1,
+        "color": [
+          1,
+          0.7529422167708612,
+          0.4793201830913402
+        ]
+      },
+      {
+        "id": "main-light-bath",
+        "intensity": 1,
+        "color": [
+          1,
+          0.7529422167708612,
+          0.4793201830913402
+        ]
+      },
+      {
+        "id": "main-light-kitchen",
+        "intensity": 1,
+        "color": [
+          1,
+          0.7529422167708612,
+          0.4793201830913402
+        ]
+      },
+      {
+        "id": "main-light-shared",
+        "intensity": 1,
+        "color": [
+          1,
+          0.7529422167708612,
+          0.4793201830913402
+        ]
+      },
+      {
+        "id": "main-light-balcony",
+        "intensity": 1,
+        "color": [
+          1,
+          0.7529422167708612,
+          0.4793201830913402
+        ]
+      }
+    ],
+    "primaryFaces": [
+      {
+        "id": "main-light-living",
+        "name": "客厅主灯",
+        "emittingFaces": [
+          {
+            "name": "furniture-415",
+            "intensity": 1,
+            "visible": true,
+            "firstName": "furniture-415"
+          }
+        ],
+        "visibleFromBelow": true
+      },
+      {
+        "id": "main-light-dining",
+        "name": "餐厅主灯",
+        "emittingFaces": [
+          {
+            "name": "furniture-417",
+            "intensity": 1,
+            "visible": true,
+            "firstName": "furniture-417"
+          }
+        ],
+        "visibleFromBelow": true
+      },
+      {
+        "id": "main-light-main",
+        "name": "主卧主灯",
+        "emittingFaces": [
+          {
+            "name": "furniture-419",
+            "intensity": 1,
+            "visible": true,
+            "firstName": "furniture-419"
+          }
+        ],
+        "visibleFromBelow": true
+      },
+      {
+        "id": "main-light-study",
+        "name": "书房兼客卧主灯",
+        "emittingFaces": [
+          {
+            "name": "furniture-421",
+            "intensity": 1,
+            "visible": true,
+            "firstName": "furniture-421"
+          }
+        ],
+        "visibleFromBelow": true
+      },
+      {
+        "id": "main-light-secondary",
+        "name": "次卧主灯",
+        "emittingFaces": [
+          {
+            "name": "furniture-423",
+            "intensity": 1,
+            "visible": true,
+            "firstName": "furniture-423"
+          }
+        ],
+        "visibleFromBelow": true
+      },
+      {
+        "id": "main-light-bath",
+        "name": "卫生间主灯",
+        "emittingFaces": [
+          {
+            "name": "furniture-425",
+            "intensity": 1,
+            "visible": true,
+            "firstName": "furniture-425"
+          }
+        ],
+        "visibleFromBelow": true
+      },
+      {
+        "id": "main-light-kitchen",
+        "name": "厨房主灯",
+        "emittingFaces": [
+          {
+            "name": "furniture-427",
+            "intensity": 1,
+            "visible": true,
+            "firstName": "furniture-427"
+          }
+        ],
+        "visibleFromBelow": true
+      },
+      {
+        "id": "main-light-shared",
+        "name": "主卧与卫生间入口主灯",
+        "emittingFaces": [
+          {
+            "name": "furniture-429",
+            "intensity": 1,
+            "visible": true,
+            "firstName": "furniture-429"
+          }
+        ],
+        "visibleFromBelow": true
+      },
+      {
+        "id": "main-light-balcony",
+        "name": "阳台主灯",
+        "emittingFaces": [
+          {
+            "name": "furniture-431",
+            "intensity": 1,
+            "visible": true,
+            "firstName": "furniture-431"
+          }
+        ],
+        "visibleFromBelow": true
+      }
+    ],
+    "whiteCeilingMaterials": [
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.94,
+        "emissiveLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.94,
+        "emissiveLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.94,
+        "emissiveLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.94,
+        "emissiveLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.94,
+        "emissiveLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.94,
+        "emissiveLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.94,
+        "emissiveLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.94,
+        "emissiveLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.94,
+        "emissiveLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.94,
+        "emissiveLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.65,
+        "emissiveLinear": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.65,
+        "emissiveLinear": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.65,
+        "emissiveLinear": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.65,
+        "emissiveLinear": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.65,
+        "emissiveLinear": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.65,
+        "emissiveLinear": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.65,
+        "emissiveLinear": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.65,
+        "emissiveLinear": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.65,
+        "emissiveLinear": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.65,
+        "emissiveLinear": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "colorLinear": [
+          0.9646862478936612,
+          0.9559733532482866,
+          0.9301108583738498
+        ],
+        "roughness": 0.65,
+        "emissiveLinear": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "allFixturesOn": true,
+    "allPrimaryFacesVisible": true,
+    "exposure": 1
+  },
+  "downlights": {
+    "count": 0,
+    "tests": []
+  },
+  "subjectStatus": "pass",
+  "staticSubjectsPass": true,
+  "errors": [],
+  "limitations": [
+    "Ray probes are targeted checks, not a proof of full collision clearance or construction compliance",
+    "Time-window visibility does not grant internal visual review or user acceptance"
+  ],
+  "humanAcceptance": "pending"
+}

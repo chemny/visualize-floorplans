@@ -16,6 +16,8 @@ Illustration of the workflow; AI interior concepts and the editable 3D preview a
 
 [Explore the bundled Champagne Pearl case](assets/reference-cases/jujian-champagne-pearl/index.html): supplied references, 13 concept images, an editable workbench, drawings and a 56-second tour. Ask the Agent to open the installed local case; GitHub does not execute HTML file pages. Its retained images and tour differ from the current example workbench in lighting and materials; see the [case notes](assets/reference-cases/jujian-champagne-pearl/README.md).
 
+[Explore the accepted 57-second homeowner tour](assets/reference-cases/dimensioned-homeowner-tour/index.html): final video, route/camera configuration and concise review records. Its user acceptance is separate from the pending internal continuous-playback review.
+
 ## Features
 
 | Capability | What it helps you do |
@@ -33,6 +35,8 @@ Illustration of the workflow; AI interior concepts and the editable 3D preview a
 This is concept design, not measured CAD, structural assessment or construction documentation. Unknown wall types require verification before demolition proposals. Video and Blender are optional; renovation pricing is excluded.
 
 ## Installation
+
+Current Skill version: **0.2.2**.
 
 ### Requirements
 
@@ -95,6 +99,8 @@ Direct readback uses the local project service. A standalone HTML stores browser
 ```text
 Create a continuous homeowner tour from this confirmed scheme. Show the main rooms clearly and keep turns smooth.
 ```
+
+Route and camera direction are planned separately, with shallow visits to small rooms and smooth doorway transitions. Review samples and a complete preview before final capture. See the [homeowner tour method](references/homeowner-tour-method.md).
 
 H5 capture requires the optional browser tools; generative final video needs a separately available provider and its own review.
 

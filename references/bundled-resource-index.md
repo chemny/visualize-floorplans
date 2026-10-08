@@ -64,3 +64,9 @@ Paths below resolve from the Skill root. Consult when selecting a helper script 
 - `references/beta4-workbench-validation.md`: historical bounded checks, not current acceptance.
 - `references/release-validation.md`: current release boundaries and historical evidence.
 - `references/local-beta-status.md`: historical technical and visual scope limitations.
+
+## 已确认的第二个导览案例
+
+- `assets/reference-cases/dimensioned-homeowner-tour/index.html`：最终 57 秒场景视频及简要入口。
+- 同目录 `README.md`、`manifest.json`、`acceptance.json`：案例边界、文件哈希及明确用户接受记录。
+- 只保存最终配置和核验摘要，不包含中间迭代或渲染网格。复用通用方法见 `homeowner-tour-method.md`；具体路径和角度不能当作共享默认值。

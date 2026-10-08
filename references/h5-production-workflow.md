@@ -1,5 +1,7 @@
 # Structured H5 production workflow
 
+For every homeowner route or video, first apply `homeowner-tour-method.md`: reuse the accepted subject-key camera method and profile, fill case targets, and review dynamic samples before full capture.
+
 Read `h5-quality-gates.md` for mandatory source calibration, AI reference/camera
 consistency, subject time-window checks and accepted-delivery gates. A raw
 preflight can complete with reported visual failures; formal delivery cannot.
@@ -42,6 +44,10 @@ unverified generative final are separate stages.
    Smooth paths must be collision-checked after smoothing. Use arclength-based movement
    and continuous rotations, not a pause at every turn. If the agreed duration
    forces high speed, report it rather than misrepresenting comfort.
+   Apply `camera_gaze.py` to the planned path using case `cameraKeys`, following
+   `homeowner-tour-method.md`. Reuse the accepted profile; first render difficult
+   turn samples and a complete low-cost dynamic preview. Subject checks, motion
+   review and actual playback must pass internally before full-resolution capture.
 6. Generate the requested final video after preflight review. A Blender animation
    is deterministic geometric playback. Seedance is a generative video branch:
    verify current API/model limits, locally configured credentials, costs and

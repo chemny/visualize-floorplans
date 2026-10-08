@@ -1,0 +1,45 @@
+{
+  "artifacts": [
+    {
+      "path": "walkthrough.mp4",
+      "sha256": "ca1ebe22383ad540db7cb537fb86e3bd22d83a0d70d2eba0b7446258352ee897",
+      "bytes": 6646636
+    },
+    {
+      "path": "tour.json",
+      "sha256": "364e52b481c106b93e24de1142f56324cec79aec92fbdf35b3da4872e84d75a2",
+      "bytes": 582860
+    },
+    {
+      "path": "route-config.json",
+      "sha256": "2c0152658a4e164d97aa83e516e593b50a8c24897f08436a7b8cc7e845aa7b39",
+      "bytes": 22191
+    },
+    {
+      "path": "path-source.json",
+      "sha256": "3ef4e1cf5b9af4deb66713ad1fe84a34c59110f4f030e4e1a80f88b44258ffca",
+      "bytes": 483029
+    },
+    {
+      "path": "subject-plan.json",
+      "sha256": "238b8834407eeabccc0a8536eda91a6e8839c173fe41be3f25a969b3554be462",
+      "bytes": 2266
+    },
+    {
+      "path": "verification.json",
+      "sha256": "c4b2b4d60dafc15eff86f2749dcc6fe966ee1d822a5a106f17fc4c80a16265e1",
+      "bytes": 1535
+    },
+    {
+      "path": "mesh-audit.json",
+      "sha256": "89b183faaa57d5243690a8bb74eab8149050bb99a8c123240ab0a44b1bfb8183",
+      "bytes": 11208
+    },
+    {
+      "path": "subject-audit.json",
+      "sha256": "3db312b0c899e222dc2b2623dc44683cf322b74f3586c72befca229a6899ff06",
+      "bytes": 340674
+    }
+  ],
+  "representation": "accepted case example, not full editable workbench or reproducible mesh package"
+}

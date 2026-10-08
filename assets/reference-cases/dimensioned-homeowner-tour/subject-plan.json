@@ -1,0 +1,84 @@
+{
+  "schema": "floor-visualization-subject-plan/1.0",
+  "schemeSha256": "e6ef3175357545c7954ca52c5abd6dde2453253612a445fbe156b3295b57c5de",
+  "tourSha256": "364e52b481c106b93e24de1142f56324cec79aec92fbdf35b3da4872e84d75a2",
+  "purpose": "Diagnostic homeowner preview; geometry, visibility and visual acceptance separate",
+  "policy": {
+    "sampleHz": 4,
+    "minContinuousSeconds": 0.5,
+    "minVisibleSamples": 2,
+    "minVisibleFraction": 0.03,
+    "minScreenAreaFraction": 0.005,
+    "maxCloseArchitectureRatio": 0.6,
+    "maxBadCompositionFraction": 0.25
+  },
+  "chapters": [
+    {
+      "id": "书房观看",
+      "purpose": "Main room composition in homeowner overview",
+      "startSeconds": 4.333333333333333,
+      "endSeconds": 6.541666666666667,
+      "subjects": [
+        "guest-sofa",
+        "study-desk"
+      ]
+    },
+    {
+      "id": "次卧观看",
+      "purpose": "Main room composition in homeowner overview",
+      "startSeconds": 10.416666666666666,
+      "endSeconds": 13.0,
+      "subjects": [
+        "secondary-bed"
+      ]
+    },
+    {
+      "id": "厨房观看",
+      "purpose": "Main room composition in homeowner overview",
+      "startSeconds": 15.166666666666666,
+      "endSeconds": 16.875,
+      "subjects": [
+        "counter"
+      ]
+    },
+    {
+      "id": "卫浴观看",
+      "purpose": "Main room composition in homeowner overview",
+      "startSeconds": 24.916666666666668,
+      "endSeconds": 26.125,
+      "subjects": [
+        "basin",
+        "toilet"
+      ]
+    },
+    {
+      "id": "主卧观看",
+      "purpose": "Main room composition in homeowner overview",
+      "startSeconds": 31.333333333333332,
+      "endSeconds": 34.708333333333336,
+      "subjects": [
+        "main-bed"
+      ]
+    },
+    {
+      "id": "客厅观看",
+      "purpose": "Main room composition in homeowner overview",
+      "startSeconds": 46.708333333333336,
+      "endSeconds": 50.916666666666664,
+      "subjects": [
+        "tv-screen",
+        "tv-base",
+        "sofa"
+      ]
+    },
+    {
+      "id": "餐厅观看",
+      "purpose": "Main room composition in homeowner overview",
+      "startSeconds": 52.208333333333336,
+      "endSeconds": 54.208333333333336,
+      "subjects": [
+        "dining-table"
+      ]
+    }
+  ]
+}

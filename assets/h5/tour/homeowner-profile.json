@@ -1,0 +1,29 @@
+{
+  "schema": "homeowner-tour-profile/1",
+  "method": "subject-key-curves-v1",
+  "reference": "assets/reference-cases/jujian-champagne-pearl/tour/walkthrough.mp4",
+  "referenceTourSha256": "e348fa4485657c23b3018001d7e573e897c4c104ce8a64debbbd001e0d7515e7",
+  "referenceFacts": {
+    "fps": 24,
+    "eyeMm": 1600,
+    "horizontalFovDegrees": 76,
+    "seconds": 56,
+    "measuredMaxYawDegreesPerSecond": 43.302437899721
+  },
+  "defaults": {
+    "eyeMm": 1600,
+    "horizontalFovDegrees": 76,
+    "shiftY": 0,
+    "headBob": false,
+    "gazeSmoothSeconds": 0.25,
+    "finalSmoothSeconds": 0.5,
+    "pitchMinDegrees": -38,
+    "pitchMaxDegrees": 1.15
+  },
+  "reviewLimits": {
+    "maxYawDegreesPerSecond": 32,
+    "maxPitchDegreesPerSecond": 14,
+    "maximumSpeedMps": 1.2
+  },
+  "limitsStatus": "Conservative starting review thresholds, not historical exact limits or proof of comfort; explicit case overrides require motion and visual review. No fixed duration."
+}

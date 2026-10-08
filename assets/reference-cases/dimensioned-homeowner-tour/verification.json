@@ -1,0 +1,46 @@
+{
+  "previewOnly": true,
+  "tourSha256": "364e52b481c106b93e24de1142f56324cec79aec92fbdf35b3da4872e84d75a2",
+  "videoSha256": "ca1ebe22383ad540db7cb537fb86e3bd22d83a0d70d2eba0b7446258352ee897",
+  "probe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 1280,
+        "height": 720,
+        "avg_frame_rate": "24/1",
+        "nb_frames": "1368"
+      }
+    ],
+    "format": {
+      "duration": "57.000000",
+      "size": "6646636"
+    }
+  },
+  "contiguousFrames": true,
+  "decode": "pass",
+  "meshHits": 0,
+  "subjectStatus": "pass",
+  "motionFailures": [],
+  "chapterFailures": [],
+  "visualReview": {
+    "method": "actual sequential frames at half-second intervals, not continuous playback certification",
+    "entry": "more floor and openings visible, door leaf still crosses view",
+    "kitchen": "counter and hob clearer; fridge crosses view on exit",
+    "mainReturn": "clear passage target; washer still visible through doorway"
+  },
+  "dynamicComfortReview": "pending",
+  "humanAcceptance": "pending",
+  "rejectedCandidate": "tour-clearance-composition-20261008 failed chair and architecture body-clearance checks; excluded from delivery",
+  "remaining": [
+    "入户门垛和门扇经过画面",
+    "厨房冰箱经过画面",
+    "主卧回程仍能看到洗衣柜"
+  ],
+  "browserPlaybackReview": {
+    "status": "blocked",
+    "reason": "Browser URL policy permits http/https and rejects this local file protocol. No alternate access attempted.",
+    "target": "index.html"
+  }
+}

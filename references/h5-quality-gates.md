@@ -1,5 +1,7 @@
 # H5 source, image and camera quality gates
 
+For every homeowner route or video, first apply `homeowner-tour-method.md`: reuse the accepted subject-key camera method and profile, fill case targets, and review dynamic samples before full capture.
+
 Read before interpreting a new source, generating AI interiors, planning a
 homeowner walkthrough or closing a delivery. This adds executable review
 contracts to the existing workflow; it does not grant new execution permission.
@@ -94,7 +96,10 @@ Record geometry and visual stage review separately from the individual checks.
 Plan **function → subject → observation angle → connection → duration**.
 Avoid blank-wall turns, repeated introductions, entering too deeply, and
 door-frame closeups. Shallow entry and offset returns are preferences subject
-to actual clearance. Necessary return routes are allowed; do not invent a loop.
+to actual clearance. Select only meaningful tour subjects; a room visit does not
+require a complete inventory scan. Apply the closeout checklist in
+`homeowner-tour-method.md`, including independent local gaze parameters and
+doorway turn timing. Necessary return routes are allowed; do not invent a loop.
 
 Copy `assets/h5/subject-plan-template.json` to the case directory. Bind the
 scheme hash and exact tour-file SHA256. Give every chapter actual stable subject
@@ -159,3 +164,12 @@ their reviewed paths/hashes. Preview handoff cannot promote an `accepted:true`
 manifest claim. ZIP integrity applies to supporting files; only the reviewed
 displayed output scopes carry acceptance. Paid/external work and Seedance remain
 separate requests and gates. No archive or local check certifies every floorplan.
+
+## Dynamic preview before full capture
+
+Follow `homeowner-tour-method.md` and the enforced `--preview-review` contract.
+Source calibration/subject checks are not substitutes for dynamic turn and
+whole-tour viewing. Changed tour, renderer or scene invalidates the preview
+review; only output-size changes can transfer the same scene review. Diagnostic
+full capture at <=1280×720 with explicit `--preview` remains available without
+claiming final acceptance. New video output is still pending user review.

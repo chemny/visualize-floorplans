@@ -46,6 +46,24 @@ to audit/run for a tour's viewing windows. Non-preview run also requires
 handoff/package requires `--accepted --bundle BUNDLE --quality-review REVIEW_JSON`.
 Default handoff/package is an unaccepted preview/file-integrity operation.
 
+## Reusable homeowner camera
+
+Read `homeowner-tour-method.md` before planning. `plan_route.py` produces the
+case spatial path and visit markers; it does not interpret legacy `cameraKeys`.
+Apply the public gaze stage explicitly after planning, using new case targets:
+
+```text
+python scripts/production/camera_gaze.py --tour PATH_TOUR --config CASE_CAMERA_CONFIG --output NEW_CAMERA_TOUR --retime
+```
+
+Start from `assets/h5/tour/camera-config-template.json` and the bundled
+`homeowner-profile.json`. Exit 2 means measured motion exceeded review thresholds:
+keep it diagnostic, adjust chapter timing/targets and re-run. The gaze stage alone preserves input frame times and positions; `--retime`
+applies shared effort-based timing and updates visit markers. Neither is an
+automatic room-target finder, mesh audit or comfort certificate. `--output` must be new.
+Use the resulting tour for subject/body audit and short dynamic samples before
+full capture. No new ad hoc camera implementation is needed for ordinary cases.
+
 ## Case contract
 
 Copy `assets/h5/case-template.json` outside the Skill, then fill it after source
@@ -177,3 +195,17 @@ it does not prove the new generic template's portability or fidelity.
 Run `scripts/release_smoke.py --out NEW_EMPTY_DIR --node NODE_EXECUTABLE` for Python, subject and interaction module checks. With existing Chromium/Playwright, create synthetic fixtures with `scripts/production/synthetic_cases.py --out NEW_DIR`, serve that directory locally, then invoke `test_workbench_browser.mjs --playwright-module MODULE --browser EXECUTABLE --base-url URL --fixture-dir NEW_DIR --out NEW_REPORT_DIR`. It uses new isolated contexts; do not point it at a blocked user browser page as a workaround. The browser script emits screenshots, FPS and resource counts and tests export/reopen. Emulated touch is not physical-phone certification.
 
 Independent HTML exports use a fresh document storage identity: first open reads the embedded seed, later opens restore edits from that document cache. New exports never borrow another document or the base case cache. Legacy exports without an identity keep their original seed behavior until re-exported with the updated engine. Local browser storage is origin/browser specific; exporting is still required to transfer new edits to another computer.
+
+## Full-video preview gate
+
+`h5.py run --config` now applies shared camera keys and timing automatically.
+After dynamic diagnostic viewing, create a pending record with
+`tour_tools.py review-template --tour TOUR --runtime RUNTIME --output REVIEW`.
+Fill only actual viewing results and artifact hashes; no automatic approval.
+Pass `--preview-review REVIEW` to `run`/`capture` before full production or HD
+capture. Direct `h5_browser.mjs capture` enforces the same gate. For low-cost
+full diagnostic capture use `--preview` and a runtime no larger than 1280×720;
+its new output remains pending. Config-based planning/retiming changes the tour
+hash: bind a new subject plan/review to the generated tour, then reuse `--tour`
+for the reviewed production run. The initial failed run retains its generated
+path, camera and reports for diagnosis; do not fabricate a passed review.

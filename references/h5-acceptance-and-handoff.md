@@ -1,5 +1,7 @@
 # H5 quality, acceptance, and handoff
 
+For every homeowner route or video, first apply `homeowner-tour-method.md`: reuse the accepted subject-key camera method and profile, fill case targets, and review dynamic samples before full capture.
+
 Use this reference when closing an approved editable H5 scheme, interior image
 set, or deterministic walkthrough. It supplements `h5-production-workflow.md`.
 It does not authorize new images, external generation, or publication.
@@ -69,6 +71,11 @@ an ordinary preview manifest cannot grant acceptance with a boolean.
 - A continuous walkthrough has no cuts, teleports, or hidden disconnected
   transitions. UI chapter jumps are viewer navigation, not edits in the video.
   Verify important subjects are visible, not merely that the route covers rooms.
+
+Follow the closeout checklist in `homeowner-tour-method.md`. Record a user's
+explicit final acceptance separately from internal playback inspection. If
+internal playback is blocked, retain that pending status and its actual cause;
+user acceptance cannot fill missing review evidence or bypass formal gates.
 
 ## Freeze and deliver
 

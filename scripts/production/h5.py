@@ -155,7 +155,7 @@ def node_call(command,args):
     node=getattr(args,'node',None) or os.environ.get('FLOOR_VIS_NODE') or shutil.which('node')
     if not node: raise ValueError('Existing Node.js required; pass --node')
     cmd=[node,str(HERE/'h5_browser.mjs'),command]
-    for key in ('html','runtime','out','tour','views','subjects','playwright_module','browser'):
+    for key in ('html','runtime','out','tour','views','subjects','playwright_module','browser','preview_review'):
         value=getattr(args,key,None)
         if value:cmd+=['--'+key.replace('_','-'),str(Path(value).resolve())]
     if getattr(args,'preview',False):cmd+=['--preview']
@@ -213,6 +213,13 @@ def handoff(directory, manifest_path=None, title='Floor Visualization', accepted
     dump(directory/'handoff.json',manifest)
     return target
 
+def require_capture_review(args):
+    if not getattr(args,'full',False) or not getattr(args,'tour',None):return
+    scene=read(Path(args.runtime)/'scene.json');w,h=scene.get('renderSettings',{}).get('size',[1280,720])
+    if not getattr(args,'preview',False) or w>1280 or h>720:
+        from tour_workflow import require_preview
+        require_preview(getattr(args,'preview_review',None),args.tour,args.runtime)
+
 def parser():
     ap=argparse.ArgumentParser(description=__doc__);sub=ap.add_subparsers(dest='command',required=True)
     sub.add_parser('doctor',help='Read-only dependency availability; never installs or runs a regression suite')
@@ -222,7 +229,7 @@ def parser():
     p=sub.add_parser('review-template',help='Case-local review skeleton with pending provenance/acceptance');p.add_argument('--bundle',required=True);p.add_argument('--out',required=True)
     for command in ('export','capture','audit','run'):
         p=sub.add_parser(command);p.add_argument('--out',required=True)
-        p.add_argument('--node');p.add_argument('--playwright-module');p.add_argument('--browser');p.add_argument('--preview',action='store_true')
+        p.add_argument('--node');p.add_argument('--playwright-module');p.add_argument('--browser');p.add_argument('--preview',action='store_true');p.add_argument('--preview-review',help='Hash-bound dynamic preview review required before full production/HD capture')
         if command=='export':p.add_argument('--html',required=True)
         elif command in ('capture','audit'):
             p.add_argument('--runtime',required=True);p.add_argument('--tour');p.add_argument('--views');p.add_argument('--subjects');p.add_argument('--full',action='store_true');p.add_argument('--resume',action='store_true');p.add_argument('--range',help='Frame range start:end, end exclusive')
@@ -273,15 +280,21 @@ def main():
         elif args.config:
             shutil.copy2(args.config,out/'tour-config.json')
             subprocess.run([sys.executable,str(HERE/'plan_route.py'),'--bundle',str(out/'production-bundle.json'),'--config',str(out/'tour-config.json'),'--output',str(out/'tour.json')]+(['--preview'] if args.preview else []),check=True)
-            cfg=read(args.config);tour=read(out/'tour.json')
-            for f in tour['frames']:f.update(horizontalFovDegrees=cfg.get('horizontalFovDegrees',76),shiftY=cfg.get('shiftY',0))
+            cfg=read(args.config)
+            if not cfg.get('cameraKeys'):raise ValueError('Camera keys required for shared homeowner method; route alone cannot produce a reviewed tour')
+            from camera_gaze import generate, PROFILE
+            from tour_workflow import retime, intent_check
+            profile=read(PROFILE);tour=generate(read(out/'tour.json'),cfg,profile)
+            tour=retime(tour,cfg,{**profile['reviewLimits'],**cfg.get('motionReviewLimits',{})})
+            tour['chapterReview']=intent_check(tour,cfg)
             dump(out/'tour.json',tour)
+            if tour['cameraMethod']['thresholdFailures'] or tour['chapterReview']['failures']:raise ValueError('Motion/chapter review failed; inspect generated tour.json before rendering')
         elif args.animation:raise ValueError('Animation requires --tour or --config')
         args.runtime=str(out/'runtime');args.tour=str(out/'tour.json') if (out/'tour.json').exists() else None
         if not args.tour and not args.views:raise ValueError('Provide a tour or explicit views; cameras are not invented')
         if args.views:shutil.copy2(args.views,out/'views.json');args.views=str(out/'views.json')
         args.out=str(out/'audit');node_call('audit',args)
-        args.out=str(out/'capture');args.full=args.animation;node_call('capture',args)
+        args.out=str(out/'capture');args.full=args.animation;require_capture_review(args);node_call('capture',args)
         video=None
         if args.animation:
             ffmpeg=args.ffmpeg or shutil.which('ffmpeg');ffprobe=args.ffprobe or shutil.which('ffprobe')
@@ -296,7 +309,9 @@ def main():
         dump(out/'run.json',{'schemeSha256':b['schemeSha256'],'engine':'h5','previewOnly':args.preview,'humanAcceptance':'pending for new artifacts','video':video.name if video else None,'subjectStatus':audit['subjectStatus'],'visualReview':'pending','acceptedDelivery':False,'Seedance':'not executed'})
         handoff(out)
         result=out
-    else:node_call(args.command,args);result=args.out
+    else:
+        if args.command=='capture':require_capture_review(args)
+        node_call(args.command,args);result=args.out
     message={'command':args.command,'output':str(result)}
     if args.command=='build':
         evidence=read(Path(result).with_suffix('.build.json'));message.update(workbenchVersion=evidence['workbenchVersion'],lightingWarnings=evidence['lightingCheck']['warnings'],buildMetadata=str(Path(result).with_suffix('.build.json')))

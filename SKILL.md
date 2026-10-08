@@ -2,7 +2,7 @@
 name: visualize-floorplans
 description: Start from one floor-plan image with optional furniture/style references, build editable offline H5 2D/3D renovation workbenches, coordinate interior concept images, and create deterministic homeowner camera preflights. Use when the user requests floor-plan confirmation, furniture and finish editing, scheme export, walkthrough planning and local handoff. Preserve structural evidence and versioned approvals. Concept design is not measured CAD or construction documentation; Seedance is a separate optional branch.
 metadata:
-  version: "0.2.1"
+  version: "0.2.2"
 ---
 
 # Visualize Floorplans
@@ -32,6 +32,24 @@ is not the third user decision round.
 ## Bundled reference case
 
 For a concrete capability preview, open `assets/reference-cases/jujian-champagne-pearl/index.html` when the user asks to see an example. Read its brief `README.md` for representation boundaries; do not load the mesh or all images unless needed. It contains supplied references, a current 0.2.0 workbench, selected concept images/drawings, scheme data and an H5 tour. This is a case-specific example, not a shared default apartment or fresh acceptance of every representation. Copy case input into a new project before editing; do not modify the bundled example. Existing image/video/mesh sources differ from the newest lighting/material demo. The page uses relative links and does not open automatically when the Skill is loaded.
+
+## Reuse the accepted homeowner tour method
+
+Before every route/camera/video task, read `references/homeowner-tour-method.md`.
+Start from its accepted-reference profile and public `scripts/production/camera_gaze.py`
+subject-key gaze method; adapt case targets and time budgets, not the algorithm
+from scratch. The 56-second example is a method reference, not a fixed duration
+or transferable apartment path. Require dynamic turn samples, a complete low-cost
+preview and subject visibility checks before high-resolution full capture.
+The primary `h5.py run --config` now applies shared gaze/timing/chapter checks.
+Full production/HD capture requires a hash-bound actual dynamic preview review;
+low-cost diagnostic previews remain possible. Use `tour_tools.py` for chapter
+motion reports, bounded corrections and pending review templates.
+Keep source, motion, viewport integrity and user visual acceptance separate.
+Use the closeout checklist in that reference. Separate room-only gaze/pitch edits
+from transit/global orientation; approach the usable doorway before turning.
+The second accepted tour example is linked there; its case parameters and user
+acceptance do not replace a new case's dynamic review.
 
 ## Required quality gates
 

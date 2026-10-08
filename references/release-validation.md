@@ -1,3 +1,7 @@
+# Release review · 0.2.2 · 2026-10-08
+
+Homeowner tour methods and a second accepted example are included. Current local checks are recorded under the ignored release preparation directory. Codex/macOS is exercised; Windows remains source-reviewed, and Claude Code/OpenClaw remain untested. Existing disclosed compatibility boundaries are unchanged. The accepted example retains pending internal continuous playback inspection separately from explicit user acceptance.
+
 # Release review · 0.2.1 · 2026-10-07
 
 Current Skill and shared H5 engine identity: **0.2.1**. Codex/macOS executes the
