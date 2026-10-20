@@ -1,7 +1,7 @@
 {
   "schema": "floor-visualization-case/1.0",
   "caseId": "replace-with-unique-case-id",
-  "title": "Floor Visualization",
+  "title": "Interior Design Assistant",
   "model": {
     "title": "填写户型名称",
     "width": null,

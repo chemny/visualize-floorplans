@@ -15,7 +15,7 @@ Clearly separate source dimensions, pixel-derived values and design assumptions.
 
 Use a copy-ready first-use prompt:
 
-> Use visualize-floorplans with this floor-plan image and my stated needs.
+> Use interior-design-assistant with this floor-plan image and my stated needs.
 > I may have no furniture or style references. Interpret and self-check the plan,
 > then present one concise checklist of consequential uncertainties and missing
 > needs, with recommended choices. After that round, propose the furniture and

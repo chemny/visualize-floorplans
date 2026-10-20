@@ -1,4 +1,4 @@
-# 户型装修可视化
+# 家装助手 · Interior Design Assistant
 
 [English](./README.md) | 中文
 
@@ -10,7 +10,7 @@
 
 ## 效果预览
 
-![能力展示示意图：户型图、可编辑二维三维工作台与室内效果](assets/visualize-floorplans-hero-zh.png)
+![能力展示示意图：户型图、可编辑二维三维工作台与室内效果](assets/interior-design-assistant-hero-zh.png)
 
 这是一张流程示意图；AI 装修效果图与可编辑三维预览是不同的输出。
 
@@ -55,7 +55,7 @@
 把这段话发给你的 Agent：
 
 ```text
-帮我安装这个 Skill：https://github.com/chemny/visualize-floorplans
+帮我安装这个 Skill：https://github.com/chemny/interior-design-assistant
 先检查基础环境，缺什么帮我补齐，再安装并检查能否发现和使用。其他功能等我需要时再配置。
 ```
 
@@ -144,4 +144,4 @@ LICENSE                  原创内容许可
 
 ## 关于我
 
-由 [chemny](https://github.com/chemny) 维护。问题和建议可以提交到[仓库 Issues](https://github.com/chemny/visualize-floorplans/issues)。
+由 [chemny](https://github.com/chemny) 维护。问题和建议可以提交到[仓库 Issues](https://github.com/chemny/interior-design-assistant/issues)。

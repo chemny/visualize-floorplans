@@ -23,7 +23,7 @@ def main():
     records=[];out.parent.mkdir(parents=True,exist_ok=True)
     with zipfile.ZipFile(out,'x',zipfile.ZIP_DEFLATED) as z:
         for p,rel in files():
-            data=p.read_bytes();entry='visualize-floorplans/'+rel.as_posix();z.writestr(entry,data);records.append({'path':rel.as_posix(),'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)})
+            data=p.read_bytes();entry='interior-design-assistant/'+rel.as_posix();z.writestr(entry,data);records.append({'path':rel.as_posix(),'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)})
     with zipfile.ZipFile(out) as z:
         if z.testzip():raise SystemExit('ZIP integrity failed')
     report={'version':version,'channel':metadata.get('channel','default'),'files':records,'archiveSha256':hashlib.sha256(out.read_bytes()).hexdigest(),'scope':'Source snapshot only, no case acceptance or platform certification','published':False}
