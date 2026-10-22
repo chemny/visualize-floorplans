@@ -182,7 +182,7 @@ def package(directory,archive,review_result=None):
     dump(archive.with_suffix('.zip.json'),{'archiveSha256':sha(archive),'files':len(manifest['files']),'bytes':archive.stat().st_size})
     return archive
 
-def handoff(directory, manifest_path=None, title='Interior Design Assistant', accepted=None):
+def handoff(directory, manifest_path=None, title='Interior Design', accepted=None):
     """Make a relocatable preview index without promoting artifacts to accepted."""
     from urllib.parse import quote
     directory=Path(directory).resolve();target=directory/'index.html'
@@ -236,7 +236,7 @@ def parser():
         else:
             p.add_argument('--bundle',required=True);p.add_argument('--config');p.add_argument('--tour');p.add_argument('--views');p.add_argument('--subjects');p.add_argument('--quality-review');p.add_argument('--animation',action='store_true');p.add_argument('--ffmpeg');p.add_argument('--ffprobe')
     p=sub.add_parser('package',help='Relocatable folder -> SHA-256 manifest + ZIP');p.add_argument('--directory',required=True);p.add_argument('--archive',required=True)
-    p=sub.add_parser('handoff',help='Local assets -> relocatable preview index');p.add_argument('--directory',required=True);p.add_argument('--manifest');p.add_argument('--title',default='Interior Design Assistant')
+    p=sub.add_parser('handoff',help='Local assets -> relocatable preview index');p.add_argument('--directory',required=True);p.add_argument('--manifest');p.add_argument('--title',default='Interior Design')
     for command in ('package','handoff'):
         p=sub.choices[command];p.add_argument('--accepted',action='store_true');p.add_argument('--quality-review');p.add_argument('--bundle')
     return ap

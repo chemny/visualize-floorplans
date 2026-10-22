@@ -1,4 +1,4 @@
-<!doctype html><meta charset="utf-8"><title>Interior Design Assistant · geometry replay</title><style>html,body{margin:0;overflow:hidden;background:#f2efe9}canvas{display:block}</style><script type="module">
+<!doctype html><meta charset="utf-8"><title>Interior Design · geometry replay</title><style>html,body{margin:0;overflow:hidden;background:#f2efe9}canvas{display:block}</style><script type="module">
 import * as THREE from './three.module.js';
 const [data,buffer]=await Promise.all([fetch('./scene.json').then(r=>r.json()),fetch('./geometry.bin').then(r=>r.arrayBuffer())]);
 const settings={size:[1280,720],exposure:1,shiftY:0,bodyRadiusMm:160,...data.renderSettings};

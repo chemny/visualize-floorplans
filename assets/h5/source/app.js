@@ -53,7 +53,7 @@ const nm = s => LANG === 'en' ? (NAMES_EN[s] ?? s) : s;
 // 静态文案：元素上写 data-en / data-en-title，中文原文首次切换时存进 dataset
 function applyStaticLang(){
   document.documentElement.lang = tr('zh-CN', 'en');
-  document.title = 'Interior Design Assistant';
+  document.title = 'Interior Design';
   document.querySelectorAll('[data-en]').forEach(el => { el.dataset.zh ??= el.textContent; el.textContent = tr(el.dataset.zh, el.dataset.en); });
   document.querySelectorAll('[data-en-title]').forEach(el => { el.dataset.zhTitle ??= el.title; el.title = tr(el.dataset.zhTitle, el.dataset.enTitle); });
   document.getElementById('langBtn').textContent = tr('EN', '中文');

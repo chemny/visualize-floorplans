@@ -1,11 +1,11 @@
 ---
-name: interior-design-assistant
+name: interior-design
 description: Start from one floor-plan image with optional furniture/style references, build editable offline H5 2D/3D renovation workbenches, coordinate interior concept images, and create deterministic homeowner camera preflights. Use when the user requests floor-plan confirmation, furniture and finish editing, scheme export, walkthrough planning and local handoff. Preserve structural evidence and versioned approvals. Concept design is not measured CAD or construction documentation; Seedance is a separate optional branch.
 metadata:
   version: "0.2.2"
 ---
 
-# Interior Design Assistant · 家装助手
+# Interior Design · 家装助手
 
 ## Default guided user workflow
 

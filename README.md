@@ -1,4 +1,4 @@
-# Interior Design Assistant
+# Interior Design
 
 English | [中文](./README.zh.md)
 
@@ -10,7 +10,7 @@ Furniture layouts and style references are optional. The Agent reads visible dim
 
 ## Preview
 
-![Capability illustration: a floor plan, editable 2D/3D workbench and interior concepts](assets/interior-design-assistant-hero-en.png)
+![Capability illustration: a floor plan, editable 2D/3D workbench and interior concepts](assets/interior-design-hero-en.png)
 
 Illustration of the workflow; AI interior concepts and the editable 3D preview are separate outputs.
 
@@ -55,7 +55,7 @@ The Agent prepares the core environment first; image and video integrations can 
 Send this request to your Agent:
 
 ```text
-Install this Skill: https://github.com/chemny/interior-design-assistant
+Install this Skill: https://github.com/chemny/interior-design
 Check the core environment and prepare anything missing, then install and verify discovery and readiness. Set up optional features when I need them.
 ```
 
@@ -144,4 +144,4 @@ Original code and documentation use [MIT](LICENSE). Adapted floorplan workbench 
 
 ## About Me
 
-Maintained by [chemny](https://github.com/chemny). Questions and feedback can be raised in the [repository issues](https://github.com/chemny/interior-design-assistant/issues).
+Maintained by [chemny](https://github.com/chemny). Questions and feedback can be raised in the [repository issues](https://github.com/chemny/interior-design/issues).

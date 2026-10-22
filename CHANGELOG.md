@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Rename the Skill to Interior Design Assistant (家装助手), with the interior-design-assistant identifier, directory, invocation and repository links. Historical accepted cases retain their original bytes.
+- Rename the Skill to Interior Design (家装助手), with the interior-design identifier, directory, invocation and repository links. Historical accepted cases retain their original bytes.
 
 ## 0.2.2 · homeowner tour methods · 2026-10-08
 
