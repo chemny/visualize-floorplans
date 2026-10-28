@@ -74,6 +74,8 @@ or clearance conditions as unverified. Batch only real unresolved trade-offs
 (such as work/guest-room use or storage versus open space), with recommendations.
 Do not turn the furniture catalog into an item-by-item questionnaire.
 
+Run the version-bound executable review in `furniture-layout-review.md` before
+presentation and after each local edit; attach its case record to the H5 build.
 Confirm the whole displayed layout together. Local requested edits remain inside
 this round; reuse unchanged evidence. Bind the layout through the existing
 approve-layout mechanism. Do not bypass structure/access/layout quality gates.
@@ -81,11 +83,13 @@ approve-layout mechanism. Do not bypass structure/access/layout quality gates.
 ## Round 3 — style
 
 If a style is already explicit, retain it and show one scheme preview/material
-summary; do not force another comparison. With no direction, show the six default workbench style directions in one
-2-by-3 interior comparison image, explain their differences and recommend
-one with a reason. Use an eye-level interior view, not a bird view, and preserve
-the confirmed walls, entrance and furniture. A different option count requires
-an explicit user request; never silently reduce the default six to three. Keep layout/camera/daylight fixed for visual comparison.
+summary; do not force another comparison. With no direction, show the nine
+defaults from `assets/project-template.json` in ONE 3-by-3 eye-level interior
+comparison image. Row 1: 现代简约、原木奶油、中古现代; row 2: 现代新中式、
+香槟珍珠、欧式奢华; row 3: 法式风格、意式暖奢、巴黎艺术.
+Explain differences and recommend one with a reason. Preserve confirmed walls,
+openings, furniture footprints and camera/daylight. Other counts require an
+explicit user request; never silently reduce the default nine.
 Generate and show one actual comparison board before asking an undecided user
 to select a style. Text/material descriptions accompany the board; they do not
 replace it. Check the host's available reference-image generation tools before
@@ -103,17 +107,16 @@ style ID in the diagnostic workbench.
 Before asking for a style choice or starting selected-style production, use
 `scripts/check_style_selection.py` with a case-local review record described in
 `references/style-selection-gate.md`. This guard applies equally to host-tool
-six-panel boards and legacy comparisons. It is an Agent-invoked checkpoint,
+nine-panel boards and legacy comparisons. It is an Agent-invoked checkpoint,
 not automatic browser interception. Passing checks evidence fields/file hashes;
 the Agent must still inspect and show the actual pixels.
 
-The legacy plan_project.py comparison planner supports 4/8/12 options and fixed
-four-panel boards. Do not pass six options to it, pad a board silently, or
-claim six-option execution is supported. Keep the legacy catalog schema,
-record the six default directions in the case brief, use the host reference-
-image tool for the six-panel selection board, then record the chosen style
-through existing selected_style fields. Use expanded legacy comparisons only
-when requested. Host tool limitations or external paid calls require disclosure.
+The plan_project.py planner supports nine options as ONE 3x3 board. Historical
+4/8/12-option manifests remain supported as four-panel boards. Do not pad a
+requested scope or silently reinterpret historical chosen styles. The default
+catalog and each style's generation prompt live in assets/project-template.json.
+Use the host reference-image tool, show the actual board, then record the chosen
+style through selected_style. Tool limitations or paid calls require disclosure.
 
 Combine style choice with the agreed final image scope (rooms/views); do not ask
 another generic “may I continue?” afterward. Images shown before this round are

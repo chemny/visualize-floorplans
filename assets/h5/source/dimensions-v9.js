@@ -16,7 +16,7 @@ export const NEW_COMPONENTS=[
  ['fridgecab','冰箱上柜',600,650,'#ece5db'],['endpanel','柜侧板',50,650,'#ece5db'],
  ['pendant','餐厅吊灯',700,260,'#a8957b'],['downlight','嵌入筒灯',100,100,'#ece5db'],['tracklight','轨道灯',1200,90,'#5b5e58']
 ];
-export const WALL_FINISHES={paint:{label:'乳胶漆',role:'wall',kind:'plaster'},wallpaper:{label:'织纹壁纸',role:'wall',kind:'fabric'},wood:{label:'木饰面',role:'wood',kind:'wood'},tile:{label:'瓷砖',role:'tile',kind:'tile'}};
+export const WALL_FINISHES={french_panel:{label:'法式线框饰面',role:'wall',kind:'french_panel'},paint:{label:'乳胶漆',role:'wall',kind:'plaster'},wallpaper:{label:'织纹壁纸',role:'wall',kind:'fabric'},wood:{label:'木饰面',role:'wood',kind:'wood'},tile:{label:'瓷砖',role:'tile',kind:'tile'}};
 export function validateDimensions(f,height=2750){
  const s=DIMENSIONS[f.type],h=f.fitToCeiling?height:(Number(f.h)||s?.h||850),e=Number(f.elevation)||0;
  if(!Number.isFinite(h)||!Number.isFinite(e)||h<=0||e<0||h+e>height+.1)throw Error(f.name+'：高度与离地之和不得超过层高 '+height+' mm');

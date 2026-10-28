@@ -1,0 +1,18 @@
+{
+  "schema": "homeowner-narration-job/1",
+  "video": {
+    "path": "./tour-review.mp4",
+    "sha256": "REPLACE"
+  },
+  "tour": {
+    "path": "./tour.json",
+    "sha256": "REPLACE"
+  },
+  "videoReview": {
+    "path": "./video-review.approved.json",
+    "sha256": "REPLACE_AFTER_EXPLICIT_VIDEO_CONFIRMATION"
+  },
+  "voice": null,
+  "music": null,
+  "captions": []
+}

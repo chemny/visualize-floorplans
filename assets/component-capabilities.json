@@ -1,0 +1,2802 @@
+{
+  "schemaVersion": 2,
+  "scope": "Component registry and inspected implementation contracts. Profiles distinguish nominal geometry, fixed subparts, actual mechanisms and declared use checks; neither profile membership nor a registered test proves current-case runtime, product, site or visual acceptance.",
+  "families": {
+    "sleep": {
+      "label": "睡眠",
+      "use": "按实际使用者和床架外尺寸选型；客房先满足可用床，沙发床需另验展开状态。",
+      "checks": "床、床头收纳、衣柜联合检查；床边进出、床头靠墙、展开包络。"
+    },
+    "seating": {
+      "label": "座椅",
+      "use": "按面对的活动对象和使用高度选型，不因目录存在而摆放。",
+      "checks": "沙发—茶几—电视或桌—椅成组；坐下、拉出、起身及旁路。"
+    },
+    "surfaces": {
+      "label": "桌台",
+      "use": "用途、人数、形状和可用边长决定尺寸；书桌不是客房必选项。",
+      "checks": "餐桌按常用及来客席位验证；桌椅朝向、够取距离、占用后通行。"
+    },
+    "storage": {
+      "label": "收纳",
+      "use": "按衣物、鞋、家政或书籍分工；一体柜检查连续长度、统一深度和可用墙角。",
+      "checks": "背墙与端墙、柜前站位、柜门/抽屉包络；墙柜还验标高、支撑与设备关系。"
+    },
+    "kitchen": {
+      "label": "厨房操作",
+      "use": "按取放—洗切—烹饪关系和设备安装条件布局。",
+      "checks": "水槽、备餐台、灶、烟机联合检查；不要堵门或用不可操作角落凑台面。"
+    },
+    "appliance": {
+      "label": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。"
+    },
+    "bath": {
+      "label": "卫浴",
+      "use": "先明确干湿区、隔断和真实进出口，再选尺寸。",
+      "checks": "洁具、淋浴隔断、门和站位联合验收；救援开启、湿区出入和检修条件另列。"
+    },
+    "lighting": {
+      "label": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。"
+    },
+    "finish": {
+      "label": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。"
+    },
+    "services": {
+      "label": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。"
+    },
+    "leisure": {
+      "label": "选配",
+      "use": "仅按明确活动或装饰需求放置，可省略。",
+      "checks": "琴凳、运动展开和安全边界、植物维护及窗户操作不能侵占通道。"
+    },
+    "door-proxy": {
+      "label": "门的独立占位组件",
+      "use": "兼容旧数据的隐藏组件；建筑门须修改真实墙体洞口，不能用家具门替代。",
+      "checks": "不作为真实洞口、门扇机制或通行校核证据。"
+    }
+  },
+  "components": [
+    {
+      "id": "accesshatch",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "accesshatch"
+    },
+    {
+      "id": "acwall",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "acwall"
+    },
+    {
+      "id": "aircon",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "aircon"
+    },
+    {
+      "id": "airvent",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "airvent"
+    },
+    {
+      "id": "armchair",
+      "family": "seating",
+      "familyLabel": "座椅",
+      "use": "按面对的活动对象和使用高度选型，不因目录存在而摆放。",
+      "checks": "沙发—茶几—电视或桌—椅成组；坐下、拉出、起身及旁路。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "armchair"
+    },
+    {
+      "id": "backsplash",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "backsplash"
+    },
+    {
+      "id": "barstool",
+      "family": "seating",
+      "familyLabel": "座椅",
+      "use": "按面对的活动对象和使用高度选型，不因目录存在而摆放。",
+      "checks": "沙发—茶几—电视或桌—椅成组；坐下、拉出、起身及旁路。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "barstool"
+    },
+    {
+      "id": "basin",
+      "family": "bath",
+      "familyLabel": "卫浴",
+      "use": "先明确干湿区、隔断和真实进出口，再选尺寸。",
+      "checks": "洁具、淋浴隔断、门和站位联合验收；救援开启、湿区出入和检修条件另列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": "vanity",
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "vanity-fixed-basin",
+      "runtimeType": "vanity"
+    },
+    {
+      "id": "bathtub",
+      "family": "bath",
+      "familyLabel": "卫浴",
+      "use": "先明确干湿区、隔断和真实进出口，再选尺寸。",
+      "checks": "洁具、淋浴隔断、门和站位联合验收；救援开启、湿区出入和检修条件另列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "bathtub-fixed-body",
+      "runtimeType": "bathtub"
+    },
+    {
+      "id": "baycushion",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "baycushion"
+    },
+    {
+      "id": "beanbag",
+      "family": "seating",
+      "familyLabel": "座椅",
+      "use": "按面对的活动对象和使用高度选型，不因目录存在而摆放。",
+      "checks": "沙发—茶几—电视或桌—椅成组；坐下、拉出、起身及旁路。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "beanbag"
+    },
+    {
+      "id": "bed",
+      "family": "sleep",
+      "familyLabel": "睡眠",
+      "use": "按实际使用者和床架外尺寸选型；客房先满足可用床，沙发床需另验展开状态。",
+      "checks": "床、床头收纳、衣柜联合检查；床边进出、床头靠墙、展开包络。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "bed"
+    },
+    {
+      "id": "boiler",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "boiler"
+    },
+    {
+      "id": "bookshelf",
+      "family": "storage",
+      "familyLabel": "收纳",
+      "use": "按衣物、鞋、家政或书籍分工；一体柜检查连续长度、统一深度和可用墙角。",
+      "checks": "背墙与端墙、柜前站位、柜门/抽屉包络；墙柜还验标高、支撑与设备关系。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "storage-envelope",
+      "runtimeType": "bookshelf"
+    },
+    {
+      "id": "cabinet",
+      "family": "storage",
+      "familyLabel": "收纳",
+      "use": "按衣物、鞋、家政或书籍分工；一体柜检查连续长度、统一深度和可用墙角。",
+      "checks": "背墙与端墙、柜前站位、柜门/抽屉包络；墙柜还验标高、支撑与设备关系。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "storage-envelope",
+      "runtimeType": "cabinet"
+    },
+    {
+      "id": "cabinetlight",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "cabinetlight"
+    },
+    {
+      "id": "ceilinground",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。 主灯款式可跟随风格或固定，按房间功能适配。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js",
+        "assets/h5/source/lamp-style.js",
+        "assets/h5/source/lamp-models.js",
+        "scripts/test_lamp_style.mjs",
+        "references/lamp-style-linkage.md"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "ceilinground"
+    },
+    {
+      "id": "ceilingsquare",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。 主灯款式可跟随风格或固定，按房间功能适配。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js",
+        "assets/h5/source/lamp-style.js",
+        "assets/h5/source/lamp-models.js",
+        "scripts/test_lamp_style.mjs",
+        "references/lamp-style-linkage.md"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "ceilingsquare"
+    },
+    {
+      "id": "chair",
+      "family": "seating",
+      "familyLabel": "座椅",
+      "use": "按面对的活动对象和使用高度选型，不因目录存在而摆放。",
+      "checks": "沙发—茶几—电视或桌—椅成组；坐下、拉出、起身及旁路。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "chair"
+    },
+    {
+      "id": "coffee",
+      "family": "surfaces",
+      "familyLabel": "桌台",
+      "use": "用途、人数、形状和可用边长决定尺寸；书桌不是客房必选项。",
+      "checks": "餐桌按常用及来客席位验证；桌椅朝向、够取距离、占用后通行。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "coffee"
+    },
+    {
+      "id": "coffeetable",
+      "family": "surfaces",
+      "familyLabel": "桌台",
+      "use": "用途、人数、形状和可用边长决定尺寸；书桌不是客房必选项。",
+      "checks": "餐桌按常用及来客席位验证；桌椅朝向、够取距离、占用后通行。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "coffeetable"
+    },
+    {
+      "id": "cornersofa",
+      "family": "seating",
+      "familyLabel": "座椅",
+      "use": "按面对的活动对象和使用高度选型，不因目录存在而摆放。",
+      "checks": "沙发—茶几—电视或桌—椅成组；坐下、拉出、起身及旁路。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "cornersofa"
+    },
+    {
+      "id": "counter",
+      "family": "kitchen",
+      "familyLabel": "厨房操作",
+      "use": "按取放—洗切—烹饪关系和设备安装条件布局。",
+      "checks": "水槽、备餐台、灶、烟机联合检查；不要堵门或用不可操作角落凑台面。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "counter-surface",
+      "runtimeType": "counter"
+    },
+    {
+      "id": "cove",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "cove"
+    },
+    {
+      "id": "crib",
+      "family": "sleep",
+      "familyLabel": "睡眠",
+      "use": "按实际使用者和床架外尺寸选型；客房先满足可用床，沙发床需另验展开状态。",
+      "checks": "床、床头收纳、衣柜联合检查；床边进出、床头靠墙、展开包络。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "crib"
+    },
+    {
+      "id": "curtain",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "curtain"
+    },
+    {
+      "id": "curtainbox",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "curtainbox"
+    },
+    {
+      "id": "curtainrail",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "curtainrail"
+    },
+    {
+      "id": "desk",
+      "family": "surfaces",
+      "familyLabel": "桌台",
+      "use": "用途、人数、形状和可用边长决定尺寸；书桌不是客房必选项。",
+      "checks": "餐桌按常用及来客席位验证；桌椅朝向、够取距离、占用后通行。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "desk"
+    },
+    {
+      "id": "dishwasher",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "dishwasher"
+    },
+    {
+      "id": "doortrim",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "doortrim"
+    },
+    {
+      "id": "doubledoor",
+      "family": "door-proxy",
+      "familyLabel": "门的独立占位组件",
+      "use": "兼容旧数据的隐藏组件；建筑门须修改真实墙体洞口，不能用家具门替代。",
+      "checks": "不作为真实洞口、门扇机制或通行校核证据。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "legacy-door-proxy",
+      "runtimeType": "doubledoor"
+    },
+    {
+      "id": "downlight",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "downlight"
+    },
+    {
+      "id": "drainoutlet",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "drainoutlet"
+    },
+    {
+      "id": "dresser",
+      "family": "surfaces",
+      "familyLabel": "桌台",
+      "use": "用途、人数、形状和可用边长决定尺寸；书桌不是客房必选项。",
+      "checks": "餐桌按常用及来客席位验证；桌椅朝向、够取距离、占用后通行。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "dresser"
+    },
+    {
+      "id": "dryer",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "dryer"
+    },
+    {
+      "id": "endpanel",
+      "family": "storage",
+      "familyLabel": "收纳",
+      "use": "按衣物、鞋、家政或书籍分工；一体柜检查连续长度、统一深度和可用墙角。",
+      "checks": "背墙与端墙、柜前站位、柜门/抽屉包络；墙柜还验标高、支撑与设备关系。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "storage-envelope",
+      "runtimeType": "endpanel"
+    },
+    {
+      "id": "equipmentoutlet",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "equipmentoutlet"
+    },
+    {
+      "id": "exhaustvent",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "exhaustvent"
+    },
+    {
+      "id": "floordrain",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "floordrain"
+    },
+    {
+      "id": "floorlamp",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "floorlamp"
+    },
+    {
+      "id": "fridge",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "fridge"
+    },
+    {
+      "id": "fridgecab",
+      "family": "storage",
+      "familyLabel": "收纳",
+      "use": "按衣物、鞋、家政或书籍分工；一体柜检查连续长度、统一深度和可用墙角。",
+      "checks": "背墙与端墙、柜前站位、柜门/抽屉包络；墙柜还验标高、支撑与设备关系。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "storage-envelope",
+      "runtimeType": "fridgecab"
+    },
+    {
+      "id": "hob",
+      "family": "kitchen",
+      "familyLabel": "厨房操作",
+      "use": "按取放—洗切—烹饪关系和设备安装条件布局。",
+      "checks": "水槽、备餐台、灶、烟机联合检查；不要堵门或用不可操作角落凑台面。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": "stove",
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "stove"
+    },
+    {
+      "id": "hood",
+      "family": "kitchen",
+      "familyLabel": "厨房操作",
+      "use": "按取放—洗切—烹饪关系和设备安装条件布局。",
+      "checks": "水槽、备餐台、灶、烟机联合检查；不要堵门或用不可操作角落凑台面。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "hood"
+    },
+    {
+      "id": "island",
+      "family": "surfaces",
+      "familyLabel": "桌台",
+      "use": "用途、人数、形状和可用边长决定尺寸；书桌不是客房必选项。",
+      "checks": "餐桌按常用及来客席位验证；桌椅朝向、够取距离、占用后通行。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "island"
+    },
+    {
+      "id": "ksink",
+      "family": "kitchen",
+      "familyLabel": "厨房操作",
+      "use": "按取放—洗切—烹饪关系和设备安装条件布局。",
+      "checks": "水槽、备餐台、灶、烟机联合检查；不要堵门或用不可操作角落凑台面。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "kitchen-sink-envelope",
+      "runtimeType": "ksink"
+    },
+    {
+      "id": "laundrycab",
+      "family": "storage",
+      "familyLabel": "收纳",
+      "use": "按衣物、鞋、家政或书籍分工；一体柜检查连续长度、统一深度和可用墙角。",
+      "checks": "背墙与端墙、柜前站位、柜门/抽屉包络；墙柜还验标高、支撑与设备关系。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "storage-envelope",
+      "runtimeType": "laundrycab"
+    },
+    {
+      "id": "laundrypower",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "laundrypower"
+    },
+    {
+      "id": "ledstrip",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "ledstrip"
+    },
+    {
+      "id": "lightpanel",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "lightpanel"
+    },
+    {
+      "id": "linearlight",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "linearlight"
+    },
+    {
+      "id": "mirrorlight",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "mirrorlight"
+    },
+    {
+      "id": "mirrorpanel",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "mirrorpanel"
+    },
+    {
+      "id": "nightstand",
+      "family": "storage",
+      "familyLabel": "收纳",
+      "use": "按衣物、鞋、家政或书籍分工；一体柜检查连续长度、统一深度和可用墙角。",
+      "checks": "背墙与端墙、柜前站位、柜门/抽屉包络；墙柜还验标高、支撑与设备关系。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "storage-envelope",
+      "runtimeType": "nightstand"
+    },
+    {
+      "id": "officechair",
+      "family": "seating",
+      "familyLabel": "座椅",
+      "use": "按面对的活动对象和使用高度选型，不因目录存在而摆放。",
+      "checks": "沙发—茶几—电视或桌—椅成组；坐下、拉出、起身及旁路。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "officechair"
+    },
+    {
+      "id": "ovencol",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "ovencol"
+    },
+    {
+      "id": "paperholder",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "paperholder"
+    },
+    {
+      "id": "pendant",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "pendant"
+    },
+    {
+      "id": "piano",
+      "family": "leisure",
+      "familyLabel": "选配",
+      "use": "仅按明确活动或装饰需求放置，可省略。",
+      "checks": "琴凳、运动展开和安全边界、植物维护及窗户操作不能侵占通道。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "piano"
+    },
+    {
+      "id": "plant",
+      "family": "leisure",
+      "familyLabel": "选配",
+      "use": "仅按明确活动或装饰需求放置，可省略。",
+      "checks": "琴凳、运动展开和安全边界、植物维护及窗户操作不能侵占通道。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "plant"
+    },
+    {
+      "id": "purifier",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "purifier"
+    },
+    {
+      "id": "returnvent",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "returnvent"
+    },
+    {
+      "id": "robotvacuum",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "robotvacuum"
+    },
+    {
+      "id": "rollerblind",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "rollerblind"
+    },
+    {
+      "id": "roundtable",
+      "family": "surfaces",
+      "familyLabel": "桌台",
+      "use": "用途、人数、形状和可用边长决定尺寸；书桌不是客房必选项。",
+      "checks": "餐桌按常用及来客席位验证；桌椅朝向、够取距离、占用后通行。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "roundtable"
+    },
+    {
+      "id": "rug",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "rug"
+    },
+    {
+      "id": "shoecab",
+      "family": "storage",
+      "familyLabel": "收纳",
+      "use": "按衣物、鞋、家政或书籍分工；一体柜检查连续长度、统一深度和可用墙角。",
+      "checks": "背墙与端墙、柜前站位、柜门/抽屉包络；墙柜还验标高、支撑与设备关系。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "storage-envelope",
+      "runtimeType": "shoecab"
+    },
+    {
+      "id": "shower",
+      "family": "bath",
+      "familyLabel": "卫浴",
+      "use": "先明确干湿区、隔断和真实进出口，再选尺寸。",
+      "checks": "洁具、淋浴隔断、门和站位联合验收；救援开启、湿区出入和检修条件另列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "shower-fixed-leaf",
+      "runtimeType": "shower"
+    },
+    {
+      "id": "sidetable",
+      "family": "surfaces",
+      "familyLabel": "桌台",
+      "use": "用途、人数、形状和可用边长决定尺寸；书桌不是客房必选项。",
+      "checks": "餐桌按常用及来客席位验证；桌椅朝向、够取距离、占用后通行。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "sidetable"
+    },
+    {
+      "id": "sink",
+      "family": "kitchen",
+      "familyLabel": "厨房操作",
+      "use": "按取放—洗切—烹饪关系和设备安装条件布局。",
+      "checks": "水槽、备餐台、灶、烟机联合检查；不要堵门或用不可操作角落凑台面。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": "ksink",
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "kitchen-sink-envelope",
+      "runtimeType": "ksink"
+    },
+    {
+      "id": "skirting",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "skirting"
+    },
+    {
+      "id": "slidingdoor",
+      "family": "door-proxy",
+      "familyLabel": "门的独立占位组件",
+      "use": "兼容旧数据的隐藏组件；建筑门须修改真实墙体洞口，不能用家具门替代。",
+      "checks": "不作为真实洞口、门扇机制或通行校核证据。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "legacy-door-proxy",
+      "runtimeType": "slidingdoor"
+    },
+    {
+      "id": "socketplate",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "socketplate"
+    },
+    {
+      "id": "sofa",
+      "family": "seating",
+      "familyLabel": "座椅",
+      "use": "按面对的活动对象和使用高度选型，不因目录存在而摆放。",
+      "checks": "沙发—茶几—电视或桌—椅成组；坐下、拉出、起身及旁路。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "sofa"
+    },
+    {
+      "id": "sofabed",
+      "family": "sleep",
+      "familyLabel": "睡眠",
+      "use": "按实际使用者和床架外尺寸选型；客房先满足可用床，沙发床需另验展开状态。",
+      "checks": "床、床头收纳、衣柜联合检查；床边进出、床头靠墙、展开包络。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "sofabed"
+    },
+    {
+      "id": "spotlight",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "spotlight"
+    },
+    {
+      "id": "stove",
+      "family": "kitchen",
+      "familyLabel": "厨房操作",
+      "use": "按取放—洗切—烹饪关系和设备安装条件布局。",
+      "checks": "水槽、备餐台、灶、烟机联合检查；不要堵门或用不可操作角落凑台面。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "stove"
+    },
+    {
+      "id": "switchplate",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "switchplate"
+    },
+    {
+      "id": "table",
+      "family": "surfaces",
+      "familyLabel": "桌台",
+      "use": "用途、人数、形状和可用边长决定尺寸；书桌不是客房必选项。",
+      "checks": "餐桌按常用及来客席位验证；桌椅朝向、够取距离、占用后通行。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "table"
+    },
+    {
+      "id": "tablelamp",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "tablelamp"
+    },
+    {
+      "id": "threshold",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "threshold"
+    },
+    {
+      "id": "toilet",
+      "family": "bath",
+      "familyLabel": "卫浴",
+      "use": "先明确干湿区、隔断和真实进出口，再选尺寸。",
+      "checks": "洁具、淋浴隔断、门和站位联合验收；救援开启、湿区出入和检修条件另列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "toilet-static",
+      "runtimeType": "toilet"
+    },
+    {
+      "id": "towelrail",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "towelrail"
+    },
+    {
+      "id": "tracklight",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "tracklight"
+    },
+    {
+      "id": "transition",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "transition"
+    },
+    {
+      "id": "treadmill",
+      "family": "leisure",
+      "familyLabel": "选配",
+      "use": "仅按明确活动或装饰需求放置，可省略。",
+      "checks": "琴凳、运动展开和安全边界、植物维护及窗户操作不能侵占通道。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "treadmill"
+    },
+    {
+      "id": "tv",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "tv"
+    },
+    {
+      "id": "tvstand",
+      "family": "storage",
+      "familyLabel": "收纳",
+      "use": "按衣物、鞋、家政或书籍分工；一体柜检查连续长度、统一深度和可用墙角。",
+      "checks": "背墙与端墙、柜前站位、柜门/抽屉包络；墙柜还验标高、支撑与设备关系。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "storage-envelope",
+      "runtimeType": "tvstand"
+    },
+    {
+      "id": "vanity",
+      "family": "bath",
+      "familyLabel": "卫浴",
+      "use": "先明确干湿区、隔断和真实进出口，再选尺寸。",
+      "checks": "洁具、淋浴隔断、门和站位联合验收；救援开启、湿区出入和检修条件另列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "vanity-fixed-basin",
+      "runtimeType": "vanity"
+    },
+    {
+      "id": "wallart",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。 图案、画框或饰面默认跟随风格；可手动固定，不自动移动或新增。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js",
+        "assets/h5/source/wall-decoration-style.js",
+        "assets/h5/source/wall-decoration-texture.js",
+        "scripts/test_wall_decoration_style.mjs",
+        "references/wall-decoration-linkage.md"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "wallart"
+    },
+    {
+      "id": "wallcab",
+      "family": "storage",
+      "familyLabel": "收纳",
+      "use": "按衣物、鞋、家政或书籍分工；一体柜检查连续长度、统一深度和可用墙角。",
+      "checks": "背墙与端墙、柜前站位、柜门/抽屉包络；墙柜还验标高、支撑与设备关系。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "storage-envelope",
+      "runtimeType": "wallcab"
+    },
+    {
+      "id": "walllamp",
+      "family": "lighting",
+      "familyLabel": "灯具",
+      "use": "按照明任务、安装面、标高和维修选择，不因发光效果推断照度达标。",
+      "checks": "与柜门、门窗、人体和设备避让；灯具绑定效果不等于电气或照明工程校核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "lighting-fixture",
+      "runtimeType": "walllamp"
+    },
+    {
+      "id": "wallpanel",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。 图案、画框或饰面默认跟随风格；可手动固定，不自动移动或新增。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js",
+        "assets/h5/source/wall-decoration-style.js",
+        "assets/h5/source/wall-decoration-texture.js",
+        "scripts/test_wall_decoration_style.mjs",
+        "references/wall-decoration-linkage.md"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "wallpanel"
+    },
+    {
+      "id": "wardrobe",
+      "family": "storage",
+      "familyLabel": "收纳",
+      "use": "按衣物、鞋、家政或书籍分工；一体柜检查连续长度、统一深度和可用墙角。",
+      "checks": "背墙与端墙、柜前站位、柜门/抽屉包络；墙柜还验标高、支撑与设备关系。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "storage-envelope",
+      "runtimeType": "wardrobe"
+    },
+    {
+      "id": "washer",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "washer"
+    },
+    {
+      "id": "waterheater",
+      "family": "appliance",
+      "familyLabel": "设备",
+      "use": "依具体型号确定散热、检修、水电排气及使用方向，不默认贴墙零距。",
+      "checks": "冰箱门与抽屉、洗烘门、设备操作人及通道同时检查；缺型号则包络待复核。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "appliance-envelope",
+      "runtimeType": "waterheater"
+    },
+    {
+      "id": "waterinlet",
+      "family": "services",
+      "familyLabel": "安装点位",
+      "use": "表达安装意向和检修位置；不是已完成的管线系统。",
+      "checks": "与使用设备对应；可达、检修、防水和专业设计条件单列。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "service-marker",
+      "runtimeType": "waterinlet"
+    },
+    {
+      "id": "windowtrim",
+      "family": "finish",
+      "familyLabel": "饰面软装",
+      "use": "按需求可省略；与实际基面及窗帘活动范围适配。",
+      "checks": "不代替结构或必要家具；地毯绊倒边缘、窗帘收拢、柜窗交接分别检查。",
+      "optional": "依需求，可省略；必要功能须有可用替代",
+      "defaultCatalog": "hidden",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js"
+      ],
+      "behaviorProfile": "finish-component",
+      "runtimeType": "windowtrim"
+    }
+  ],
+  "doorMechanisms": {
+    "single": "2D/3D swing and sweep checks",
+    "double": "2 hinge leaves and sweeps; linked opening only, independent main-leaf use not implemented",
+    "hidden": "hinged finish variant, not a new mechanism",
+    "sliding": "2/3 panels within opening and single wall-side panel; net opening, advanced UI available",
+    "open": "leafRemoved; aperture retained",
+    "folding": "unsupported",
+    "pocket": "unsupported",
+    "wall_mounted_sliding": "single wall-side panel; installation side, parking direction and sampled operation diagnostics; hardware installation unverified"
+  },
+  "caseOnly": [
+    "Shower sliding or folding partitions remain unsupported; do not substitute hinged geometry for those mechanisms."
+  ],
+  "architecturalCatalog": {
+    "runtime": "homeStudio.getArchitecturalCatalog()",
+    "common": [
+      "hinged",
+      "wallslide",
+      "sliding",
+      "window",
+      "passage"
+    ],
+    "optional": [
+      "double",
+      "hidden"
+    ],
+    "windowOperation": "opening geometry only",
+    "showerOperation": "explicit showerDoor: hinged outward leaf, left/right hinge, angle 5–100, open/closed; SVG/actual mesh/navigation and facility review; absent field remains shape-only",
+    "finishes": "door/window trims, thresholds and transitions belong to openings; skirting generated from rooms/walls",
+    "panelFinishes": {
+      "values": [
+        "solid",
+        "clear",
+        "frosted"
+      ],
+      "independentOfMechanism": true,
+      "scope": "外观饰面不能赋予不存在的门机制，也不自动证明玻璃安全或产品选型。",
+      "evidence": [
+        "assets/h5/source/architectural-presets.js",
+        "scripts/test_architectural_presets.mjs"
+      ]
+    }
+  },
+  "behaviorProfiles": {
+    "nominal-envelope": {
+      "label": "按类型渲染的名义外包络",
+      "resize": {
+        "mode": "renderer_defined_envelope",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [],
+        "initialization": "组件按保存的本体外包络初始化；渲染细节由具体类型决定。",
+        "limits": "通过组件尺寸、离地和层高校验；设计尺寸范围不等于真实产品允许范围。",
+        "exceptions": [
+          "安装面、顶到天花板或自动生成部件可能约束高度及离地；按实际组件字段处理。"
+        ]
+      },
+      "operation": {
+        "support": "static_representation",
+        "implemented": [
+          "保存的姿态、外形及尺寸可用于平面/三维展示。"
+        ],
+        "notImplemented": [
+          "不从外形推定真实五金、完整人体动作或产品安装合格。"
+        ],
+        "requires": [
+          "当前案例另行提供使用空间、产品参数及必要检查。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs"
+        ],
+        "browser": []
+      }
+    },
+    "storage-envelope": {
+      "label": "柜体长度、深度、本体高度与离地",
+      "resize": {
+        "mode": "cabinet_envelope",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [],
+        "initialization": "组件按保存的本体外包络初始化；渲染细节由具体类型决定。",
+        "limits": "通过组件尺寸、离地和层高校验；设计尺寸范围不等于真实产品允许范围。",
+        "exceptions": [
+          "安装面、顶到天花板或自动生成部件可能约束高度及离地；按实际组件字段处理。"
+        ]
+      },
+      "operation": {
+        "support": "declared_use_envelope_only",
+        "implemented": [
+          "长度w、深度d、本体高度h与离地elevation分别保存；尺寸修改、复制、删除使用统一撤销事务。",
+          "衣柜/书柜fitToCeiling及壁柜topToCeiling按完成顶面派生高度。"
+        ],
+        "notImplemented": [
+          "没有由普通尺寸编辑自动生成的真实柜门/抽屉开合动画。",
+          "柜门、抽屉、人体及通道完整使用需要显式包络与设施声明。"
+        ],
+        "requires": [
+          "当前案例另行提供使用空间、产品参数及必要检查。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js",
+          "assets/h5/source/production-contract.js"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/production/test_facility_use_review.py"
+        ],
+        "browser": [
+          "scripts/test_header_icon_actions_browser.mjs",
+          "scripts/test_editor_usability_browser.mjs"
+        ]
+      }
+    },
+    "appliance-envelope": {
+      "label": "设备本体与型号相关安装条件",
+      "resize": {
+        "mode": "renderer_defined_envelope",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [],
+        "initialization": "组件按保存的本体外包络初始化；渲染细节由具体类型决定。",
+        "limits": "通过组件尺寸、离地和层高校验；设计尺寸范围不等于真实产品允许范围。",
+        "exceptions": [
+          "安装面、顶到天花板或自动生成部件可能约束高度及离地；按实际组件字段处理。"
+        ]
+      },
+      "operation": {
+        "support": "model_selection_required",
+        "implemented": [
+          "保存的姿态、外形及尺寸可用于平面/三维展示。"
+        ],
+        "notImplemented": [
+          "模型门缝、把手不证明冰箱、洗烘机、洗碗机等真实门或抽屉可动。",
+          "散热、检修、水电和排气条件必须来自所选产品及场地。"
+        ],
+        "requires": [
+          "当前案例另行提供使用空间、产品参数及必要检查。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js",
+          "assets/h5/source/furniture-detail-v11.js"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/test_component_details.mjs"
+        ],
+        "browser": []
+      }
+    },
+    "counter-surface": {
+      "label": "台面/地柜与独立开孔",
+      "resize": {
+        "mode": "renderer_defined_envelope",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [],
+        "initialization": "组件按保存的本体外包络初始化；渲染细节由具体类型决定。",
+        "limits": "通过组件尺寸、离地和层高校验；设计尺寸范围不等于真实产品允许范围。",
+        "exceptions": [
+          "安装面、顶到天花板或自动生成部件可能约束高度及离地；按实际组件字段处理。"
+        ]
+      },
+      "operation": {
+        "support": "declared_use_envelope_only",
+        "implemented": [
+          "台面和地柜外包络可编辑；同高独立水槽位置参与台面开孔。"
+        ],
+        "notImplemented": [
+          "不从外形推定真实五金、完整人体动作或产品安装合格。"
+        ],
+        "requires": [
+          "当前案例另行提供使用空间、产品参数及必要检查。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js",
+          "assets/h5/source/furniture-detail-v11.js"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/test_component_details.mjs"
+        ],
+        "browser": []
+      }
+    },
+    "kitchen-sink-envelope": {
+      "label": "独立厨房水槽",
+      "resize": {
+        "mode": "renderer_defined_envelope",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [],
+        "initialization": "组件按保存的本体外包络初始化；渲染细节由具体类型决定。",
+        "limits": "通过组件尺寸、离地和层高校验；设计尺寸范围不等于真实产品允许范围。",
+        "exceptions": [
+          "安装面、顶到天花板或自动生成部件可能约束高度及离地；按实际组件字段处理。"
+        ]
+      },
+      "operation": {
+        "support": "static_representation",
+        "implemented": [
+          "厨房水槽与灶分别是独立组件，可定位、旋转及改尺寸；适用时同高台面开孔随其位置。",
+          "单盆/双盆配置按当前水槽模型生成。"
+        ],
+        "notImplemented": [
+          "不继承洗手台basinLayout固定盆体拉伸行为。",
+          "水槽、切配、灶的使用流程及安装余量需另外检查。"
+        ],
+        "requires": [
+          "当前案例另行提供使用空间、产品参数及必要检查。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/test_component_details.mjs"
+        ],
+        "browser": []
+      }
+    },
+    "shower-fixed-leaf": {
+      "label": "固定门宽的淋浴围挡",
+      "resize": {
+        "mode": "fixed_leaf_variable_enclosure",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [
+          "showerDoor.width"
+        ],
+        "initialization": "旧数据仅在已有显式平开机制时以w-40 mm初始化门宽；之后独立保存，不随外围拉伸重新计算。",
+        "limits": "围挡宽深均至少500 mm，且宽度至少为固定门宽+40 mm；门宽至少300 mm；过小数字输入拒绝，拖拽按最小尺寸约束。",
+        "exceptions": [
+          "支持的显式门角度为5–100°；材料或外形选项不能替代门机制。"
+        ]
+      },
+      "operation": {
+        "support": "conditional_hinged_mechanism",
+        "implemented": [
+          "仅显式showerDoor.type=hinged时，平面/三维/碰撞共用门扇与把手几何；支持打开/关闭及左右铰链。",
+          "增大围挡宽度在锁边侧补固定玻璃，不拉宽已有门扇；深度修改不改门宽。"
+        ],
+        "notImplemented": [
+          "未配置showerDoor的旧组件仅为外形，不能按可开启门验收。",
+          "不支持淋浴滑动或折叠门机制；没有五金选型、手力或专业救援开启认证。"
+        ],
+        "requires": [
+          "明确showerDoor:{type,hinge,angle,open,width}并声明设施完整使用流程。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js",
+          "assets/h5/source/shower-door.js",
+          "assets/h5/source/shower-runtime.js",
+          "scripts/production/shower_door.py"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/test_shower_doors.mjs",
+          "scripts/production/test_facility_use_review.py"
+        ],
+        "browser": [
+          "scripts/test_shower_browser.mjs",
+          "scripts/test_shower_resize_browser.mjs",
+          "scripts/test_component_contracts_browser.mjs"
+        ]
+      }
+    },
+    "vanity-fixed-basin": {
+      "label": "固定台盆与孔/龙头联动",
+      "resize": {
+        "mode": "fixed_bowl_variable_cabinet",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [
+          "basinLayout.width",
+          "basinLayout.depth",
+          "basinLayout.gap",
+          "basinLayout.backGap",
+          "basinLayout.faucetInset"
+        ],
+        "initialization": "缺少盆体布局时初始化一次；明确切换单/双盆可建立新默认盆组，单纯拉伸不能重建默认值。",
+        "limits": "外围须容纳固定盆组及边距；按共享几何约束限制拖拽并拒绝过小数字输入。",
+        "exceptions": [
+          "单/双盆数量切换与外围拉伸是不同操作；depth改变保留已保存背边偏移。"
+        ]
+      },
+      "operation": {
+        "support": "static_representation",
+        "implemented": [
+          "外围拉伸只扩柜体/台面；居左/居中/居右是组件局部坐标。",
+          "盆体、台面孔、下水与龙头共用局部布局；旋转后关系保持。"
+        ],
+        "notImplemented": [
+          "柜门/抽屉没有从本体自动推导出的真实可动机制。",
+          "厨房ksink不自动继承本固定盆体行为。"
+        ],
+        "requires": [
+          "basinLayout及单/双盆配置有效；设施使用另验。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js",
+          "assets/h5/source/vanity-basin.js",
+          "scripts/production/vanity_basin.py"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/test_vanity_basin.mjs",
+          "scripts/production/test_facility_use_review.py"
+        ],
+        "browser": [
+          "scripts/test_vanity_resize_browser.mjs",
+          "scripts/test_component_contracts_browser.mjs"
+        ]
+      }
+    },
+    "bathtub-fixed-body": {
+      "label": "固定缸体与可扩外围",
+      "resize": {
+        "mode": "fixed_body_variable_surround",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [
+          "bathtubBody.width",
+          "bathtubBody.depth"
+        ],
+        "initialization": "缺少bathtubBody时以当前w/d捕获一次本体尺寸；之后外围变化不重设本体。",
+        "limits": "外围宽深均不能小于固定缸体；拖拽约束及数字输入拒绝共用该下限。",
+        "exceptions": [
+          "原有浴缸模型与材质保留；本体与外围仅在支持字段范围内编辑。"
+        ]
+      },
+      "operation": {
+        "support": "static_representation",
+        "implemented": [
+          "编辑w/d扩展外围平台，原有缸体、盆腔和龙头组件不随外围等比拉伸。",
+          "缸体居左/居中/居右按组件局部坐标同步平面/三维。"
+        ],
+        "notImplemented": [
+          "不是新的浴缸型号自动选型或可进入性认证。"
+        ],
+        "requires": [
+          "bathtubBody有效；有需要才在案例中放置，不为测试功能自动添加正式浴缸。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js",
+          "assets/h5/source/bathtub-body.js",
+          "scripts/production/bathtub_body.py"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/test_bathtub_body.mjs"
+        ],
+        "browser": [
+          "scripts/test_bathtub_resize_browser.mjs",
+          "scripts/test_component_contracts_browser.mjs"
+        ]
+      }
+    },
+    "toilet-static": {
+      "label": "静态马桶本体",
+      "resize": {
+        "mode": "renderer_defined_envelope",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [],
+        "initialization": "组件按保存的本体外包络初始化；渲染细节由具体类型决定。",
+        "limits": "通过组件尺寸、离地和层高校验；设计尺寸范围不等于真实产品允许范围。",
+        "exceptions": [
+          "安装面、顶到天花板或自动生成部件可能约束高度及离地；按实际组件字段处理。"
+        ]
+      },
+      "operation": {
+        "support": "static_representation",
+        "implemented": [
+          "本体包含座圈、盖、铰链及封闭底座，并保留保存外包络。"
+        ],
+        "notImplemented": [
+          "座圈/盖的存在不代表已实现开盖操作、坐姿或无障碍完整人体动作。"
+        ],
+        "requires": [
+          "当前案例另行提供使用空间、产品参数及必要检查。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js",
+          "assets/h5/source/furniture-detail-v11.js"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/test_component_details.mjs"
+        ],
+        "browser": []
+      }
+    },
+    "lighting-fixture": {
+      "label": "灯具外形、显隐与照明分层",
+      "resize": {
+        "mode": "renderer_defined_envelope",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [],
+        "initialization": "组件按保存的本体外包络初始化；渲染细节由具体类型决定。",
+        "limits": "通过组件尺寸、离地和层高校验；设计尺寸范围不等于真实产品允许范围。",
+        "exceptions": [
+          "顶面及安装面派生的标高保留；手动家具灯与顶部灯具分别处理。"
+        ]
+      },
+      "operation": {
+        "support": "fixture_light_and_visibility",
+        "implemented": [
+          "已启用灯具的照明贡献独立于镜头移动和外形显隐。",
+          "顶部灯具按mount=ceiling或顶部类型分组，顶面开关同步显隐；其他安装面的灯具不因此全部隐藏。",
+          "用户显式选择日照/夜景及灯具参数不修改家具几何。"
+        ],
+        "notImplemented": [
+          "发光或材质亮度不证明照度、电气回路、专业安装与维修条件合格。"
+        ],
+        "requires": [
+          "当前案例另行提供使用空间、产品参数及必要检查。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js",
+          "assets/h5/source/lighting-runtime.js",
+          "assets/h5/source/renovation-components-v12.js"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/test_ceiling_visibility.py"
+        ],
+        "browser": [
+          "scripts/test_generated_workbench_browser.mjs",
+          "scripts/test_simple_lighting_browser.mjs"
+        ]
+      }
+    },
+    "finish-component": {
+      "label": "饰面与生成收口",
+      "resize": {
+        "mode": "manual_or_owner_derived_finish",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [],
+        "initialization": "组件按保存的本体外包络初始化；渲染细节由具体类型决定。",
+        "limits": "通过组件尺寸、离地和层高校验；设计尺寸范围不等于真实产品允许范围。",
+        "exceptions": [
+          "安装面、顶到天花板或自动生成部件可能约束高度及离地；按实际组件字段处理。"
+        ]
+      },
+      "operation": {
+        "support": "static_representation",
+        "implemented": [
+          "手动饰面按名义尺寸编辑；带assemblyOwner的派生部件由所属房间/家具重新生成，编辑转向所属对象。",
+          "踢脚线按真实墙边界和洞口生成，墙角回边与收口需检查实际网格。"
+        ],
+        "notImplemented": [
+          "不从饰面外形推定施工节点、防水或结构性能。"
+        ],
+        "requires": [
+          "当前案例另行提供使用空间、产品参数及必要检查。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js",
+          "assets/h5/source/skirting-runs.js"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/test_skirting_outline.mjs",
+          "scripts/test_component_details.mjs"
+        ],
+        "browser": []
+      }
+    },
+    "service-marker": {
+      "label": "安装意向/设备附件",
+      "resize": {
+        "mode": "renderer_defined_envelope",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [],
+        "initialization": "组件按保存的本体外包络初始化；渲染细节由具体类型决定。",
+        "limits": "通过组件尺寸、离地和层高校验；设计尺寸范围不等于真实产品允许范围。",
+        "exceptions": [
+          "安装面、顶到天花板或自动生成部件可能约束高度及离地；按实际组件字段处理。"
+        ]
+      },
+      "operation": {
+        "support": "schematic_only",
+        "implemented": [
+          "保存的姿态、外形及尺寸可用于平面/三维展示。"
+        ],
+        "notImplemented": [
+          "图形不代表已完成供电、给排水、通风、管线系统或专业校核。"
+        ],
+        "requires": [
+          "实际目录可见性与保存兼容性分开；选配隐藏点位不自动插入当前案例。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js",
+          "assets/h5/source/renovation-components-v12.js"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/test_architectural_presets.mjs"
+        ],
+        "browser": []
+      }
+    },
+    "legacy-door-proxy": {
+      "label": "兼容旧方案的独立门外形",
+      "resize": {
+        "mode": "legacy_proxy_envelope",
+        "mutable": [
+          "w",
+          "d",
+          "h",
+          "elevation"
+        ],
+        "fixed": [],
+        "initialization": "组件按保存的本体外包络初始化；渲染细节由具体类型决定。",
+        "limits": "通过组件尺寸、离地和层高校验；设计尺寸范围不等于真实产品允许范围。",
+        "exceptions": [
+          "安装面、顶到天花板或自动生成部件可能约束高度及离地；按实际组件字段处理。"
+        ]
+      },
+      "operation": {
+        "support": "legacy_shape_only",
+        "implemented": [
+          "仅兼容已有独立家具门的外形数据，不作为建筑洞口入口。"
+        ],
+        "notImplemented": [
+          "不创造真实墙洞、可通行净口、正确扫掠或可靠门型操作。"
+        ],
+        "requires": [
+          "新增门窗必须经建筑构件入口绑定真实墙体洞口。"
+        ]
+      },
+      "representation": {
+        "planMeshRelation": "同一方案字段派生2D和3D；尺寸一致性与实际显示效果需独立检查。",
+        "acceptance": "not_implied_by_index"
+      },
+      "evidence": {
+        "source": [
+          "assets/h5/source/app.js",
+          "assets/h5/source/furniture-size.js",
+          "assets/h5/source/dimensions-v9.js",
+          "assets/h5/source/architectural-presets.js"
+        ],
+        "validation": [
+          "scripts/test_furniture_size.mjs",
+          "scripts/production/test_interaction_modules.mjs",
+          "scripts/test_architectural_presets.mjs"
+        ],
+        "browser": []
+      }
+    }
+  },
+  "architecturalMechanismProfiles": {
+    "hinged": {
+      "support": "hinged_geometry",
+      "requires": [
+        "真实墙洞及明确铰链、方向、角度"
+      ],
+      "implemented": [
+        "平面/三维门扇、把手与扫掠诊断；角度5–180°的数据范围不等于所有门实际可开到该角度。"
+      ],
+      "notImplemented": [
+        "实地墙垛、五金、安装和人体动作需另验。"
+      ],
+      "evidence": {
+        "source": [
+          "assets/h5/source/architectural-presets.js",
+          "assets/h5/source/walls.js",
+          "scripts/production/door_operation_review.py"
+        ],
+        "validation": [
+          "scripts/test_architectural_presets.mjs",
+          "scripts/production/test_door_operation_review.py",
+          "scripts/test_wall_opening_angles.mjs"
+        ]
+      },
+      "acceptance": "case_operation_paths_and_product_conditions_required"
+    },
+    "wallslide": {
+      "support": "single_wall_slide_geometry",
+      "requires": [
+        "真实墙洞、side、direction、overlap及停车墙空间"
+      ],
+      "implemented": [
+        "单扇沿墙滑动、净口与停车区诊断。"
+      ],
+      "notImplemented": [
+        "不自动挖墙安装暗藏轨道，不等于产品硬件已选定。"
+      ],
+      "evidence": {
+        "source": [
+          "assets/h5/source/architectural-presets.js",
+          "assets/h5/source/walls.js",
+          "scripts/production/door_operation_review.py",
+          "assets/h5/source/sliding-door.js"
+        ],
+        "validation": [
+          "scripts/test_architectural_presets.mjs",
+          "scripts/production/test_door_operation_review.py",
+          "scripts/test_single_wall_slide.mjs"
+        ]
+      },
+      "acceptance": "case_operation_paths_and_product_conditions_required"
+    },
+    "sliding": {
+      "support": "multi_panel_slide_geometry",
+      "requires": [
+        "真实墙洞及2/3扇配置"
+      ],
+      "implemented": [
+        "滑动面板与连续净开口共享平面/三维几何。"
+      ],
+      "notImplemented": [
+        "多轨实际五金和产品安装条件需另验。"
+      ],
+      "evidence": {
+        "source": [
+          "assets/h5/source/architectural-presets.js",
+          "assets/h5/source/walls.js",
+          "scripts/production/door_operation_review.py",
+          "assets/h5/source/sliding-door.js"
+        ],
+        "validation": [
+          "scripts/test_architectural_presets.mjs",
+          "scripts/production/test_door_operation_review.py",
+          "scripts/test_sliding_doors.mjs"
+        ]
+      },
+      "acceptance": "case_operation_paths_and_product_conditions_required"
+    },
+    "double": {
+      "support": "two_hinge_leaves_geometry",
+      "requires": [
+        "真实墙洞、双扇比例与开向"
+      ],
+      "implemented": [
+        "两扇几何与扫掠检查。"
+      ],
+      "notImplemented": [
+        "未实现主/次扇独立使用流程。"
+      ],
+      "evidence": {
+        "source": [
+          "assets/h5/source/architectural-presets.js",
+          "assets/h5/source/walls.js",
+          "scripts/production/door_operation_review.py"
+        ],
+        "validation": [
+          "scripts/test_architectural_presets.mjs",
+          "scripts/production/test_door_operation_review.py",
+          "scripts/production/test_door_checks.py"
+        ]
+      },
+      "acceptance": "case_operation_paths_and_product_conditions_required"
+    },
+    "hidden": {
+      "support": "hinged_finish_variant",
+      "requires": [
+        "真实平开洞口"
+      ],
+      "implemented": [
+        "隐藏门是平开外观变体，沿用平开机制。"
+      ],
+      "notImplemented": [
+        "不是暗藏侧滑/折叠的新机制。"
+      ],
+      "evidence": {
+        "source": [
+          "assets/h5/source/architectural-presets.js",
+          "assets/h5/source/walls.js",
+          "scripts/production/door_operation_review.py"
+        ],
+        "validation": [
+          "scripts/test_architectural_presets.mjs",
+          "scripts/production/test_door_operation_review.py"
+        ]
+      },
+      "acceptance": "case_operation_paths_and_product_conditions_required"
+    },
+    "passage": {
+      "support": "aperture_only",
+      "requires": [
+        "真实墙洞及leafRemoved"
+      ],
+      "implemented": [
+        "去除门扇并保留洞口。"
+      ],
+      "notImplemented": [
+        "无门扇开闭动作。"
+      ],
+      "evidence": {
+        "source": [
+          "assets/h5/source/architectural-presets.js",
+          "assets/h5/source/walls.js",
+          "scripts/production/door_operation_review.py"
+        ],
+        "validation": [
+          "scripts/test_architectural_presets.mjs",
+          "scripts/production/test_door_operation_review.py"
+        ]
+      },
+      "acceptance": "case_operation_paths_and_product_conditions_required"
+    },
+    "window": {
+      "support": "aperture_only",
+      "requires": [
+        "真实窗洞及窗台/高度"
+      ],
+      "implemented": [
+        "窗洞、窗框及保存的开口几何。"
+      ],
+      "notImplemented": [
+        "未实现可动窗扇的完整开启机制。"
+      ],
+      "evidence": {
+        "source": [
+          "assets/h5/source/architectural-presets.js",
+          "assets/h5/source/walls.js",
+          "scripts/production/door_operation_review.py"
+        ],
+        "validation": [
+          "scripts/test_architectural_presets.mjs",
+          "scripts/production/test_door_operation_review.py"
+        ]
+      },
+      "acceptance": "case_operation_paths_and_product_conditions_required"
+    },
+    "folding": {
+      "support": "unsupported",
+      "requires": [],
+      "implemented": [],
+      "notImplemented": [
+        "没有共享折叠门机制，不能以外观或平开门冒充。"
+      ],
+      "evidence": {
+        "source": [
+          "assets/h5/source/architectural-presets.js",
+          "assets/h5/source/walls.js",
+          "scripts/production/door_operation_review.py"
+        ],
+        "validation": [
+          "scripts/test_architectural_presets.mjs",
+          "scripts/production/test_door_operation_review.py"
+        ]
+      },
+      "acceptance": "case_operation_paths_and_product_conditions_required"
+    },
+    "pocket": {
+      "support": "unsupported",
+      "requires": [],
+      "implemented": [],
+      "notImplemented": [
+        "没有共享入墙暗藏侧滑机制，不能以沿墙侧滑冒充。"
+      ],
+      "evidence": {
+        "source": [
+          "assets/h5/source/architectural-presets.js",
+          "assets/h5/source/walls.js",
+          "scripts/production/door_operation_review.py"
+        ],
+        "validation": [
+          "scripts/test_architectural_presets.mjs",
+          "scripts/production/test_door_operation_review.py"
+        ]
+      },
+      "acceptance": "case_operation_paths_and_product_conditions_required"
+    }
+  },
+  "regressionEntry": {
+    "crossLayout": "scripts/workbench_cross_layout.py",
+    "fixtures": "scripts/production/workbench_regression_cases.py",
+    "componentBrowser": "scripts/test_component_contracts_browser.mjs",
+    "scope": "Synthetic cross-layout execution and actual-case execution remain separate; exact feature results and not-applicable cases must be read from their run reports."
+  }
+}

@@ -121,3 +121,13 @@ capability of every host or a photorealistic generative video chain. Seedance
 remains a separate branch requiring current provider capability, inputs,
 execution authorization, and result review. Do not start paid generation,
 construction detailing, procurement, or publication as handoff cleanup.
+
+## Optional stage cleanup
+
+After a genuine stage confirmation, verified video or accepted handoff, follow
+`stage-cleanup.md`. Keep current source/acceptance dependencies and compact
+provenance records; source snapshots and earlier statuses remain protected unless
+the exact retirement scope is separately reviewed and authorized. Scan/report
+first, then obtain batch approval for checked backup and reversible quarantine.
+Recheck current deliverables after moving files. Cleanup does not confer quality
+acceptance, authorize permanent deletion or start background jobs.

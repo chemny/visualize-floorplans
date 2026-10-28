@@ -23,7 +23,7 @@ ALLOWED_FORMAT = {"png", "jpeg", "webp"}
 STYLE_OPTION_IDS = {
     "modern_minimal", "wood_cream", "modern_luxury", "modern_chinese",
     "midcentury_modern", "song_eastern", "contemporary_french", "italian_luxury",
-    "champagne_pearl", "milan_greige", "paris_art_deco", "sculptural_cream",
+    "champagne_pearl", "milan_greige", "paris_art_deco", "sculptural_cream", "european_luxury",
 }
 LOCK_KINDS = {
     "room_count", "wall", "door", "sliding_door", "opening", "window",
@@ -199,8 +199,8 @@ def validate_manifest(data: dict[str, Any], manifest_path: Path, allow_missing_i
     design = data.get("design")
     require(isinstance(design, dict), "design must be an object")
     style_options = design.get("style_options")
-    require(isinstance(style_options, list) and len(style_options) in {4, 8, 12},
-            "design.style_options must contain 4, 8 or 12 styles (new-project default: 12)")
+    require(isinstance(style_options, list) and len(style_options) in {4, 8, 9, 12},
+            "design.style_options must contain 4, 8, 9 or 12 styles (new-project default: 9)")
     style_ids: set[str] = set()
     for index, option in enumerate(style_options):
         require(isinstance(option, dict), f"style option {index} must be an object")
@@ -524,29 +524,30 @@ Hard constraints:
     if selected_style is None:
         options = design["style_options"]
         tasks = []
-        for offset in range(0, len(options), 4):
-            group = options[offset:offset+4]
-            labels = [chr(65 + offset + i) for i in range(4)]
+        panel_count = 9 if len(options) == 9 else 4
+        for offset in range(0, len(options), panel_count):
+            group = options[offset:offset+panel_count]
+            labels = [chr(65 + offset + i) for i in range(len(group))]
             style_lines = [
                 f'{label}. {option["name"]} ({option["id"]}): '
-                f'palette {", ".join(option["palette"])}; materials {", ".join(option["materials"])}'
+                f'palette {", ".join(option["palette"])}; materials {", ".join(option["materials"])}; visual direction: {option.get("generation_prompt", option.get("description", ""))}'
                 for label, option in zip(labels, group)
             ]
-            preview_prompt = f"""Create one renovation style-selection preview image as a strict 2x2 grid with exactly four equally sized panels. Use the same representative living-dining room, identical camera position, focal length, major furniture arrangement, daylight direction, and exposure in every panel and across all comparison boards. Change only palette, finishes, furniture design language, lighting fixtures, textiles, and decor. Keep the panels clearly separated and label them {', '.join(labels)} with their style names. This board is for style selection, not structural approval or final delivery. Make materials, upholstery, lighting and detailing visibly distinct, not just beige palette swaps. Preserve the confirmed furniture footprints and access. Style names describe design directions, not market rankings or standardized categories.
+            preview_prompt = f"""Create one renovation style-selection preview image as a strict {"3x3" if panel_count == 9 else "2x2"} grid with exactly {"nine" if panel_count == 9 else "four"} equally sized panels, ordered left-to-right then top-to-bottom. Use the same representative living-dining room, identical camera position, focal length, major furniture arrangement, daylight direction, and exposure in every panel and across all comparison boards. Change only palette, finishes, furniture design language, lighting fixtures, textiles, and decor. Keep the panels clearly separated and label them {', '.join(labels)} with their style names. This board is for style selection, not structural approval or final delivery. Make materials, upholstery, lighting and detailing visibly distinct, not just beige palette swaps. Preserve the confirmed furniture footprints and access. Style names describe design directions, not market rankings or standardized categories.
 
 Style options:
 {lines(style_lines)}
 
-Use the supplied floor-plan, approved 2D base, and approved access map only to keep the representative room plausible. Do not add or remove doors or windows. Do not render four independent whole-home plans. No watermark or logo."""
+Use the supplied floor-plan, approved 2D base, and approved access map only to keep the representative room plausible. Do not add or remove doors or windows. Do not render independent whole-home plans. Preserve a bright, broadly appealing middle-to-high-end residential quality; do not force differentiation through harsh industrial or gimmicky design. No watermark or logo."""
             tasks.append({
-            "id": "style-preview-grid" if len(options) == 4 else f"style-preview-grid-{offset//4+1}",
+            "id": "style-preview-grid" if len(options) in {4, 9} else f"style-preview-grid-{offset//4+1}",
             "kind": "style_preview",
             "status": "ready_for_generation",
             "depends_on": [],
             "reference_images": confirmed_references,
             "style_ids": [option["id"] for option in group],
             "panel_labels": labels,
-            "output": "outputs/styles/four-style-preview.png" if len(options) == 4 else f"outputs/styles/style-preview-{offset//4+1}.png",
+            "output": "outputs/styles/nine-style-preview.png" if len(options) == 9 else "outputs/styles/four-style-preview.png" if len(options) == 4 else f"outputs/styles/style-preview-{offset//4+1}.png",
             "request": {
                 "model": "gpt-image-2",
                 "operation": "edit",

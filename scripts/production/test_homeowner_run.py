@@ -15,8 +15,9 @@ class RunIntegration(unittest.TestCase):
     called.append(command);o=json.loads(Path(args.tour).read_text());self.assertIn('timingMethod',o);self.assertEqual(o['cameraMethod']['method'],'subject-key-curves-v1');self.assertFalse(o['chapterReview']['failures']);Path(args.out).mkdir()
     if command=='audit':(Path(args.out)/'audit.json').write_text(json.dumps({'subjectStatus':'not_checked'}))
    argv=['h5.py','run','--bundle',str(bundle),'--config',str(config),'--out',str(p/'run'),'--preview']
-   with patch.object(sys,'argv',argv),patch.object(h5,'validate_bundle'),patch.object(h5,'prepare',side_effect=prepare),patch.object(h5.subprocess,'run',side_effect=planner),patch.object(h5,'node_call',side_effect=browser),patch.object(h5,'handoff'),contextlib.redirect_stdout(io.StringIO()):h5.main()
-   self.assertEqual(called,['audit','capture'])
+   with patch.object(sys,'argv',argv),patch.object(h5,'validate_bundle'),patch.object(h5,'prepare',side_effect=prepare),patch.object(h5.subprocess,'run',side_effect=planner),patch.object(h5,'node_call',side_effect=browser),patch.object(h5,'handoff'),contextlib.redirect_stdout(io.StringIO()),self.assertRaisesRegex(ValueError,'Tour contract'):h5.main()
+   self.assertEqual(called,[])
+   report=json.loads((p/'run/tour-contract-report.json').read_text());self.assertEqual(report['issues'][0]['code'],'missing_tour_contract')
  def test_hd_diagnostic_cannot_skip_review(self):
   from types import SimpleNamespace
   with tempfile.TemporaryDirectory() as tmp:

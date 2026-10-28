@@ -1,3 +1,5 @@
+Every video capture first requires the displayed timed route animation and explicit user approval; see `route-rehearsal-gate.md`. `--preview` and ranges do not waive `--route-review`.
+
 # H5 source, image and camera quality gates
 
 For every homeowner route or video, first apply `homeowner-tour-method.md`: reuse the accepted subject-key camera method and profile, fill case targets, and review dynamic samples before full capture.
@@ -72,6 +74,14 @@ After generation, record for each agreed image:
 - Named evidence for room shape, openings, object identity/count, placement,
   orientation, proportions, materials, lighting and perspective. Each check
   uses `{status,reviewer,evidence}`. Explicitly list allowed conceptual differences.
+- Record `object_count` separately from identity: compare the confirmed per-view
+  inventory, including duplicated equipment and added soft furnishings; explain
+  occluded objects without treating them as missing. Record `framing` against
+  the shot intent: whole-home plans/bird's-eyes include every outer room and
+  balcony with margin. Room views may intentionally crop to their approved scope.
+  The linked image-delivery validator uses the equivalent
+  `furniture_equipment_count_preserved` and `whole_home_framing_complete` checks.
+  These are evidence requirements, not automatic image-recognition claims.
 - Cross-view consistency review and complete agreed `expectedImageIds`.
 - Actual pixel ratio versus the agreed output ratio. The default permits 0.1%
   native pixel rounding; exact dimensions can use zero tolerance. Never crop or
@@ -171,5 +181,5 @@ Follow `homeowner-tour-method.md` and the enforced `--preview-review` contract.
 Source calibration/subject checks are not substitutes for dynamic turn and
 whole-tour viewing. Changed tour, renderer or scene invalidates the preview
 review; only output-size changes can transfer the same scene review. Diagnostic
-full capture at <=1280×720 with explicit `--preview` remains available without
+full capture at <=1280×720 with explicit `--preview` still requires route-animation approval; it remains available without
 claiming final acceptance. New video output is still pending user review.

@@ -23,6 +23,16 @@ Apply evidence in this order:
 Keep project-specific legend overrides in the recognition artifact. Never turn
 one user's correction into a universal rule.
 
+### Door symbol identity before confirmation
+
+For new recognition use schema0.3: record `door_model`, `leaf_count`,
+`hinge_ends` and `source_observation` for every door. Inspect both sides of the
+source symbol; “as original” is not acceptance of an assumed single leaf.
+Bind each observation to an original-image hash and crop in case `doorSourceReview`.
+`h5.py build` compares this independent record to effective opening overrides and
+blocks mismatches; missing legacy records are explicitly not verified. Ambiguous
+symbols stay uncertain. Build consistency alone cannot establish source fidelity.
+
 ## 2. Separate graphic layers
 
 Classify visible marks before interpreting spaces:

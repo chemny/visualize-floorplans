@@ -2,10 +2,16 @@
 name: interior-design
 description: Start from one floor-plan image with optional furniture/style references, build editable offline H5 2D/3D renovation workbenches, coordinate interior concept images, and create deterministic homeowner camera preflights. Use when the user requests floor-plan confirmation, furniture and finish editing, scheme export, walkthrough planning and local handoff. Preserve structural evidence and versioned approvals. Concept design is not measured CAD or construction documentation; Seedance is a separate optional branch.
 metadata:
-  version: "0.2.2"
+  version: "0.2.11"
 ---
 
 # Interior Design · 家装助手
+
+全屋参观生成与修订遵循 `references/tour-planning-contract.md`。三轮复核须检查真实
+目标驱动、整房单向性、全部捕获入口和最终帧拍墙/突转；历史通过、数值通过与
+三维播放验收分别记录。缺少新契约的旧配置不能直接捕获；当前Blender仅支持静态出图。
+当前执行版本为 `homeowner-tour-rules/2`。规则、实现与反例测试的对应关系见
+`references/tour-rule-implementation.md`；修改全屋参观引擎时读取该表，禁止只改文档或案例补丁。
 
 ## Default guided user workflow
 
@@ -29,13 +35,93 @@ Only genuine dependencies or consequential decisions justify a pause.
 These interaction rounds coordinate the technical stages below; optional video
 is not the third user decision round.
 
+## Stage-bound asset cleanup
+
+At confirmed stage boundaries, video verification or accepted handoff, read
+`references/stage-cleanup.md`. Use `scripts/stage_cleanup.py scan` to inventory
+explicitly obsolete/temporary media, protect source/current/final dependencies
+and report unknown files. A batch needs explicit user approval before verified
+external-directory backup and reversible quarantine. Recheck project snapshots,
+then verify current deliverables; restore if affected. No background scheduler,
+permanent deletion or automatic approval. Installing this feature does not
+authorize cleanup of existing cases.
+
 ## Bundled reference case
 
 For a concrete capability preview, open `assets/reference-cases/jujian-champagne-pearl/index.html` when the user asks to see an example. Read its brief `README.md` for representation boundaries; do not load the mesh or all images unless needed. It contains supplied references, a current 0.2.0 workbench, selected concept images/drawings, scheme data and an H5 tour. This is a case-specific example, not a shared default apartment or fresh acceptance of every representation. Copy case input into a new project before editing; do not modify the bundled example. Existing image/video/mesh sources differ from the newest lighting/material demo. The page uses relative links and does not open automatically when the Skill is loaded.
 
 ## Reuse the accepted homeowner tour method
 
-Before every route/camera/video task, read `references/homeowner-tour-method.md`.
+Before every route/camera/video task, read `references/tour-planning-contract.md`
+(the unified generation/revision/acceptance contract), then
+`references/homeowner-tour-method.md` for the reusable method and reference evidence.
+Prioritize the viewing purpose and public → primary → secondary → service stages
+before distance minimization. Full tours enter and leave the same confirmed door;
+do not finish inside a bedroom. Each observation records its viewing purpose.
+Normal walking faces travel (prefer within 60°); final-frame `tour_forward_motion.py`
+rejects facing over 90° away for more than 0.5s while moving above 0.2m/s,
+including across chapter boundaries. Camera turning and movement join naturally
+along the route. Stationary turns are excluded from the walking check.
+Before planning, derive core functions from the actual furniture and
+`assets/h5/tour/core-functions.json`. Planning binds omitted core targets; final
+contract and mesh checks reconstruct them independently. Require 0.5s readable
+core fixtures in the first room-viewing episode; later pass-throughs cannot fill
+omissions. One shot can show multiple functions. Never drop a hard-to-frame
+fixture to improve candidate scores; see the planning contract for scope.
+Production is strictly sequential: confirm route, generate and review silent video,
+then obtain explicit user acceptance of that exact video before narration/subtitles/music.
+Use `h5.py narration-prepare` before any TTS or subtitle work and
+`h5.py narration-compose` for composition; both enforce hash-bound
+`homeowner-video-approval/1`. Never chain video encoding directly into narration.
+Page packaging enforces the same acceptance. Review capture releases and samples
+never authorize narration; pending records must not be automatically approved.
+Use `references/tour-presentation-pages.md` for the shared three-page workflow, templates, media binding and interactions. Treat that document as the single presentation SOP and use its rule-to-implementation checklist. Regenerate through the shared CLI in a fresh directory and verify actual generated interactions; test counts alone do not certify appearance. Do not recreate case-local page shells. Keep the three stage tabs at the top; embed only the pure route-map component in auxiliary 3D previews, never a full stage page.
+For a new tour or a revision, read `references/unified-tour-production.md` and use
+`h5.py plan-tour --job --out` for the bounded joint-candidate/repair workflow and
+three-stage presentation in `references/tour-presentation-pages.md`: route-only first, then video review, then narrated playback. Actual 3D checks remain a separate camera preview. This entry never captures video or grants approval.
+The lower-level `h5.py design-tour --bundle --brief --out` remains available to compare room
+order, select doorway/shallow observation points and emit semantic gaze. Do not
+write case-local timed path-chasing camera generators or compulsory viewing moves.
+Use `references/tour-native-revision.md` for native doorway composition repairs,
+explicit frozen revision scope, synchronized before/after review and a conclusive
+engineering-stage report. Existing helpers are connected to `plan-tour`; scoped
+repairs must not call global smoothing or silently modify passed observations.
+Read `revisionOutcome` before reporting success: retaining a checked baseline is
+not a successful repair, and selecting a revision does not grant visual acceptance.
+Require explicit case `coveragePolicy.enabled` and `minimumPercent`, plus a case
+`maximumSeconds`; never fill a shared apartment coverage percentage or total duration.
+Every room must meet that case minimum; failures block route acceptance unless the
+case explicitly chose the reference-area mode in `unified-tour-production.md`.
+That mode retains measured gaps for visual review and never waives core-fixture,
+collision, motion or actual playback checks.
+The shared horizontal-area screen detects omissions but cannot certify actual 3D visibility.
+Keep actual 3D visibility pending until its own review; do not exempt small rooms or
+shrink the denominator to force a pass. For one-pass room viewing, require shallow inside-room stations, declare each
+room’s signed left-to-right or right-to-left sweep, and protect that direction
+through final smoothing. Complete each room in one continuous viewing episode before visiting the next
+room. Normal exits and later pass-throughs are navigation, not another scan. Do not
+split the same room into entry-side and return-side viewing episodes; enforce
+`roomViewingPolicy.singleEpisode` against real room IDs, not observation labels.
+Default to one observation station per real room, at most two. A second station
+requires a concrete occlusion/distinct-area reason; furniture targets and navigation
+vertices are not separate stops. Use `observationPointPolicy` (1.5–2.5s recommended,
+3s maximum per point, simultaneous position/gaze hold at most 0.5s). These are
+product defaults, not industry standards. Recheck actual
+retimed point durations with `tour_observation_points.py`; failures block capture.
+When room time limits are confirmed, persist `roomBudgetPolicy` and check the
+complete entry/view/exit window with `tour_room_budgets.py`, not observation
+chapters alone. Over-budget rooms block capture; do not raise speed or silently
+relax coverage/time limits to pass. `tour_contract.py` unifies final-frame checks
+for generation, revisions, rehearsal and capture; retain numeric, actual-3D and
+human acceptance separately. Preserve per-window `viewingDurationFloors` when
+revising without reducing viewing time. Inspect design-report.json and the timed rehearsal before requesting approval.
+Read `references/route-rehearsal-gate.md` and show the timed, interactive plan-based
+route animation before **any** video capture, including low-resolution previews
+and local turn samples. Require explicit user approval of that displayed artifact,
+path, independent camera facing and exact timing. Text itineraries are insufficient.
+`--route-review` is required by both Python and direct browser capture; neither
+`--preview` nor `--range` bypasses this gate. Rehearse a compact case-specific
+duration budget first; over-budget routes must be revised before capture.
 Start from its accepted-reference profile and public `scripts/production/camera_gaze.py`
 subject-key gaze method; adapt case targets and time budgets, not the algorithm
 from scratch. The 56-second example is a method reference, not a fixed duration
@@ -43,13 +129,45 @@ or transferable apartment path. Require dynamic turn samples, a complete low-cos
 preview and subject visibility checks before high-resolution full capture.
 The primary `h5.py run --config` now applies shared gaze/timing/chapter checks.
 Full production/HD capture requires a hash-bound actual dynamic preview review;
-low-cost diagnostic previews remain possible. Use `tour_tools.py` for chapter
+low-cost diagnostic previews remain possible only after timed route-animation approval. Use `tour_tools.py` for chapter
 motion reports, bounded corrections and pending review templates.
 Keep source, motion, viewport integrity and user visual acceptance separate.
+For explicitly authorized, unaccepted review videos with disclosed issues, use
+the scoped `--review-release` path in `route-rehearsal-gate.md`; ordinary capture
+and formal delivery gates remain unchanged. Never copy a case's issue count or
+repair parameters into shared rules.
 Use the closeout checklist in that reference. Separate room-only gaze/pitch edits
 from transit/global orientation; approach the usable doorway before turning.
 The second accepted tour example is linked there; its case parameters and user
 acceptance do not replace a new case's dynamic review.
+
+For main-fixture style changes, follow `references/lamp-style-linkage.md`: preserve
+positions and actual light contributions, resolve body/plan parity, respect fixed
+choices, and verify save/reload independently from visual samples.
+
+Wall-surface patterns, existing wall panels and artwork follow
+`references/wall-decoration-linkage.md`; use the shared style/room/face policy,
+respect fixed choices and preserve architecture and decoration placement.
+
+## Workbench maintenance and regeneration
+
+Before regenerating an H5 workbench after shared UI changes, apply
+`references/workbench-reliability-rules.md` and
+`references/h5-interaction-presentation.md`. The standard build verifies
+`assets/h5/engine.provenance.json`; rebuild stale source through
+`scripts/production/rebuild_h5.mjs`, never by rewriting a checksum alone.
+Run `scripts/workbench_browser_suite.py --case CASE --out NEWDIR --checks core`
+with existing browser dependencies to exercise the newly generated artifact.
+Browser findings must bind HTML/engine/template/case fingerprints; unavailable
+checks are not passing checks. Keep UI-only upgrades on the original storage
+identity, preserve scheme/materials, and retain separate visual/human acceptance.
+For shared workbench regressions, run `scripts/workbench_cross_layout.py --out NEWDIR`
+with existing browser tools. It generates independent renamed rectangular,
+concave/rotated and empty single-room fixtures, verifies required mechanism scopes,
+and keeps synthetic capability evidence separate from the actual-case review.
+Use `scripts/check_component_capabilities.py --component TYPE` to inspect indexed
+resize and mechanism boundaries; an indexed test path is not a passing case result.
+This workflow does not enable server saving, video generation or publication.
 
 ## Required quality gates
 
@@ -236,9 +354,14 @@ Before style previews or renovation views, read
 `references/furniture-layout-review.md`. Produce and obtain confirmation of a
 furniture/equipment layout on the approved structure and access base. Reuse an
 already confirmed, unchanged layout rather than asking again. Infer basic
-equipment from room functions; keep the checklist internal and ask only about
-consequential uncertainty. Known access or operation conflicts require correction;
-unmeasured clearances remain explicitly unverified, not passed.
+equipment from room functions; run the version-bound layout/group/revision gate
+in `furniture-layout-review.md` before presentation, with case-specific evidence.
+Keep the checklist internal and ask only about
+consequential uncertainty. Known access or operation conflicts require correction; restricted-use designs
+need verified usable states and visible conditions, never unconditional passes.
+For whole-assembly revisions, declare the required intent/state/final-output
+checks in `references/layout-use-and-representation-contract.md`. Unmeasured
+clearances remain explicitly unverified, not passed.
 
 Before the first image-generation call for an agreed image set or revision batch,
 read `references/pre-generation-preflight.md` and complete its front-loaded
@@ -275,17 +398,19 @@ the exact layout as a reference. Legacy/synthetic plans do not enforce this gate
 and must not be used to bypass it. File binding does not prove visual correctness.
 Do not repurpose `approve-primary` to approve a layout proposal.
 
-1. Let the user specify a style or choose from the 12 defaults in
-   `assets/project-template.json`: 现代简约、原木奶油、现代轻奢、现代新中式、
-   中古现代、轻东方宋式、克制法式优雅、意式克制奢华、香槟珍珠、米兰暖灰、
-   巴黎装饰艺术、奶油雕塑感. For undecided users, recommend three suitable directions and one
-   preferred choice with a reason, using the same layout/camera/daylight for
-   a single comparison board when available. Follow
-   `references/guided-user-workflow.md` for the host-tool three-option branch;
-   the legacy planner still supports only 4/8/12-option boards. Read
-   `references/design-and-revisions.md` for expanded comparison execution.
+1. Let the user specify a style or choose from the nine defaults in
+   `assets/project-template.json`, in this fixed row-major order:
+   现代简约、原木奶油、 中古现代；现代新中式、香槟珍珠、欧式奢华；
+   法式风格、意式暖奢、巴黎艺术. For an undecided user, generate and show
+   ONE 3x3 eye-level interior comparison board with all nine, preserving the
+   same confirmed layout, camera and daylight. Read each option's
+   `generation_prompt` and `references/prompt-contracts.md`; naming changes
+   alone do not define a new visual. Keep broad residential appeal and quality.
+   Follow `references/guided-user-workflow.md` and the style-selection gate.
+   The planner supports one nine-panel board; 4/8/12 remain legacy-compatible.
    These are design directions, not popularity rankings. Preserve a user's
-   smaller requested comparison; never require comparison after selection.
+   explicitly requested smaller comparison; never require comparison after an
+   explicit selection. Do not add excluded styles to the default nine.
    Use `selected_style: custom` with `custom_style.name` and
    `description` for a custom direction. Record supplied reference images,
    palette/material overrides, requirements, and preserved furniture in `design`.
@@ -413,7 +538,12 @@ Do not repurpose `approve-primary` to approve a layout proposal.
 Run this stage only when video is requested and the Stage 2 scheme is current.
 
 1. Plan the route after image approval, not during floor-plan or style review.
-   Confirm start, end, rooms visited, and approximate pace. Indoor starts and
+   First generate and display the timed route animation using
+   `route_rehearsal.py` and the current furniture PNG. Confirm its start/end,
+   visits, independent camera facing, total duration and observe/transit rhythm.
+   Bind the explicit user reply to that exact animation with `--route-review`
+   before any video/samples, including diagnostic low-resolution capture. A text
+   itinerary or a static path does not satisfy this gate. Indoor starts and
    ends are valid. Use `indoor_segment` for an interior clip,
    `entry_to_interior` for a tour that enters the home and finishes inside, and
    `full_tour` for outside-to-outside tours; a move inside one open zone has no
@@ -480,3 +610,13 @@ See `references/bundled-resource-index.md` for scripts, templates and their role
 
 Read `references/completion-report.md` and report confirmed scopes, uncertainties,
 quality failures, agreed artifacts and their reference chains.
+
+门型及家具选型、支持边界与检查入口见 `references/component-use-and-capabilities.md`；门型变更同时读 `references/door-selection.md`。
+
+新布局及门型修改须执行 `references/door-selection.md` 的布局前后门机制复核，核对构建 `.doors.json` 与声明通道；门扇/把手/停车区失败不得仅凭构建成功声称已通过。常用门窗从建筑构件入口插入并绑定墙洞，不能用独立家具门替代。
+
+修改卫浴、衣帽间或其门后，按 `references/facility-use-checks.md` 为受影响设施声明接近、开启、使用、退出流程；正式验收设置 facilityUsePolicy.required=true 并包含全部受影响设施。未配置的淋浴门不按可开启门验收，设施报告失败不得靠只提供房间入口路径绕过。家具不动优先比较真实门机制；个例铰链/角度、人体包络、站位只保存在案例。
+
+Room finish boundaries use the shared H5 build normalizer in `scripts/production/floor_boundaries.py` and the contract in `references/workbench-reliability-rules.md`. Align to actual wall faces and explicit opening spans, not approximate room label boxes. Treat unresolved gaps/overlaps as input errors; do not hide them with another case-only overlay. Retain canonical normalized room polygons for plan/mesh/area consistency.
+
+Local stage closeout and version boundaries: `references/local-version-closeout.md`. Use `scripts/release_smoke.py` for the consolidated module checks; actual generated-browser, device, video and user approvals remain separate. Never infer case acceptance from local version freeze.

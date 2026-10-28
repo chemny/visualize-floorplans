@@ -120,7 +120,7 @@ and the video sample remain separate acceptance work.
 - [x] Split confirmation into structure/function and door/window access gates.
 - [x] Add access-only validation for swing direction, sliding doors, and
       unreachable rooms.
-- [x] Add 4/8/12-option comparison planning, with 12 defaults across three 2x2 boards.
+- [x] Use nine defaults in ONE 3x3 board, with per-style visual prompts; retain historical 4/8/12 planning.
 - [x] Add evidence-coded recognition artifacts and deterministic validation.
 - [x] Compile provider tasks directly from the approved delivery shot list.
 - [x] Propagate asset kind, camera intent, must-show, and structural locks into generation tasks.

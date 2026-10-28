@@ -7,6 +7,13 @@ class TourWorkflowTests(unittest.TestCase):
  def setUp(self):
   self.t={'fps':24,'seconds':1,'schemeSha256':'case','frames':[{'frame':i,'pointMm':[i*100,0],'eyeMm':1600,'yawRadians':i*.03,'pitchRadians':0} for i in range(24)],'visits':[{'name':'entry','frame':0},{'name':'room','frame':12},{'name':'exit','frame':23}]}
   self.c={'chapters':[{'name':'view','from':'entry','to':'room','phase':'observe','subjects':['cabinet'],'minimumSeconds':2},{'name':'return','from':'room','to':'exit','phase':'transit'}]};self.l={'maximumSpeedMps':1.2,'maxYawDegreesPerSecond':32,'maxPitchDegreesPerSecond':14}
+ def test_explicit_single_sweep_survives_final_smoothing(self):
+  # A connection-induced backward wiggle must not re-enter a declared room sweep.
+  for i,f in enumerate(self.t['frames']):f['yawRadians']=math.radians([0,8,3,9,15,22,30,35,42,50,55,60,65][min(i,12)])
+  self.c['chapters'][0]['singleSweepDegrees']=65
+  out=retime(self.t,self.c,self.l);end=out['visits'][1]['frame'];angles=[f['yawRadians'] for f in out['frames'][:end+1]]
+  self.assertTrue(all(b>=a-1e-9 for a,b in zip(angles,angles[1:])))
+  self.assertFalse(out['cameraMethod']['thresholdFailures'])
  def test_retime_limits_and_endpoints(self):
   o=retime(self.t,self.c,self.l);m=metrics(o)
   self.assertGreater(o['seconds'],self.t['seconds']);self.assertLessEqual(m['maximumSpeedMps'],1.200001);self.assertLessEqual(m['maxYawDegreesPerSecond'],32.000001)
@@ -22,7 +29,7 @@ class TourWorkflowTests(unittest.TestCase):
   with self.assertRaises(ValueError):retime(self.t,self.c,self.l)
  def test_repeat_observation_needs_reason(self):
   self.c['chapters'][1].update(phase='observe',subjects=['cabinet']);self.assertTrue(intent_check(self.t,self.c)['failures'])
-  self.c['chapters'][1]['repeatReason']='exit detail';self.assertFalse(intent_check(self.t,self.c)['failures'])
+  self.c['ruleExceptions']=[{'code':'repeat_subject','chapter':self.c['chapters'][1]['name'],'subjectId':'cabinet','reason':'Synthetic detail exception'}];self.assertFalse(intent_check(self.t,self.c)['failures'])
  def test_sway_report_and_local_baseline(self):
   baseline=copy.deepcopy(self.t);o=refine(self.t,[{'startSeconds':.2,'endSeconds':.7,'yawBumpDegrees':4}]);self.assertEqual(self.t,baseline)
   for i,(a,b) in enumerate(zip(self.t['frames'],o['frames'])):

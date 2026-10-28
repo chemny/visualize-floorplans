@@ -1,5 +1,10 @@
 # Preserve upstream runtime and selected reference artifacts byte for byte.
-assets/h5/engine.js -whitespace
+assets/h5/engine.js -text -whitespace
+# Provenance compares installed bytes. Preserve source line endings on checkout.
+assets/h5/source/** text eol=lf
+assets/h5/version.json text eol=lf
+assets/h5/component-types.json text eol=lf
+assets/h5/engine.provenance.json text eol=lf
 assets/h5/runtime/three.core.js -whitespace
 assets/reference-cases/jujian-champagne-pearl/workbench/index.html -whitespace
 assets/reference-cases/jujian-champagne-pearl/drawings/*.svg -whitespace

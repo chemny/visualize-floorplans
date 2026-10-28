@@ -73,7 +73,7 @@ review. The blank template intentionally fails build: it cannot fabricate walls.
   browser storage, panel preferences and drawing modes are isolated per case.
 - `model`: `width`, `depth`, `height` in mm, `footprint` polygon, `rooms` array.
   A room needs `id`, `name`, `poly`, and explicit `at:[x,y]` label position.
-- `model.floorConnections`: optional explicit finish-only patches `{id,poly,materialRoomId}`. Keep them outside room polygons and walls, without mutual overlap. They follow the named room material in 2D/3D; report their floor area separately, include it once in material totals, and preserve the existing room/ownership area basis. These are reviewed case geometry, never inferred room merges. Export their geometry and invalidate finish approval when it changes.
+- `model.floorConnections`: optional reviewed input finish patches `{id,poly,materialRoomId}` assigned to an existing room, not extra rooms. Under default `floorBoundaryPolicy`, build normalizes wall/footprint overlaps and merges patches into that room, leaving normalized `floorConnections:[]`; plan, mesh and area use those same canonical polygons. Record source patches and merge/area evidence, count each floor region once, and keep source-labelled/ownership area separate from current net finish area. If normalization is explicitly disabled for a documented compatibility case, independent patches follow their owner material and contribute their area separately once. Neither mode authorizes inferred room merges; geometry changes invalidate finish approval.
 - `initialState.rooms`: matching room IDs with `{name,mat}`. Floor material keys
   are `wood`, `walnut`, `tile800`, `tile600`, `marble`, `antislip`, `terrazzo`,
   `carpet`. Room names and materials are editable.
@@ -84,7 +84,7 @@ review. The blank template intentionally fails build: it cannot fabricate walls.
 - An opening has `{id,kind,at,width,swing,hingeEnd,angle}` plus optional
   `sillHeight`, `height`, `entry`. `at` is measured along the wall start→end,
   not an absolute room coordinate. `hingeEnd` is `start` or `end`; `swing` is
-  +1 or -1; `angle` is the opening extent in degrees (5–100, normally 90), not
+  +1 or -1; `angle` is the opening extent in degrees (5–180, normally 90), not
   the current closed pose. `kind` is `door`, `sliding`, or `window`.
   `entranceOpenings` explicitly names entrance opening/wall IDs. The structure
   drawing keeps that door symbol and shows other doors as blank openings.
@@ -209,3 +209,26 @@ its new output remains pending. Config-based planning/retiming changes the tour
 hash: bind a new subject plan/review to the generated tour, then reuse `--tour`
 for the reviewed production run. The initial failed run retains its generated
 path, camera and reports for diagnosis; do not fabricate a passed review.
+
+### Single wall-sliding leaf
+
+A single opaque wall-side sliding door uses `kind:"sliding"`, `doorModel:"sliding"`,
+`leaves:1`, `slideMount:"wall"`, `slideSide:-1|1`, `slideOverlap:0..100` (mm),
+`slideDirection:-1|1`, and `slideOpen:0..1`. Side is relative to the wall's left
+normal; direction follows wall start/end. The panel slides entirely beside the
+opening, not inside a double-leaf stack. Check the wall-side parking strip,
+handles and overhead track in the actual case; this does not create a wall pocket.
+JS and Python use the same panel projection for plan, mesh and navigation.
+Two/three-leaf aperture stacking remains unchanged. See `test_single_wall_slide.mjs`.
+
+Style linkage: room `function` (bedroom/study/child/guest/living/dining/entrance/hall/closet/bathroom/kitchen/balcony) is authoritative over names. State rooms support `floorStyleMode:"follow"|"fixed"`, furniture `colorStyleMode:"fixed"`, wall faces `styleMode:"fixed"|"follow"`. These flags preserve explicit manual choices during style changes. `presentation.materials.wood.styleMode:"fixed"` retains exact embedded albedo color; omitted follows palette tint. Main fixture defaults are resolved with `defaultPlacement:"room-center"` and roomId only once, recorded as placementOrigin after resolution.
+
+Fixed room floor finishes also persist `floorStyleId`, retaining palette and roughness in 2D/3D across later style choices, with independently cached floor materials and fixed SVG patterns. Switching back to follow restores current-style mapping.
+
+Operable shower `showerDoor.width` is fixed leaf width in mm, independent of enclosure w/d. Legacy values resolve once to w−40; extra front width becomes fixed glass on latch side. Width must be finite, at least300 and no greater than enclosure w−40. This is concept geometry, not a product opening specification.
+
+Vanity `basinLayout` stores width/depth (one bowl), count, gap (between bowls), alignment left/center/right, backGap and faucetInset in mm. Resolve once from legacy sizes; preserve through resize/export. Single/double count changes reinitialize to a fitting default. Local left/right follows object rotation. Python generation validation and JS plan/mesh share this contract. Independent kitchen ksink components are unaffected.
+
+Bathtub `bathtubBody:{width,depth,alignment}` persists fixed physical body dimensions and local left/center/right position inside editable surround w/d. Resolve once from legacy body footprint. Surround must contain the fixed body. Python generation validation mirrors JS body geometry.
+
+`floorBoundaryPolicy` controls orthogonal room/wall boundary normalization during H5 build (enabled by default; toleranceMm default120, allowed0–200). It merges explicit floorConnections into their materialRoomId room and emits normalized polygons plus `.floors.json` evidence. Repair does not move walls/openings/furniture. Large missing zones and ambiguous free overlaps require explicit input correction. Room net finish areas may update after removing wall overlap and including their former connection patches.

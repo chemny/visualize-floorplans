@@ -1,0 +1,34 @@
+{
+  "schema": "homeowner-design-brief/1",
+  "_instructions": "Draft only. Fill current case entrance, coordinates, room intents, explicit duration and coverage policy before running. No sample apartment or approval is implied.",
+  "tourMode": "full_tour",
+  "entranceOpeningId": null,
+  "startPoint": null,
+  "maximumSeconds": null,
+  "coveragePolicy": {
+    "enabled": true,
+    "minimumPercent": null
+  },
+  "roomViewingPolicy": {
+    "singleEpisode": true,
+    "excludeNormalTransit": true
+  },
+  "observationPointPolicy": {
+    "defaultPointsPerRoom": 1,
+    "maximumPointsPerRoom": 2,
+    "recommendedSeconds": [
+      1.5,
+      2.5
+    ],
+    "maximumSecondsPerPoint": 3,
+    "maximumStillSeconds": 0.5
+  },
+  "orderOverrideReason": "",
+  "rooms": [],
+  "roomBudgetPolicy": {
+    "maximumTotalSeconds": null,
+    "rooms": []
+  },
+  "ruleExceptions": [],
+  "timingLocks": {}
+}

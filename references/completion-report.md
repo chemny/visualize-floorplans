@@ -17,3 +17,8 @@ Report:
 - output paths and sizes;
 - route and video artifacts only when that optional branch was requested;
 - whether results remain conceptual or were upgraded by a structured 3D system.
+
+When stage cleanup is requested, also report scan-only versus executed scope,
+protected and unknown items, candidate bytes, actual space recovered, backup
+verification, quarantine batch/retention, deliverable integrity and restoration.
+Do not describe quarantining as permanent deletion or disk space recovery.

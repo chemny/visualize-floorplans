@@ -37,8 +37,8 @@ calling it a usable MVP.
 - [ ] When video is requested, route topology passes `scripts/validate_route.py`.
 - [ ] Uncertain room assignments are visibly distinguished from confirmed facts.
 - [ ] Room count matches confirmed manifest.
-- [ ] The default 12-style preview uses three 2x2 boards with the same scene and
-      camera across every panel; a user-scoped 4/8-option comparison stays smaller.
+- [ ] The default nine-style preview uses ONE 3x3 board with the same scene,
+      camera and daylight across every panel; explicit user-scoped counts remain supported.
 - [ ] A style is selected before detailed canonical generation.
 - [ ] The canonical 3D view passes a door-by-door comparison against the approved
       access map before delivery.

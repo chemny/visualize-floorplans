@@ -1,0 +1,25 @@
+{
+  "schema": "homeowner-production-job/1",
+  "_instructions": "Fill paths for one frozen current scheme. Supply either brief, or both seedTour and seedConfig. Paths and budgets belong to the case. Never invent approval. Planning produces interactive rehearsal only, never video.",
+  "bundle": null,
+  "brief": null,
+  "seedTour": null,
+  "seedConfig": null,
+  "runtime": null,
+  "plan": null,
+  "planBounds": null,
+  "meshPreflight": true,
+  "revisionScope": null,
+  "search": {
+    "beamWidth": 3,
+    "perRoomCandidates": 6,
+    "maximumRounds": 2,
+    "maximumFullEvaluations": 40,
+    "maximumPlanningSeconds": 300,
+    "neighbourhoodMm": 400,
+    "maximumCandidateMeshEvaluations": 8,
+    "maximumDoorwayCandidates": 3,
+    "strictRepairRounds": true
+  },
+  "visualFeedback": null
+}

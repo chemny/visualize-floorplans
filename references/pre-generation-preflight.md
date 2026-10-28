@@ -52,6 +52,12 @@ shot specification or references before sending either task to the provider.
 - Write one case-local preflight record: authority paths/hashes, unresolved
   facts, per-view must-show and preservation constraints, planned reuse/edit/
   regeneration decisions, and the reason each planned image is needed.
+- Extract a per-view furniture/equipment inventory from the confirmed layout:
+  stable IDs, room, quantity and position, including repeated small units such as
+  bedside tables. Include it in prompts; forbid added equipment, rugs or floor
+  plants unless approved. In perspective views, distinguish hidden items from
+  missing ones. For whole-home plans/bird's-eyes, frame the entire footprint with
+  margin; a complementary camera must not crop an outer room or balcony.
 - Do not call an image provider while a consequential contradiction or required
   approval remains open. For a previously accepted primary image, a targeted
   derived-view correction can reuse it only for the unchanged details that pass

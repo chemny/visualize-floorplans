@@ -32,6 +32,7 @@ def design_block(design, visible_rooms=None):
     # User palette/materials take precedence over defaults; do not emit two
     # conflicting directions into different parts of the same prompt.
     scheme = {"style": chosen.get("name"), "description":chosen.get("description", ""),
+              "generation_prompt":chosen.get("generation_prompt", chosen.get("description", "")),
               "palette":design.get("palette") or chosen.get("palette",[]),
               "materials":design.get("materials") or chosen.get("materials",[]),
               "household":design.get("household", ""), "budget_tier":design.get("budget_tier", ""),

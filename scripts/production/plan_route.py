@@ -3,6 +3,8 @@ Standard library only. Windows remain obstacles. No teleports or room clips.
 """
 import argparse, json, math, heapq
 from pathlib import Path
+from door_checks import door_leaves, is_closed, sliding_geometry, leaf_segments
+from shower_door import enclosure_segments
 
 def inside(p,poly):
  x,y=p;on=False
@@ -26,7 +28,7 @@ def endpoint_padding(w,all_walls,end):
 
 class Planner:
  def __init__(self,bundle,config):
-  self.b=bundle;self.cfg=config;self.grid=config.get('gridMm',80);self.radius=config.get('bodyRadiusMm',160);self.rooms=bundle['model']['rooms'];self.walls=[];self.leaves=[];self.furniture=[]
+  self.b=bundle;self.cfg=config;self.grid=config.get('gridMm',80);self.radius=config.get('bodyRadiusMm',160);self.rooms=bundle['model']['rooms'];self.walls=[];self.leaves=[];self.vision_leaves=[];self.furniture=[]
   for w in bundle['state']['walls']:
    if w.get('demolished'):continue
    a,b=w['a'],w['b'];l=math.dist(a,b);v=[(b[i]-a[i])/l for i in (0,1)];at=0
@@ -36,19 +38,26 @@ class Planner:
     if o['at']>at:self.walls.append(([a[i]+(at-pad_start if at==0 else at)*v[i] for i in (0,1)],[a[i]+o['at']*v[i] for i in (0,1)],w['t']/2))
     end=o['at']+o['width']
     if o['kind']=='window':self.walls.append(([a[i]+o['at']*v[i] for i in (0,1)],[a[i]+end*v[i] for i in (0,1)],w['t']/2))
-    if o['kind']=='sliding':
-     n=3 if o.get('leaves')==3 else 2;pw=o['width']/n+min(30,o['width']*.02);opened=max(0,min(1,o.get('slideOpen',0)));direction=-1 if o.get('slideDirection')==-1 else 1
-     for i in range(n):
-      closed=-o['width']/2+o['width']*(i+.5)/n;target=direction*(o['width']/2-pw/2);along=o['at']+o['width']/2+closed+(target-closed)*opened;track=(i-(n-1)/2)*35
-      centre=[a[k]+v[k]*along+[-v[1],v[0]][k]*track for k in (0,1)]
-      self.leaves.append(([centre[k]-v[k]*pw/2 for k in (0,1)],[centre[k]+v[k]*pw/2 for k in (0,1)],20))
+    if o['kind']=='sliding' and not o.get('leafRemoved'):
+     for panel in sliding_geometry(w,o)['panels']:
+      centre=[panel['cx'],panel['cy']];pw=panel['pw']
+      self.leaves.append(([centre[k]-v[k]*pw/2 for k in (0,1)],[centre[k]+v[k]*pw/2 for k in (0,1)],panel['thickness']/2))
+      if o.get('panelFinish','solid')!='glass':self.vision_leaves.append(self.leaves[-1])
+      if o.get('leaves')==1:
+       pull=[centre[k]+v[k]*pw*.34+[-v[1],v[0]][k]*o.get('slideSide',-1)*30 for k in (0,1)];self.leaves.append((pull,pull,15))
     if o['kind']=='door':
-     inward=[-v[1]*o['swing'],v[0]*o['swing']];reverse=o.get('hingeEnd')=='end';h=end if reverse else o['at'];closed=[x*(-1 if reverse else 1) for x in v];angle=math.radians(o.get('angle',90));leaf=[closed[i]*math.cos(angle)+inward[i]*math.sin(angle) for i in (0,1)];hinge=[a[i]+h*v[i]+inward[i]*(w['t']/2+15)+closed[i]*25 for i in (0,1)]
-     if bundle['state'].get('doors',{}).get(w['id']) is False:leaf=closed
-     self.leaves.append((hinge,[hinge[i]+leaf[i]*(o['width']-50) for i in (0,1)],20))
+     index=next(i for i,raw in enumerate(w['opens']) if raw.get('id')==o.get('id') and raw['at']==o['at'])
+     for leaf in door_leaves(w,o,is_closed(bundle['state'],w,o,index)):
+      parts=list(leaf_segments(leaf,leaf['angleDegrees']))
+      self.leaves.extend((a,b,pad) for _,a,b,pad in parts)
+      if o.get('panelFinish','solid')!='glass':self.vision_leaves.extend((a,b,pad) for kind,a,b,pad in parts if kind=='leaf')
     at=end
    if at<l:self.walls.append(([a[i]+(at-pad_start if at==0 else at)*v[i] for i in (0,1)],[b[i]+pad_end*v[i] for i in (0,1)],w['t']/2))
   for f in bundle['state']['furniture']:
+   if f['type']=='shower' and f.get('showerDoor'):
+    # Glass and pulls remain physical obstacles. They are not opaque planar
+    # walls; the independent triangle audit still checks actual visibility.
+    self.leaves.extend(enclosure_segments(f));continue
    if f.get('planPoint') or f['type'] in ['rug','tv','stove','waterheater','acwall','threshold','skirting','doortrim','windowtrim','waterinlet','drainoutlet','floordrain','transition'] or f.get('elevation',0)>1100:continue
    self.furniture.append(f)
   self.cache={}
@@ -76,11 +85,14 @@ class Planner:
   if k not in self.cache:self.cache[k]=not self.blocked(self.point(k))
   return self.cache[k]
  def nearest(self,p):
+  if self.blocked(p):raise ValueError('Exact endpoint is not walkable '+str(p))
   k=tuple(round(v/self.grid) for v in p)
   candidates=[(math.dist(p,self.point((k[0]+a,k[1]+b))),(k[0]+a,k[1]+b)) for a in range(-8,9) for b in range(-8,9)];candidates.sort()
   for _,k in candidates:
-   if self.free(k):return k
-  raise ValueError('No walkable point near '+str(p))
+   # A nearby free cell can lie across a thin wall or an open door leaf.
+   # Attach the exact physical endpoint only to a genuinely reachable cell.
+   if self.free(k) and self.line_free(p,self.point(k)):return k
+  raise ValueError('No safely connected walkable point near '+str(p))
  def line_free(self,a,b):
   n=max(1,math.ceil(math.dist(a,b)/25));return all(not self.blocked([a[k]+(b[k]-a[k])*i/n for k in (0,1)]) for i in range(n+1))
  def astar(self,a,b):
@@ -106,13 +118,22 @@ class Planner:
    out.append(pts[j]);i=j
   return out
  def round(self,pts):
+  pts=[p for i,p in enumerate(pts) if i==0 or math.dist(p,pts[i-1])>.001]
+  if len(pts)<2:return pts
   out=[pts[0]]
   for i in range(1,len(pts)-1):
-   a,b,c=pts[i-1:i+2];radius=min(450,math.dist(a,b)*.35,math.dist(b,c)*.35)
-   u=[b[k]+(a[k]-b[k])*radius/math.dist(a,b) for k in (0,1)];v=[b[k]+(c[k]-b[k])*radius/math.dist(b,c) for k in (0,1)]
-   curve=[[u[k]*(1-t)**2+2*b[k]*t*(1-t)+v[k]*t*t for k in (0,1)] for t in [j/24 for j in range(25)]]
-   if all(self.line_free(x,y) for x,y in zip([out[-1]]+curve,curve)):out.extend(curve)
-   else:out.append(b)
+   a,b,c=pts[i-1:i+2];incoming=[b[k]-a[k] for k in (0,1)];outgoing=[c[k]-b[k] for k in (0,1)]
+   if sum(x*y for x,y in zip(incoming,outgoing))/(math.dist(a,b)*math.dist(b,c))> .99999:
+    out.append(b);continue
+   # Smaller radii are explicit candidates, never an unreported sharp-corner fallback.
+   accepted=False
+   for fraction in (.35,.25,.15,.08):
+    radius=min(450,math.dist(a,b)*fraction,math.dist(b,c)*fraction)
+    u=[b[k]+(a[k]-b[k])*radius/math.dist(a,b) for k in (0,1)];v=[b[k]+(c[k]-b[k])*radius/math.dist(b,c) for k in (0,1)]
+    curve=[[u[k]*(1-t)**2+2*b[k]*t*(1-t)+v[k]*t*t for k in (0,1)] for t in [j/24 for j in range(25)]]
+    if all(self.line_free(x,y) for x,y in zip([out[-1]]+curve,curve)) and self.line_free(curve[-1],c):
+     out.extend(curve);accepted=True;break
+   if not accepted:raise ValueError('No safe rounded corner; replan the path or observation station')
   out.append(pts[-1]);return out
 
 def apply_camera_cues(frames, fps, cues, max_yaw=35):
@@ -178,8 +199,10 @@ def plan(bundle,config,preview=False):
  weights=[sum(weights[max(0,i-8):min(len(weights),i+9)])/len(weights[max(0,i-8):min(len(weights),i+9)]) for i in range(len(weights))]
  weighted=[0]
  for i,(a,b) in enumerate(zip(dense,dense[1:])):weighted.append(weighted[-1]+math.dist(a,b)*weights[i])
+ from tour_rules import profile
+ defaults=profile()
  for i in range(count):
-  time_distance=weighted[-1]*i/(count-1);k=max(0,min(len(dense)-2,bisect.bisect_right(weighted,time_distance)-1));fraction=(time_distance-weighted[k])/(weighted[k+1]-weighted[k] or 1);d=lengths[k]+fraction*(lengths[k+1]-lengths[k]);pos=sample(d);ahead=sample(min(length,d+650));behind=sample(max(0,d-150));target=math.atan2(ahead[1]-behind[1],ahead[0]-behind[0]);frames.append({'frame':i+1,'pathDistanceMm':d,'pointMm':pos,'eyeMm':config.get('eyeMm',1650),'yawRadians':target,'pitchRadians':-.06,'horizontalFovDegrees':config.get('horizontalFovDegrees',70)})
+  time_distance=weighted[-1]*i/(count-1);k=max(0,min(len(dense)-2,bisect.bisect_right(weighted,time_distance)-1));fraction=(time_distance-weighted[k])/(weighted[k+1]-weighted[k] or 1);d=lengths[k]+fraction*(lengths[k+1]-lengths[k]);pos=sample(d);ahead=sample(min(length,d+650));behind=sample(max(0,d-150));target=math.atan2(ahead[1]-behind[1],ahead[0]-behind[0]);frames.append({'frame':i+1,'pathDistanceMm':d,'pointMm':pos,'eyeMm':config.get('eyeMm',defaults['eyeMm']),'yawRadians':target,'pitchRadians':-.06,'horizontalFovDegrees':config.get('horizontalFovDegrees',defaults['horizontalFovDegrees'])})
  visits=[];visit_times=[]
  for stop,d in zip(stops,stop_distances):
   at=min(range(count),key=lambda i:abs(frames[i]['pathDistanceMm']-d))

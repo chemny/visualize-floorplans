@@ -4,19 +4,38 @@ from pathlib import Path
 
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def markers(t):return {s['name']:s.get('frameIndex',s.get('frame')) for s in (t.get('stopFrames') or t.get('visits',[]))}
+def chapter_limits(base,chapter):
+ """Chapter ceilings may only tighten an explicitly supplied global ceiling."""
+ local=chapter.get('motionReviewLimits',{})
+ for key,value in local.items():
+  if key not in base or isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value) or not 0<value<=base[key]:raise ValueError('Chapter motion limit must be positive and no higher than global ceiling: '+key)
+ return {**base,**local}
+
+def edge_limits(t,c,key,base):
+ """Assign each frame chord to its chapter, including the boundary chords."""
+ result=[base[key]]*max(0,len(t['frames'])-1);m=markers(t)
+ for ch in c.get('chapters',[]):
+  local=chapter_limits(base,ch);a,z=m.get(ch.get('from')),m.get(ch.get('to'))
+  if not isinstance(a,int) or not isinstance(z,int) or not 0<=a<z<len(t['frames']):raise ValueError('Invalid chapter limit interval')
+  for i in range(a,z):result[i]=min(result[i],local[key])
+ return result
 def metrics(t):
  f=t['frames'];fps=t['fps'];yr=[(b['yawRadians']-a['yawRadians'])*fps*180/math.pi for a,b in zip(f,f[1:])];speed=[math.dist(a['pointMm'],b['pointMm'])*fps/1000 for a,b in zip(f,f[1:])];signs=[1 if v>1 else -1 for v in yr if abs(v)>1]
  return {'maxYawDegreesPerSecond':max(map(abs,yr),default=0),'maxPitchDegreesPerSecond':max((abs(b['pitchRadians']-a['pitchRadians'])*fps*180/math.pi for a,b in zip(f,f[1:])),default=0),'maximumSpeedMps':max(speed,default=0),'minimumSpeedMps':min(speed,default=0),'stationaryFrames':sum(v<.0024 for v in speed),'positiveYawTravelDegrees':sum(max(0,v)/fps for v in yr),'negativeYawTravelDegrees':sum(max(0,-v)/fps for v in yr),'yawDirectionChanges':sum(a!=b for a,b in zip(signs,signs[1:])),'maxYawAccelerationDegreesPerSecondSquared':max((abs(b-a)*fps for a,b in zip(yr,yr[1:])),default=0)}
 
 def intent_check(t,c):
+ from tour_rules import exception
  stops=markers(t);seen=set();fail=[];reports=[]
  for ch in c.get('chapters',[]):
-  a,z=stops.get(ch.get('from')),stops.get(ch.get('to'));phase=ch.get('phase');subjects=ch.get('subjects',[])
+  a,z=stops.get(ch.get('from')),stops.get(ch.get('to'));phase=ch.get('phase');subjects=list(dict.fromkeys(ch.get('subjects',[])+ch.get('orderedViewTargets',[])))
   if a is None or z is None or a>=z:fail.append('Invalid chapter endpoints: '+str(ch.get('name')));continue
   if phase not in ('observe','transit'):fail.append('Declare observe/transit: '+str(ch.get('name')))
   if phase=='observe':
    if not subjects:fail.append('Missing observation subjects: '+str(ch.get('name')))
-   if seen.intersection(subjects) and not ch.get('repeatReason'):fail.append('Repeated observation needs repeatReason: '+str(ch.get('name')))
+   overlap=seen.intersection(subjects)
+   previous=c['chapters'][len(reports)-1] if reports else {}
+   continuation=(previous.get('roomId')==ch.get('roomId') and previous.get('episodeId',previous.get('roomId'))==ch.get('episodeId',ch.get('roomId')) and (previous.get('movingView') or ch.get('movingView')))
+   if overlap and not continuation and any(not exception(c,'repeat_subject',ch.get('name'),s) for s in overlap):fail.append('Repeated observation needs scoped ruleExceptions: '+str(ch.get('name')))
    seen.update(subjects)
   if phase=='transit' and subjects and not ch.get('observationReason'):fail.append('Transit observation needs observationReason: '+str(ch.get('name')))
   segment={'frames':t['frames'][a:z+1],'fps':t['fps']};m=metrics(segment)
@@ -26,6 +45,9 @@ def intent_check(t,c):
    if m[k]>v:fail.append('Chapter motion limit: '+str(ch.get('name'))+' / '+k)
   reports.append({'name':ch.get('name'),'phase':phase,'subjects':subjects,'metrics':m})
  if not c.get('chapters'):fail.append('Explicit observation/transit chapters required')
+ if c.get('choreographyPolicy',{}).get('enabled'):
+  from tour_choreography import inspect
+  fail.extend('Choreography: '+issue['code']+' / '+issue.get('chapter',issue.get('message','')) for issue in inspect(t,c)['issues'])
  return {'failures':fail,'chapters':reports,'limitations':'Intent declarations and rotation metrics do not prove visibility or comfort. Direction changes are diagnostic; no universal reversal-count threshold.'}
 
 def retime(t,c,limits):
@@ -40,7 +62,7 @@ def retime(t,c,limits):
  # Optional chapter budgets may be stricter than the global motion ceilings.
  # This keeps observation pace while permitting faster already-seen connections.
  for ch in c.get('chapters',[]):
-  local=ch.get('timingLimits',{})
+  local={**ch.get('motionReviewLimits',{}),**ch.get('timingLimits',{})}
   if not local:continue
   a,z=st.get(ch.get('from')),st.get(ch.get('to'))
   if a is None or z is None or not 0<=a<z<len(f):raise ValueError('Invalid chapter timing endpoints')
@@ -87,6 +109,21 @@ def retime(t,c,limits):
    index=m.get('frameIndex',m.get('frame'));at=min(n-1,round(times[index]*fps));m['seconds']=at/fps
    if 'frameIndex' in m:m['frameIndex']=at
    else:m['frame']=at
+ # Final smoothing must not reverse an explicitly declared one-way room sweep.
+ marks={m['name']:m.get('frameIndex',m.get('frame')) for m in o.get('stopFrames',o.get('visits',[]))}
+ for ch in c.get('chapters',[]):
+  sweep=ch.get('singleSweepDegrees')
+  if ch.get('phase')!='observe' or sweep is None or abs(sweep)<.001:continue
+  a,z=marks[ch['from']],marks[ch['to']];direction=1 if sweep>0 else -1
+  values=[direction*frame['yawRadians'] for frame in new[a:z+1]]
+  if values[-1]<values[0]:continue  # Report the invalid intent, never silently reverse it.
+  low,high=values[0],values[-1];blocks=[]
+  for value in values:
+   blocks.append([min(high,max(low,value)),1])
+   while len(blocks)>1 and blocks[-2][0]>blocks[-1][0]:
+    right=blocks.pop();left=blocks.pop();count=left[1]+right[1];blocks.append([(left[0]*left[1]+right[0]*right[1])/count,count])
+  fitted=[value for value,count in blocks for _ in range(count)]
+  for frame,value in zip(new[a:z+1],fitted):frame['yawRadians']=direction*value
  for ch in records:ch.update(startSeconds=times[ch['fromIndex']],endSeconds=times[ch['toIndex']],allocatedSeconds=times[ch['toIndex']]-times[ch['fromIndex']])
  # Old timeline and review evidence have obsolete frame indices/hashes.
  for k in ['roomTimeline','roomJumpTimes','humanAcceptance','subjectAudit','qualityReview']:o.pop(k,None)

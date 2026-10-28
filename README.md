@@ -24,11 +24,12 @@ Illustration of the workflow; AI interior concepts and the editable 3D preview a
 | --- | --- |
 | Start from one plan | Review rooms, dimensions, walls, windows and access before designing. |
 | Furniture planning | Propose wall-backed furniture, usable passages, door clearance and curtain space for your household. |
-| Visual style selection | Compare six interior style directions in one image before choosing; requires an available image-generation tool. |
+| Visual style selection | Compare nine interior style directions in one 3×3 image before choosing; requires an available image-generation tool. |
 | Editable 2D/3D workbench | Edit furniture, doors, eligible walls and finishes, then inspect the same scheme from above or in a walkthrough. |
 | Precise editing | Copy objects, insert components from a context menu, snap alignment, measure and undo/redo. |
 | Save and confirm | Save directly to a local project service and confirm a stage; portable HTML supports independent saving and export. |
 | Coordinated interior concepts | Generate room and whole-home views using the confirmed layout and style, then review differences. |
+| Stage cleanup | Review obsolete media, protect referenced assets, then back up and quarantine an explicitly approved batch; no background deletion. |
 | Local delivery | Package the workbench, drawings, scheme data and approved images with an index and file checksums. |
 | Optional camera preflight | Plan and capture a continuous H5 tour when requested; video generation is a separate optional branch. |
 
@@ -36,7 +37,12 @@ This is concept design, not measured CAD, structural assessment or construction 
 
 ## Installation
 
-Current Skill version: **0.2.2**.
+Current local Skill version: **0.2.11** (not published).
+
+Native tour revisions now include bounded doorway composition candidates and validation, explicit
+frame/observation freezing, synchronized before/after review and an engineering
+closeout report. See [the revision workflow](references/tour-native-revision.md).
+Engineering verification and user visual acceptance are recorded separately.
 
 ### Requirements
 
@@ -81,7 +87,7 @@ Three people will live here. Make the study a guest room too, keep the main pass
 ### Choose finishes visually
 
 ```text
-Show six styles for the confirmed living/dining layout in one comparison image, using the same eye-level view. Recommend one and explain why.
+Show nine styles for the confirmed living/dining layout in one comparison image, using the same eye-level view. Recommend one and explain why.
 ```
 
 Image generation requires the optional tool listed above; workbench palettes alone do not replace interior effect images.
@@ -119,6 +125,8 @@ Three concentrated decision rounds: **plan and essential needs → furniture lay
 
 You can request individual tasks. Changes to geometry, furniture or finishes invalidate only the dependent confirmations; successful file checks do not grant human approval. See [guided workflow](references/guided-user-workflow.md), [quality gates](references/h5-quality-gates.md) and [save/confirm behavior](references/project-save-confirm.md).
 
+Cleanup details: [stage cleanup](references/stage-cleanup.md).
+
 ## Repository Structure
 
 ```text
@@ -145,3 +153,5 @@ Original code and documentation use [MIT](LICENSE). Adapted floorplan workbench 
 ## About Me
 
 Maintained by [chemny](https://github.com/chemny). Questions and feedback can be raised in the [repository issues](https://github.com/chemny/interior-design/issues).
+
+Local closeout: [version boundaries and verification](references/local-version-closeout.md). Skill 0.2.11 includes workbench subsystem 0.2.7; build hashes establish exact identity.

@@ -1,0 +1,3 @@
+// The editable footprint is the surround; the tub itself never stretches.
+export function ensureBathtubBody(f){if(f.type!=='bathtub')return f;f.bathtubBody??={width:f.w,depth:f.d,alignment:'center'};bathtubBodyGeometry(f);return f;}
+export function bathtubBodyGeometry(f){const b=f.bathtubBody||{width:f.w,depth:f.d,alignment:'center'};if(!['left','center','right'].includes(b.alignment)||![b.width,b.depth].every(Number.isFinite)||b.width<400||b.depth<300||f.w<b.width-.01||f.d<b.depth-.01)throw Error('外围尺寸不能小于浴缸本体');return{width:b.width,depth:b.depth,x:b.alignment==='left'?-(f.w-b.width)/2:b.alignment==='right'?(f.w-b.width)/2:0,z:0,minWidth:b.width,minDepth:b.depth};}

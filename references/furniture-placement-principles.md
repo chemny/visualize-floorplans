@@ -4,6 +4,21 @@ Read with furniture-layout-review.md before proposing or revising any layout.
 These are concept-design and review rules, not building regulations. Source
 structure and consequential uncertainties remain authoritative.
 
+## 六个布局评价维度
+
+本表统一组织下文已有原则，不把每个维度另写成重复摆放规则。空间利用率评价可用空间，不是家具占地率；便利性评价操作代价，不是勉强可达。
+
+|维度|判断重点|已有执行与边界|
+|---|---|---|
+|功能适配|必要功能、使用者需求、待客与选配的适度配置|房间功能/数量与整组功能映射；不强制每个房间摆齐所有组件|
+|空间利用率|可取用收纳、有效活动区、可用墙段及零碎空隙|墙角/墙面锚定、柜长与操作区检查；不自动最大化柜体或求全屋最优|
+|便利性|连续动作链、够取、绕行、开关门及转换步骤|通路、站位、椅子/柜门/设备状态组合；“关门才能用”须计入代价而非无条件通过|
+|安全与舒适|磕碰夹挤、坐卧转身、门窗使用及必要通行|声明的碰撞、间距及使用包络；真实人体、产品及现场条件单列，模型不作规范认证|
+|维护与耐用|清洁死角、防潮、散热、排水及设备检修|沿用清洁/服务/安装核查，现主要依赖人工和产品资料；未知项不能算通过|
+|视觉协调|尺度比例、轴线、柜体连续性、疏密及统一关系|对齐/尺寸、最终二维三维一致性和看图复核；不把图形一致当作审美合格|
+
+候选比较与取舍记录见 `layout-candidate-comparison.md`，复用既有布局验收入口。功能、安全操作与必要通行先过底线，再比较六维收益和代价；不以单一碰撞通过或总分代替合理性判断。
+
 ## Required checks
 
 - Design for everyday convenience from confirmed household needs; do not invent
@@ -110,10 +125,12 @@ use a collision-free arrangement as a substitute for room composition:
    surfaces, wardrobe with operating space, desk and pulled-out seat, sofa and TV.
    Prefer two bedside units for a double bed when usable circulation remains;
    consider smaller/integrated units before sacrificing access.
-4. Compare at least two viable arrangements internally using entry sightline,
-   door-back space, continuous circulation, storage access and usable free area.
-   Select the arrangement that supports everyday use with fewer awkward gaps.
-   Do not add extra cabinets simply to fill an empty rectangle.
+4. Compare at least two viable arrangements using the six dimensions above,
+   with actual candidate states and explicit benefits, costs and unresolved
+   conditions; follow `layout-candidate-comparison.md`. Preserve entrance
+   sightlines, door-back space, continuous circulation, storage access and
+   usable free area. State why each alternative was not selected; do not add
+   extra cabinets simply to fill an empty rectangle.
 5. Check occupied states: cupboard/drawer doors, seated chairs, appliance doors,
    cleaning access and guest-bed expansion. Require separate daily and guest
    states for dual-purpose rooms. Resolve observed conflicts before presentation.

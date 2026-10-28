@@ -1,0 +1,12 @@
+{
+  "schema": "homeowner-core-functions/1",
+  "minimumReadableSeconds": 0.5,
+  "types": {
+    "bed": "sleep", "sofabed": "sleep",
+    "sofa": "seating", "tvstand": "television",
+    "wardrobe": "storage", "desk": "work", "table": "dining",
+    "ksink": "kitchen_wash", "stove": "cooking", "counter": "worktop", "fridge": "cold_storage",
+    "toilet": "toilet", "vanity": "wash", "shower": "shower", "bathtub": "bathing",
+    "washer": "laundry"
+  }
+}

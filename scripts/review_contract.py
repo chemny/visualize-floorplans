@@ -9,7 +9,10 @@ PACKAGE_CHECKS = {"style_consistent","materials_consistent","furniture_consisten
 def required_checks(kind):
     checks = set(BASE_CHECKS)
     if kind in {"birdseye","room_view","furnished_colour_plan"}:
-        checks |= {"furniture_matches_scheme", "materials_match_scheme", "bay_window_and_balcony_preserved"}
+        checks |= {"furniture_matches_scheme", "materials_match_scheme", "bay_window_and_balcony_preserved",
+                   "furniture_equipment_count_preserved"}
+    if kind in {"birdseye", "furnished_colour_plan"}:
+        checks |= {"whole_home_framing_complete"}
     if kind == "room_view":
         checks |= {"camera_and_visible_proportions_plausible"}
     return checks

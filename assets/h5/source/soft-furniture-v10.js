@@ -1,3 +1,4 @@
+import {finishMaterial} from './material-finish.js';
 import * as T from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 
@@ -13,9 +14,10 @@ function tex(kind,relief=false){
  const ctx=canvas.getContext('2d'),img=ctx.createImageData(512,512);let seed=51379;
  const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
  for(let y=0;y<512;y++)for(let x=0;x<512;x++){
-  const weave=(Math.sin(x*Math.PI)+Math.cos(y*Math.PI))*1.4;
+  const weave=(Math.cos(x*Math.PI)+Math.cos(y*Math.PI))*1.4;
   const grain=Math.sin(x*.38+Math.sin(y*.027)*.55)*2+Math.sin(x*.091)*1.2;
-  const v=relief?128+(kind==='fabric'?weave*2:grain*2)+(rand()-.5)*5:246+(kind==='fabric'?weave:grain)+(rand()-.5)*3;
+  const reliefPattern=kind==='fabric'?weave:kind==='metal'?Math.sin(y*2.7)*1.5:grain;
+  const v=relief?128+reliefPattern*2+(rand()-.5)*5:246+reliefPattern+(rand()-.5)*3;
   const j=(y*512+x)*4;img.data[j]=img.data[j+1]=img.data[j+2]=clamp(v,0,255);img.data[j+3]=255;
  }
  ctx.putImageData(img,0,0);const tx=new T.CanvasTexture(canvas);
@@ -23,11 +25,11 @@ function tex(kind,relief=false){
  textures.set(key,tx);return tx;
 }
 function material(color,kind,role,spec={}){
- if(kind==='wood'&&spec.furnitureWoodFinish==='lacquer'){const m=new T.MeshPhysicalMaterial({color,roughness:spec.lacquerRoughness??.36,metalness:0,clearcoat:.18,clearcoatRoughness:.45,envMapIntensity:.3});m.userData.finishRole=role;m.userData.furnitureSurface='satin-lacquer';return m;}
- const m=new T.MeshStandardMaterial({color,roughness:kind==='fabric'?(spec.fabricRoughness??.78):kind==='wood'?(spec.woodRoughness??.62):kind==='metal'?(spec.metalRoughness??.35):.7,metalness:kind==='metal'?.72:0,envMapIntensity:kind==='metal'?.7:.2});
- if(kind==='fabric'||kind==='wood'){m.map=tex(kind);m.bumpMap=tex(kind,true);m.bumpScale=kind==='fabric'?.00035:.00055;}
+ if((kind==='wood'&&spec.furnitureWoodFinish==='lacquer')||(kind==='plain'&&role==='cabinet')){const m=new T.MeshPhysicalMaterial({color,roughness:spec.lacquerRoughness??.36,metalness:0,clearcoat:.18,clearcoatRoughness:.45,envMapIntensity:.3});m.userData.finishRole=role;m.userData.furnitureSurface='satin-lacquer';return finishMaterial(m,'lacquer');}
+ const m=new T.MeshStandardMaterial({color,roughness:kind==='fabric'?(spec.fabricRoughness??.86):kind==='wood'?(spec.woodRoughness??.62):kind==='metal'?(spec.metalRoughness??.35):.7,metalness:kind==='metal'?.72:0,envMapIntensity:kind==='metal'?.7:.2});
+ if(kind==='fabric'||kind==='wood'){m.map=tex(kind);m.bumpMap=tex(kind,true);m.bumpScale=kind==='fabric'?.00055:.00055;}
  if(role==='appliance-metal'){m.bumpMap=tex('metal',true);m.bumpScale=.00012;m.userData.surface='brushed-silver';}
- m.userData.finishRole=role;return m;
+ m.userData.finishRole=role;return finishMaterial(m,kind);
 }
 function projectedUV(geo,period){
  const p=geo.attributes.position,n=geo.attributes.normal,uv=new Float32Array(p.count*2);

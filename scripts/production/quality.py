@@ -9,8 +9,8 @@ from pathlib import Path
 
 SCHEMA = 'floor-visualization-quality-review/1.0'
 STAGES = ('source', 'images', 'tour')
-IMAGE_CHECKS = ('room_shape', 'openings', 'object_identity', 'placement',
-                'orientation', 'proportions', 'materials', 'lighting', 'perspective')
+IMAGE_CHECKS = ('room_shape', 'openings', 'object_identity', 'object_count', 'placement',
+                'orientation', 'proportions', 'materials', 'lighting', 'perspective', 'framing')
 
 def read(path):
     return json.loads(Path(path).read_text(encoding='utf-8'))

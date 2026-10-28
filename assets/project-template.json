@@ -4,7 +4,15 @@
   "input_image": "/absolute/path/to/floorplan.png",
   "input_assessment": {
     "condition": "critical_missing",
-    "items": [{"id": "source-review", "origin": "unknown", "description": "Inspect uploaded source and record consequential gaps", "consequential": true, "evidence": []}]
+    "items": [
+      {
+        "id": "source-review",
+        "origin": "unknown",
+        "description": "Inspect uploaded source and record consequential gaps",
+        "consequential": true,
+        "evidence": []
+      }
+    ]
   },
   "interpretation_artifacts": {
     "source_image": "/absolute/path/to/floorplan.png",
@@ -22,7 +30,10 @@
       "approval_source": null,
       "artifact_sha256": {},
       "facts_sha256": null,
-      "source_self_check": {"method": null, "evidence": null},
+      "source_self_check": {
+        "method": null,
+        "evidence": null
+      },
       "scopes": {
         "structure_and_zones": {
           "status": "unconfirmed",
@@ -35,7 +46,9 @@
           "evidence": []
         }
       },
-      "unresolved_items": ["structure_and_access_review_pending"]
+      "unresolved_items": [
+        "structure_and_access_review_pending"
+      ]
     }
   },
   "mode": "conceptual",
@@ -48,25 +61,168 @@
   "structural_locks": [],
   "design": {
     "style_options": [
-      {"id": "modern_minimal", "name": "现代简约", "palette": ["warm white", "warm gray", "natural wood"], "materials": ["matte paint", "wood", "restrained stone"]},
-      {"id": "wood_cream", "name": "原木奶油", "palette": ["cream", "light oak", "soft beige"], "materials": ["light oak", "linen", "matte paint"]},
-      {"id": "modern_luxury", "name": "现代轻奢", "palette": ["ivory", "taupe", "charcoal"], "materials": ["stone", "metal accents", "leather or velvet"]},
-      {"id": "modern_chinese", "name": "现代新中式", "palette": ["warm white", "walnut", "ink gray"], "materials": ["wood", "stone", "textured fabric"]},
-      {"id": "midcentury_modern", "name": "中古现代", "palette": ["walnut", "ochre", "muted olive"], "materials": ["sculpted wood", "leather", "woven upholstery"]},
-      {"id": "song_eastern", "name": "轻东方宋式", "palette": ["rice white", "pale wood", "celadon"], "materials": ["fine timber joinery", "linen", "matte ceramic"]},
-      {"id": "contemporary_french", "name": "克制法式优雅", "palette": ["warm ivory", "pale oak", "burgundy accents"], "materials": ["delicate shallow mouldings", "travertine", "velvet", "patinated brass"]},
-      {"id": "italian_luxury", "name": "意式克制奢华", "palette": ["walnut", "warm gray", "cognac"], "materials": ["limited honed stone", "tailored leather", "bronze", "wool"]},
-      {"id": "champagne_pearl", "name": "香槟珍珠", "palette": ["pearl milky white", "pale champagne", "warm taupe"], "materials": ["soft sheen lacquer", "silk texture", "restrained champagne metal", "sculptural glass"]},
-      {"id": "milan_greige", "name": "米兰暖灰", "palette": ["warm greige", "mushroom gray", "espresso accents"], "materials": ["suede texture", "stitched leather", "smoked glass", "brushed titanium"]},
-      {"id": "paris_art_deco", "name": "巴黎装饰艺术", "palette": ["ivory", "dusty mauve", "burgundy"], "materials": ["restrained geometric detailing", "burl wood lacquer", "velvet", "ribbed glass"]},
-      {"id": "sculptural_cream", "name": "奶油雕塑感", "palette": ["ivory", "sand", "cognac accents"], "materials": ["boucle", "ribbed ceramic", "limestone", "sculptural upholstery"]}
+      {
+        "id": "modern_minimal",
+        "name": "现代简约",
+        "palette": [
+          "warm white",
+          "soft gray",
+          "restrained natural wood"
+        ],
+        "materials": [
+          "matte paint",
+          "gray stone tile",
+          "plain woven upholstery"
+        ],
+        "description": "Clean straight silhouettes, uncluttered flat walls and white ceiling, gray woven sofa, restrained rectangular stone coffee table and flat-front TV cabinet. Quiet neutral contrast, discreet ceiling lights; avoid ornate mouldings, carved gilt furniture and decorative clutter.",
+        "generation_prompt": "Clean straight silhouettes, uncluttered flat walls and white ceiling, gray woven sofa, restrained rectangular stone coffee table and flat-front TV cabinet. Quiet neutral contrast, discreet ceiling lights; avoid ornate mouldings, carved gilt furniture and decorative clutter."
+      },
+      {
+        "id": "wood_cream",
+        "name": "原木奶油",
+        "palette": [
+          "cream white",
+          "light oak",
+          "soft beige"
+        ],
+        "materials": [
+          "light oak",
+          "linen",
+          "matte paint"
+        ],
+        "description": "Light natural oak floor and cabinetry, cream linen sofa, simple rounded edges, soft woven throw and understated ceramic decor, warm white painted ceiling. Warm approachable residential atmosphere; avoid full wood-clad ceilings, ornate classical mouldings and extensive gold trim.",
+        "generation_prompt": "Light natural oak floor and cabinetry, cream linen sofa, simple rounded edges, soft woven throw and understated ceramic decor, warm white painted ceiling. Warm approachable residential atmosphere; avoid full wood-clad ceilings, ornate classical mouldings and extensive gold trim."
+      },
+      {
+        "id": "midcentury_modern",
+        "name": "中古现代",
+        "palette": [
+          "walnut brown",
+          "cream",
+          "muted olive"
+        ],
+        "materials": [
+          "walnut",
+          "woven upholstery",
+          "aged brass"
+        ],
+        "description": "Clearly visible warm walnut floor and sideboard, tapered timber legs, midcentury furniture proportions, cream upholstery with olive and caramel accents, retro geometric art and small brass details. Bright livable vintage sophistication; avoid generic all-beige cream rooms or a dark themed bar.",
+        "generation_prompt": "Clearly visible warm walnut floor and sideboard, tapered timber legs, midcentury furniture proportions, cream upholstery with olive and caramel accents, retro geometric art and small brass details. Bright livable vintage sophistication; avoid generic all-beige cream rooms or a dark themed bar."
+      },
+      {
+        "id": "modern_chinese",
+        "name": "现代新中式",
+        "palette": [
+          "warm white",
+          "walnut",
+          "ink gray"
+        ],
+        "materials": [
+          "wood frames",
+          "pale stone",
+          "textured linen",
+          "matte ceramic"
+        ],
+        "description": "Contemporary Chinese wood-frame seating with linen cushions, walnut console, framed ink landscape and restrained ceramic vase or tea objects; warm pale stone floor and white ceiling. Modern comfortable home with clear Eastern character; avoid palace ornament, heavy red timber and changing the floor plan.",
+        "generation_prompt": "Contemporary Chinese wood-frame seating with linen cushions, walnut console, framed ink landscape and restrained ceramic vase or tea objects; warm pale stone floor and white ceiling. Modern comfortable home with clear Eastern character; avoid palace ornament, heavy red timber and changing the floor plan."
+      },
+      {
+        "id": "champagne_pearl",
+        "name": "香槟珍珠",
+        "palette": [
+          "pearl milky white",
+          "pale champagne",
+          "warm taupe"
+        ],
+        "materials": [
+          "pearl lacquer",
+          "silk-texture upholstery",
+          "pale polished stone",
+          "champagne metal"
+        ],
+        "description": "Luminous pearl-white flat-front cabinetry, pale champagne silky cushions and upholstery, light polished stone floor and coffee table, delicate champagne-metal edging and small metallic ornaments. Bright refined contemporary light luxury with subtle sheen; avoid walnut-dominant cabinets, dark rooms, heavy classical carvings and all-over gold.",
+        "generation_prompt": "Luminous pearl-white flat-front cabinetry, pale champagne silky cushions and upholstery, light polished stone floor and coffee table, delicate champagne-metal edging and small metallic ornaments. Bright refined contemporary light luxury with subtle sheen; avoid walnut-dominant cabinets, dark rooms, heavy classical carvings and all-over gold."
+      },
+      {
+        "id": "european_luxury",
+        "name": "欧式奢华",
+        "palette": [
+          "warm ivory",
+          "antique gold",
+          "cream"
+        ],
+        "materials": [
+          "carved gilded furniture",
+          "polished pale marble",
+          "crystal",
+          "damask upholstery"
+        ],
+        "description": "Explicit classical European grandeur: ornate carved cream sofa with gilded frame, carved marble coffee table, layered wall mouldings and ceiling medallion, crystal chandelier, framed classical landscape oil painting, pale polished marble floor and gilded console. Elegant bright residential luxury; do not simplify into modern light luxury or make the room a palace hall. Preserve actual ceiling height and openings.",
+        "generation_prompt": "Explicit classical European grandeur: ornate carved cream sofa with gilded frame, carved marble coffee table, layered wall mouldings and ceiling medallion, crystal chandelier, framed classical landscape oil painting, pale polished marble floor and gilded console. Elegant bright residential luxury; do not simplify into modern light luxury or make the room a palace hall. Preserve actual ceiling height and openings."
+      },
+      {
+        "id": "contemporary_french",
+        "name": "法式风格",
+        "palette": [
+          "warm ivory",
+          "pale oak",
+          "sage accents"
+        ],
+        "materials": [
+          "French wall mouldings",
+          "herringbone oak",
+          "carved cream upholstery",
+          "antique brass"
+        ],
+        "description": "Distinct residential French elegance: ivory panelled walls with delicate classical mouldings and cornice, herringbone oak floor, cream curved sofa with restrained carved frame, floral framed painting, oval-back dining chairs, graceful brass chandelier and fabric-shade lamp. Warm romantic livability; avoid generic minimalist beige, heavy crystal-and-gold European opulence, or navy geometric Art Deco as the dominant language.",
+        "generation_prompt": "Distinct residential French elegance: ivory panelled walls with delicate classical mouldings and cornice, herringbone oak floor, cream curved sofa with restrained carved frame, floral framed painting, oval-back dining chairs, graceful brass chandelier and fabric-shade lamp. Warm romantic livability; avoid generic minimalist beige, heavy crystal-and-gold European opulence, or navy geometric Art Deco as the dominant language."
+      },
+      {
+        "id": "italian_luxury",
+        "name": "意式暖奢",
+        "palette": [
+          "warm beige",
+          "caramel",
+          "walnut"
+        ],
+        "materials": [
+          "tailored leather",
+          "travertine",
+          "warm stone",
+          "brushed bronze"
+        ],
+        "description": "Warm caramel leather sofa, generous low architectural silhouettes, pale travertine slab coffee table, warm textured stone feature wall, walnut cabinetry and restrained bronze, sculptural fabric pendant and neutral abstract art. Refined comfortable contemporary Italian residential luxury; avoid dark black-marble dominance, ornate classical carvings, cold gray showroom lighting and excessive gold.",
+        "generation_prompt": "Warm caramel leather sofa, generous low architectural silhouettes, pale travertine slab coffee table, warm textured stone feature wall, walnut cabinetry and restrained bronze, sculptural fabric pendant and neutral abstract art. Refined comfortable contemporary Italian residential luxury; avoid dark black-marble dominance, ornate classical carvings, cold gray showroom lighting and excessive gold."
+      },
+      {
+        "id": "paris_art_deco",
+        "name": "巴黎艺术",
+        "palette": [
+          "ivory",
+          "navy blue",
+          "antique gold"
+        ],
+        "materials": [
+          "dark wood",
+          "navy velvet",
+          "pale marble",
+          "brass geometric detailing"
+        ],
+        "description": "Preserve the established navy-and-gold art direction: cream sofa with navy cushions, navy geometric rug with fine gold border, framed navy-and-gold geometric artwork, navy upholstered dining chairs, dark walnut console and restrained brass, pale marble coffee table. Bright sophisticated Parisian Art Deco residence; avoid replacing it with burgundy abstract-art eclecticism, industrial fixtures or French floral-classical ornament.",
+        "generation_prompt": "Preserve the established navy-and-gold art direction: cream sofa with navy cushions, navy geometric rug with fine gold border, framed navy-and-gold geometric artwork, navy upholstered dining chairs, dark walnut console and restrained brass, pale marble coffee table. Bright sophisticated Parisian Art Deco residence; avoid replacing it with burgundy abstract-art eclecticism, industrial fixtures or French floral-classical ornament."
+      }
     ],
     "selected_style": null,
     "custom_style": null,
     "reference_images": [],
     "preserve_furniture": [],
     "room_schemes": {},
-    "scheme": {"version":"scheme-v1", "layout":[], "furniture":[], "finishes":[]},
+    "scheme": {
+      "version": "scheme-v1",
+      "layout": [],
+      "furniture": [],
+      "finishes": []
+    },
     "household": "",
     "budget_tier": "medium",
     "palette": [],

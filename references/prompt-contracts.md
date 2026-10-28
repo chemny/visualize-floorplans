@@ -63,14 +63,24 @@ or projection into a walkable door. Do not convert a sliding door into a window.
 
 ## Style selection boards
 
-Default to the 12 options in `assets/project-template.json`, in three 2x2 boards:
+Default to ONE 3x3 comparison board using assets/project-template.json, with
+exact names and row-major order:
 
-- A: 现代简约;
-- B: 原木奶油;
-- C: 现代轻奢;
-- D: 现代新中式;
-- E–H: 中古现代、轻东方宋式、克制法式优雅、意式克制奢华;
-- I–L: 香槟珍珠、米兰暖灰、巴黎装饰艺术、奶油雕塑感.
+- Row 1: 现代简约、原木奶油、中古现代.
+- Row 2: 现代新中式、香槟珍珠、欧式奢华.
+- Row 3: 法式风格、意式暖奢、巴黎艺术.
+
+Include every option's `generation_prompt` verbatim as its visual direction;
+it defines furniture language, materials, lighting and decor, not just colors.
+欧式奢华 uses carved gilt furniture, crystal and classical ornament; 法式风格
+uses residential French mouldings, curved furniture, floral art and herringbone
+wood; 意式暖奢 uses warm leather, travertine and contemporary proportions;
+巴黎艺术 retains navy-and-gold geometric art, rug and upholstery.
+Other options retain their established design language. Differentiate through
+design while keeping bright, broadly appealing residential quality; avoid harsh
+industrial or gimmicky substitutions. Do not use case-specific geometry or
+household preferences as shared defaults. Explicit user references override
+presets. An already selected style skips the comparison.
 
 Use the same representative room, camera position, focal length, major furniture
 arrangement, daylight direction, and exposure across all panels and boards. Change only
@@ -79,7 +89,7 @@ decor. Keep panel boundaries obvious. Add short stable labels and style names; i
 text rendering is unavailable, add labels deterministically after generation.
 
 The board is for style choice, not structural approval. Generate it only after
-the structural, access and furniture-layout confirmations. Do not generate 12 independent
+the structural, access and furniture-layout confirmations. Do not generate nine independent
 detailed whole-home views by default. After the user chooses one panel, record
 the selected style before compiling the detailed canonical task.
 

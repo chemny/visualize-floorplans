@@ -1,8 +1,81 @@
 # Changelog
 
+## 0.2.11 — 本地未发布
+
+- 阶段收尾：完整音轨/字幕/参数追溯、统一全部模块回归收集、独立子系统版本说明与本地固化边界；保留案例用户验收待审。
+- 收尾回归修正：旧隔离夹具接入地板/灯具预处理，把手纳入碰撞断言；几何测试显式复用已有依赖，跨户型指针测试先适配视图，保持真实点击及拖拽要求。CI 覆盖全部生产 Python 测试。
+
+- 补齐路线确认→视频审阅→讲解制作的执行关卡；新增绑定具体视频与路线的待确认记录。
+- 新增 narration-prepare/compose；页面包装同步检查视频确认，样例仅演示，不授予制作批准。
+- 增加越级拦截、确认失效及实际短媒体合成回归；不修改现有案例，不自动批准或发布。
+
+- Local 0.2.10: consolidate the review presentation SOP and traceability matrix; enforce top-level navigation, sidebar chapter ownership and explicit empty-media states; verify regeneration from the public CLI without changing case data.
+- Local 0.2.9: merge media route and room chapters into a synchronized map/list sidebar; remove expansion dialog and duplicate chapters; bind module URLs to content hashes to avoid stale UI code.
+- Local 0.2.9: use 16:9 media boxes with independently sized route panels; phrase-based, punctuation-light subtitles with bounded estimated timing and stable DOM updates; remove route-page auxiliary/sample controls.
+- Local 0.2.9:  lock the three-stage presentation SOP, isolate the pure route map from stage navigation, add an auxiliary 3D preview entry and reject nested full-page review layouts during generation. No route, scene or media changes.
+
+## 0.2.4 · timed route rehearsal gate · 2026-10-22
+
+- Restore reusable plan-based animation with moving camera, independent gaze/FOV, arrivals, viewing/transit timing, playback and scrub controls.
+- Require explicit displayed-animation approval before every tour capture in Python and the direct browser adapter, including low-resolution previews and ranges.
+- Bind approval to the exact route, heading, timing and source artifacts; block over-budget routes and preserve pending user/visual states.
+
 ## Unreleased
 
-- Rename the Skill to Interior Design (家装助手), with the interior-design identifier, directory, invocation and repository links. Historical accepted cases retain their original bytes.
+- Local 0.2.8: connect real-opening doorway composition diagnostics and bounded joint position/gaze candidates to `plan-tour`; add explicit revision scopes that freeze approved observations and all undeclared frame fields. Generate hash-bound synchronous before/after pages and conclusive engineering closeout reports, separate from playback/user acceptance. Share candidate/deadline/mesh budgets, preserve hard gates, and reject stale target-binding evidence. Read `revisionOutcome`: baseline retention is not a successful repair. No current-case update, video capture or publication is implied.
+
+- Generate the shared three-stage tour interface from the production planner: route-only start-to-end animation, video review with a large synchronized route map, and narration with independent sound/caption controls. Add relocatable media/hash/timebase binding, pending placeholders, explicit post-encode integration and independent-layout/mismatch regressions. Keep actual 3D preview and all approval gates separate.
+
+
+- Local 0.2.7: unify room-aware wall finishes, aligned moulding/panel patterns and existing artwork by style. Create follow records for actual interior wall faces; protect fixed choices, wet/service rooms and furniture/door geometry. Add procedural art palettes, fixed/follow controls, persistence and scope regressions.
+
+- Local 0.2.6: add classic glass-arm crystal main fixture with bead swags and pendants; preserve existing three options, fixed-choice behavior and light parameters. Validate body bounds and expand repeated mesh instances in production export. Wall-decoration audit does not change finishes.
+
+- Local 0.2.5: style-bound flat/convex/crystal main fixtures with room adaptation, fixed-choice overrides, matching plan/mesh fields, ceiling/source-offset preservation and low-ceiling validation. Preserve other fixture types and scheme layouts; add policy/geometry regressions and actual-page persistence checks. Not published.
+
+- Organize existing placement principles into six evaluation dimensions and extend the existing layout gate with evidence-bound candidate comparison, hard constraints and explicit trade-offs. Distinguish prospective comparison from retrospective validation; do not imply layout optimality from collision clearance.
+
+- Extend the existing layout review gate with assembly function intent, explicit door/cabinet/person operating-state combinations and hash-bound final plan/mesh/screenshot receipts. Report legacy omissions and conditional usability honestly; add regression counterexamples without importing case cabinet dimensions or rendering code.
+
+- Restore sliding-door leaf count, wall-relative stacking direction and opening-percentage controls in the effective property panel. Share panel geometry across plan/mesh/net-opening reports and parity-check Python route obstacles; retain protected apertures. Add synthetic browser edit/mesh/undo/persistence and cross-language regressions.
+
+- New-floorplan regression: accept exact room-owned short skirting returns during state validation while retaining ordinary furniture size bounds; rebuild the shared engine and add a size regression to local smoke checks.
+
+- Close workflow-review gaps without changing existing cases: require explicit image inventory/framing evidence, distinguish label-only revisions from redesign, and exercise existing source/layout/style binding gates in installed-source regression.
+- Replace the case-specific two-issue review-capture release with `/2`: exact displayed-animation authorization and issue list, current source/renderer/clearance evidence, low-resolution review-only status, and one validator shared by Python and browser entries. Ordinary capture and formal acceptance remain strict.
+- Include review-release, dynamic-preview and screen-quality Node checks in local regression; no publication or automatic case migration.
+
+- Add data-only room-first fragment qualification, shared-scene batch mesh checks, evidence-bound fragment connection selection and explicit frame/second deficit reports. Preserve every viewing lock and revalidate the assembled whole route.
+- Remove artificial per-vertex connection waits: curve subdivision does not add physical travel time. Share density-independent walking/yaw/pitch work between candidate connection pricing and timeline reconstruction.
+
+- Connect exact tour endpoints only to reachable grid cells, rejecting blocked endpoints rather than snapping through walls or door leaves. Add bounded, case-configured passage-coverage gaze proposals and honor per-chapter navigation policy even when endpoints are unchanged; final timing, coverage, motion and mesh gates remain mandatory.
+
+- Certify final gaze-projection feasibility, reject duplicate seed station proposals before beam/local selection, and accept bounded case station, entry-framing and safe rounded connection-waypoint candidates without altering timing locks.
+
+- Repair tour candidate evidence parity: numeric failures still receive bounded mesh checks; untested candidates and historical visual failures cannot win by dropping checks or changing floats.
+- Include continuous moving views in joint/local repair, preserve shared poses and viewing frame locks, screen connection budgets early, and repair positional/velocity seams with collision checks.
+- Search pitch in both directions using projected object bounds, propose an actual entrance closing view, reserve mesh budget across repair rounds, and add data-only `searchOnly` validation without new rehearsal pages.
+
+- Add `homeowner-tour-rules/2`: one camera profile, final-frame trajectory continuity, mandatory intents/visit budgets, scoped exceptions and exact timing locks; block silent sharp-corner fallback.
+- Count coverage within the first continuous visit; audit full-timeline mesh screen occlusion, clipped/brief subject composition, approach reversals and empty endings. Compare feasible candidates using the same evidence.
+- Bind current engine fingerprints and real continuous-playback review to both capture gates; pending, sampled or failed visual reviews cannot be promoted by numeric success. Existing preview data and accepted historical media remain untouched.
+
+- Consolidate homeowner touring into `references/tour-planning-contract.md` and a final-frame contract shared by design, revisions, rehearsal, Python capture and the direct browser capture report gate.
+- Require case-specific coverage and total-duration policies; remove obsolete split-room viewing guidance and case-specific room budgets from shared instructions.
+- Preserve per-window viewing floors across revisions; check real-room continuity, sweep direction, station counts, exact entrance return, geometry, motion, coverage and complete visit budgets independently.
+- Add synthetic cross-case and Python/JavaScript gate regressions; numeric success keeps actual 3D visibility, dynamic comfort and human acceptance pending.
+
+- Add scoped connection refinement and optional short moving observation windows with per-chapter viewing-frame preservation, exact endpoint connectivity checks and unchanged motion ceilings; retain fresh coverage, budget and visual-review gates.
+
+- Enforce one default / two maximum observation stations per real room, second-station justification, final per-station duration and simultaneous stillness checks in tour design, rehearsal and capture gates. Furniture targets and navigation vertices do not create extra stops.
+
+- Rename display name, Skill directory, invocation identifier, archive root and active repository links to Interior Design / interior-design (家装助手); preserve historical accepted case bytes.
+
+- Inspect large JSON dependency documents one at a time with decoded-string indexing; fail closed on malformed or duplicate keys instead of skipping oversized bundles.
+
+- Add stage-bound media cleanup planning with explicit inventories and conservative reference protection.
+- Require hash-bound batch authorization, verified backup outside the project and reversible quarantine; provide collision-safe restore.
+- Keep scheduling and permanent deletion out of scope. Existing projects are not cleaned automatically.
 
 ## 0.2.2 · homeowner tour methods · 2026-10-08
 
@@ -245,3 +318,38 @@
 - Put door hinge/swing/delete actions and whole-wall removal in the selected-object popup, separate from properties.
 - Move Save to top-right navigation; show persisted last-save timestamp in bottom-right status.
 - Add review rules for carrier-wall alignment and floor coverage to wall faces; retain source room polygons when explicit finish patches fill edges.
+
+## 0.2.3 — Nine-style selection defaults
+
+- Default catalog and host workflow now use one 3x3 board with nine agreed styles.
+- Add per-style generation prompts used by comparison and selected-style tasks; retain historical 4/8/12 planners.
+- Add European luxury, French, warm Italian and Paris art workbench palettes; preserve legacy Milan state compatibility.
+- Current-case French selection is recorded in the case, not embedded in shared defaults.
+
+
+## Unreleased — three-round homeowner-tour gap closure
+
+- Ordered frozen-scheme targets now drive generated sweep and final-frame visibility/order evidence.
+- Aggregate sweep direction across a real room; exclude ordinary transit, report missing historical room metadata.
+- Reject legacy/missing camera-evidence capture reports in Python and JS; disable ungated Blender animation at both entrypoints.
+- Check full-timeline sustained wall proximity and angular acceleration; bind production subject-audit samples to required route targets.
+- Add failure-injection regressions and a read-only three-case matrix auditor. Historical acceptance is preserved; numeric results never grant playback acceptance.
+
+
+## Unreleased — unified homeowner planning job
+
+- Add plan-tour job entry with bounded joint station/path/gaze candidates and report-driven local repairs.
+- Preserve source schemes and viewing durations; sparse angular constraints are rechecked on final frames.
+- Produce synchronized 2D/actual-3D interactive rehearsal and bind the displayed parent page to pending approval.
+- Add browser-free actual triangle subject preflight; retain dynamic comfort and human acceptance as pending.
+- Anchor coverage time sampling per interval so unrelated earlier timing changes do not shift unchanged observation samples.
+
+### Unreleased — door identity and double-leaf clearance
+
+- Compare hash-bound source observations with effective door model/count/hinges during builds; legacy missing evidence is unverified. Recognition0.3 records independent leaf identity.
+- Shared swing geometry checks both double leaves and removed-leaf passages; route planner uses the same geometry. Source fidelity, geometric clearance and functional usability remain distinct.
+
+### Unreleased — executable layout and edit-intent review
+
+- Bind existing room-function, composition/operation and exact-edit checks to the actual scheme version; verify semantic inventory, axes, edge gaps and operating footprints.
+- H5 builds recheck attached layout records; legacy missing records explicitly remain unreviewed. Synthetic regression counterexamples cover absent beds, surplus desks, too few seats, split/unequal cabinetry, misalignment, blocked operation, stale evidence and unintended edits. No case geometry or preferences become defaults.

@@ -50,7 +50,12 @@ Review the actual drawing, including objects in use rather than footprints only:
   verifying IDs, room, drawing representation and actual mesh presence for essentials;
   each required function has equipment or an explicit omission;
   no unnecessary cabinet has been silently made mandatory.
-- Doors: proposed room doors normally open inward; compare hinge sides so the
+- Doors: use `production/door_checks.py` for every effective door override;
+  enumerate both hinges and both unequal leaf lengths, check each full angular
+  sweep against furniture, and use the same leaves in `plan_route.Planner`.
+  Removed leaves are passages, not obstacles. Record sampling limits separately
+  from actual2D/3D leaf-count checks and operating-state usability.
+  Proposed room doors normally open inward; compare hinge sides so the
   open leaf rests near a receiving wall, with explicit reasons for exceptions.
   Check the actual 3D pose as well as the 2D sweep. Hinge, swing, closure, jamb/return and handle-side obstructions remain
   consistent with the approved access map; furniture does not block an opening.
@@ -68,6 +73,54 @@ unscaled or distorted generated image. Record each consequential check as
 observed clear, conflicting, or unverified with a brief reason. Correct visible
 conflicts before downstream generation; carry unmeasured conditions visibly as
 pending verification. Concept approval never certifies construction feasibility.
+
+## Executable review before presentation
+
+Run `python3 scripts/layout_review.py --case CASE.json --review REVIEW.json`
+before presenting a new layout or local revision. The case-local record uses
+`schema: layout-review/1`, a canonical `stateSha256` from `design_contract.digest`,
+and the existing review scopes, without replacing their design principles:
+
+- `rooms`: every real room's purpose, independent function/type counts, optional
+  omissions, and observed reasonableness with hash-bound evidence. Household
+  count alone cannot determine guest seating or make a desk mandatory. Record
+  the chosen ordinary hosting provision and room-function trade-off.
+- `groups`: members, composition review, named operating states and computed
+  relationships (`aligned`, `gap`, `operating_zone`, `count`, `pose`,
+  `uniform_depth`). Targets come from the case brief. Static footprint clearance
+  cannot stand in for observed operating-space/composition review.
+- `revision`: hash-bound baseline and original user-intent evidence, explicit
+  allowed changed IDs, and semantic requirements. `inventory` counts all objects
+  matching the room/types, so an extra cabinet cannot hide outside an ID list;
+  dimensional fields and `absent` catch split/unequal or supposedly removed items.
+  Preserve untouched objects and source walls/openings. Neighbouring changes
+  must be inside the user's authorization, not silently widen the edit.
+
+Each qualitative record uses `status: observed_clear`, a concrete `observation`
+and `evidence: [{path, sha256}]`. Unresolved local operation/layout issues block
+this gate; a verified restricted-use combination must be explicitly disclosed,
+never promoted to unconditional usability; carry site/product uncertainties separately. File/hash validation
+cannot prove the observation was performed or establish aesthetic quality.
+The full executable record shape and synthetic rejection examples are in
+`scripts/test_layout_review.py`; no apartment dimensions are shared defaults.
+
+Attach a passing record as case `layoutReview: {path, sha256}`. `h5.py build`
+rechecks it against the actual input state before writing; stale data and failed
+intent/relationships block the build. Historical cases without it remain
+compatible but their `.build.json` says `layoutReviewCheck.status: not_provided`,
+not reviewed. This does not add an editor auto-layout or user-approval gate;
+`approve-layout` still requires the existing exact-artifact user confirmation.
+
+For whole-assembly revisions, combined door/cabinet/person states and final
+plan/mesh/screenshot verification, use the extensions in
+`layout-use-and-representation-contract.md`. They reuse the group and revision
+records above. Declare relevant `requiredChecks`; absent legacy coverage is
+reported as `not_provided`, not inferred from previous passes.
+
+For candidate comparison, use the six dimensions in
+`furniture-placement-principles.md` and `layout-candidate-comparison.md`.
+The same gate checks `candidateComparison`; declare it in requiredChecks when
+comparison is in scope. A collision pass alone is not a reasonableness verdict.
 
 ## 3. Local edits and exact-version acceptance
 
@@ -161,3 +214,5 @@ original drawing readings from model-derived dimensions; do not force an
 unreconciled source chain onto inconsistent geometry. Regenerate displayed chains when their supporting geometry changes, and verify
 segment sums against their declared endpoints. Detailed opening dimensions are
 reserved for a separately requested technical drawing.
+
+组件选择与真实能力边界见 `component-use-and-capabilities.md`，门的机制选择见 `door-selection.md`；沿用本文件的验收证据，不另建重复规则。

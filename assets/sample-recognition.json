@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "source_image": "source/floorplan.png",
   "legend_overrides": [],
   "linework": [
@@ -7,13 +7,17 @@
       "id": "wall-1",
       "kind": "solid_wall",
       "physical": true,
-      "evidence_codes": ["solid_wall_continuity"]
+      "evidence_codes": [
+        "solid_wall_continuity"
+      ]
     },
     {
       "id": "guide-1",
       "kind": "dashed_auxiliary",
       "physical": false,
-      "evidence_codes": ["dashed_line_only"]
+      "evidence_codes": [
+        "dashed_line_only"
+      ]
     }
   ],
   "elements": [
@@ -22,21 +26,34 @@
       "kind": "entrance_door",
       "certainty": "confirmed",
       "traversable": true,
-      "evidence_codes": ["user_confirmed"]
+      "evidence_codes": [
+        "user_confirmed"
+      ],
+      "door_model": "single",
+      "leaf_count": 1,
+      "hinge_ends": [
+        "start"
+      ],
+      "source_observation": "Example only: inspect actual source leaf strokes and hinge sides; replace this observation for each case."
     },
     {
       "id": "window-1",
       "kind": "window",
       "certainty": "confirmed",
       "traversable": false,
-      "evidence_codes": ["parallel_frame_lines"]
+      "evidence_codes": [
+        "parallel_frame_lines"
+      ]
     },
     {
       "id": "bay-window-1",
       "kind": "bay_window",
       "certainty": "probable",
       "traversable": false,
-      "evidence_codes": ["exterior_projection", "parallel_frame_lines"]
+      "evidence_codes": [
+        "exterior_projection",
+        "parallel_frame_lines"
+      ]
     }
   ],
   "zones": [
@@ -44,13 +61,18 @@
       "id": "outside",
       "proposed_function": "outside",
       "certainty": "confirmed",
-      "evidence_codes": ["drawing_legend"]
+      "evidence_codes": [
+        "drawing_legend"
+      ]
     },
     {
       "id": "zone-a",
       "proposed_function": "living_dining",
       "certainty": "probable",
-      "evidence_codes": ["bounded_polygon", "adjacency"]
+      "evidence_codes": [
+        "bounded_polygon",
+        "adjacency"
+      ]
     }
   ]
 }

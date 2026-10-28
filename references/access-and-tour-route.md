@@ -88,7 +88,8 @@ Choose the route mode before adding steps:
   never invent a doorway to represent motion inside an open room. A move between
   zones lists each real, confirmed access point in ordered `steps`.
 
-For either mode, confirm the actual start/end positions, camera facing,
+For either mode, show the timed animated plan rehearsal required by
+`route-rehearsal-gate.md`, then confirm the actual start/end positions, camera facing,
 approximate pace, and intended visible furniture. A zone graph cannot prove
 that the camera avoids walls or furniture. Check the drawn path against the
 current approved structure and furniture layout before presenting it.

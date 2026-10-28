@@ -1,0 +1,7 @@
+// Fixed bowl dimensions in mm; countertop/cabinet dimensions remain independent.
+export function defaultVanityLayout(f){const count=f.basins??(f.name?.includes('双盆')?2:1),width=Math.min(550,(f.w-100)/count-(count===2?45:0)),depth=Math.min(360,f.d*.66);return{width,depth,count,gap:count===2?Math.max(40,f.w*.48-width):40,alignment:f.basinLayout?.alignment||'center',backGap:(f.d-depth)/2,faucetInset:f.d*.1};}
+export function ensureVanityLayout(f){if(f.type!=='vanity')return f;f.basins??=f.name?.includes('双盆')?2:1;if(!f.basinLayout||f.basinLayout.count!==(f.basins??1))f.basinLayout=defaultVanityLayout(f);vanityBasinGeometry(f);return f;}
+export function vanityBasinGeometry(f){const l=f.basinLayout||defaultVanityLayout(f),count=f.basins??l.count??1,groupWidth=count*l.width+(count-1)*l.gap;
+ if(![1,2].includes(count)||!['left','center','right'].includes(l.alignment)||![l.width,l.depth,l.gap,l.backGap,l.faucetInset].every(Number.isFinite)||l.width<150||l.depth<150||l.gap<0||l.backGap<0||l.faucetInset<0||f.w<groupWidth+100-.01||f.d<l.depth+l.backGap+40-.01)throw Error('洗手台尺寸不足以容纳固定台盆');
+ const center=l.alignment==='left'?-(f.w-groupWidth)/2+50:l.alignment==='right'?(f.w-groupWidth)/2-50:0,z=-f.d/2+l.backGap+l.depth/2;
+ return{width:l.width,depth:l.depth,centers:Array.from({length:count},(_,i)=>center-groupWidth/2+l.width/2+i*(l.width+l.gap)),z,faucetZ:-f.d/2+l.faucetInset,minWidth:groupWidth+100,minDepth:l.depth+l.backGap+40};}

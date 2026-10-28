@@ -18,7 +18,7 @@ image-only generation without changing the Skill's user workflow.
 | `interpretation_artifacts.confirmation` | User confirmation bound to the current reconstructed-plan version and review scopes |
 | `interpretation_artifacts.topdown_base_svg` | Editable reconstructed plan paired with its same-revision PNG preview |
 | `structural_locks` | Confirmed, evidenced structural facts later generations must preserve |
-| `design.style_options` | 12 defaults for new projects; 4/8-option subsets supported |
+| `design.style_options` | 9 defaults in one 3x3 board; historical 4/8/12 supported |
 | `design.selected_style` | `null`, a default ID, or `custom` with explicit custom_style |
 | `design` | Household, budget tier, palette, materials, and free-form needs |
 | `outputs` | Canonical view, room views, style variants, image size, quality, and format |
@@ -474,16 +474,18 @@ permit an asset-kind mismatch when the plan's substitution policy is
 V0 supports one canonical view and a small set of derived views. Use dimensions
 whose edges are multiples of 16 and do not exceed the active provider limits.
 
-For new renovation projects, copy the 12 options from `assets/project-template.json`.
-Registered IDs are `modern_minimal`, `wood_cream`, `modern_luxury`, `modern_chinese`,
-`midcentury_modern`, `song_eastern`, `contemporary_french`, `italian_luxury`,
-`champagne_pearl`, `milan_greige`, `paris_art_deco`, and `sculptural_cream`.
-The script accepts 4, 8 or 12 distinct registered options. Before selection,
-use `selected_style: null` and `style_preview: style_comparison_boards`: four
-options per board, three boards for the default twelve. Legacy `four_style_grid`
-requires exactly four options. After selection, use an included ID or `custom` and
-compile the detailed canonical plan directly. A custom direction requires
-`design.custom_style.name` and `description`. The output preview may be null
+For new renovation projects, copy the nine options from assets/project-template.json:
+modern_minimal, wood_cream, midcentury_modern, modern_chinese, champagne_pearl,
+european_luxury, contemporary_french, italian_luxury, paris_art_deco.
+Each has name, palette, materials, description and generation_prompt. Include
+generation_prompt in comparison and selected-style tasks; explicit user changes
+take precedence. Keep legacy IDs for historical 4/8/12-option manifests.
+The script accepts 4, 8, 9 or 12 distinct registered options. Before selection,
+use selected_style: null and style_preview: style_comparison_boards. Nine options
+produce ONE 3x3 board; historical counts produce four-panel boards.
+Legacy four_style_grid requires four options. After selection, use an included
+ID or custom and compile the canonical plan. Custom requires a name and
+description. The output preview may be null
 when a style is already specified. See `design-and-revisions.md` for preferences,
 reference images, and shared/per-room scheme records.
 

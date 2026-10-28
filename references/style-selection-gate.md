@@ -9,16 +9,16 @@ python3 scripts/check_style_selection.py /absolute/path/style-selection-review.j
 Before production with the chosen style, run again with `--production`.
 Exit 1 means the relevant step remains pending. Do not replace a missing board
 with prose or fabricate a passing review. This is a required Agent checkpoint
-for both the six-style host path and the legacy 4/8/12 planner; it is not wired
+for both the nine-style host path and the legacy 4/8/12 planner; it is not wired
 to every chat turn or an automatic generator hook.
 
 Write a case-local JSON object with these fields:
 
 - `mode`: `visual` (default), `direct_choice`, or `text_fallback`.
-- `options`: distinct style IDs; default host comparison uses all six workbench
-  styles in one 2-by-3 eye-level interior board. Other counts require an explicit
-  request. The generic checker accepts at least two for those user-scoped cases;
-  a passing count check does not authorize reducing the default six.
+- `options`: distinct style IDs; default comparison uses all nine options from
+  `assets/project-template.json` in ONE 3-by-3 eye-level board. Other counts
+  require an explicit request. The generic checker accepts at least two for
+  user-scoped historical cases; passing it does not authorize reducing nine.
 - `layout`: `{ "path": "...", "sha256": "..." }` for the exact current
   confirmed layout image. A supplied saved-layout screenshot may be the visual
   reference; explicitly record its scope, and do not claim editable-state parity.

@@ -2,6 +2,17 @@
 
 Read before modifying H5 editing, rendering, persistence, floor coverage or delivery behavior. These are reusable implementation rules, not the bundled apartment's dimensions or palette approval.
 
+## Ceiling and fixture visibility
+
+Orbit/bird views default to hiding ceiling surfaces and ceiling-mounted fixture
+models together. Turning on the top view reveals both; walk mode reveals both
+without changing the saved orbit top-view preference. Include ceiling fixture
+types even when legacy input omits mount. Full wall height does not reveal lamps.
+Keep actual light sources, intensities and illumination independent of fixture
+mesh visibility. Export includes ceilings and fixtures, then restores viewer state.
+Wall lamps and table lamps retain their own visibility rules. Verify mode changes,
+manual top toggles, legacy mounts and export restoration before acceptance.
+
 ## Rendering and walk safeguards
 
 Walk collision uses the vertical overlap of the furniture body and a standing
@@ -31,7 +42,8 @@ restore complete architecture; never alter saved scheme dimensions.
 Common component behavior must remain consistent across styles: thin default TV
 geometry (35 mm), side-emitting ceiling diffusers, fixed always-on room lighting,
 native display resolution and complete furniture in presentation cutaways.
-Style changes control colors/material finishes rather than these behaviors.
+Style changes control colors/material finishes and supported main-fixture bodies
+under `lamp-style-linkage.md`; they do not override these common behaviors.
 Migrate legacy standard TV depths once while retaining nonstandard or already migrated edited sizes.
 Kitchen decoration positions and room finish approvals remain case-specific.
 
@@ -48,6 +60,79 @@ regression via `scripts/release_smoke.py`, including interaction modules. Use
 `production/synthetic_cases.py` and `test_workbench_browser.mjs` for isolated
 cross-shape UI checks with existing browser dependencies; report emulated mobile
 separately from physical-device and Windows checks.
+
+### Source freshness and final-artifact verification
+
+Use the shared rebuild entry `scripts/production/rebuild_h5.mjs` with existing
+esbuild/dependency paths. It records `assets/h5/engine.provenance.json` for the
+source set (including `version.json`), bundled engine and component registry.
+`scripts/production/engine_provenance.py check` independently verifies that record;
+`h5.py build` runs the same check before generating a workbench. Changed, missing
+or additional source inputs, a changed bundle/registry, or a missing provenance
+record block generation with a rebuild instruction. Do not refresh the record
+without actually rebuilding. Template edits are tracked separately by the build's
+template hash and do not require a JavaScript rebuild.
+
+Run the shared browser entry against a newly generated copy, never the user's
+saved tab:
+
+```bash
+python3 scripts/workbench_browser_suite.py --case /absolute/path/case.json \
+  --out /absolute/path/new-evidence-directory --node /existing/node \
+  --browser /existing/chrome --playwright-module /existing/playwright/index.js \
+  --checks core
+```
+
+The `core` selection covers room focus/top fixtures, product copy, persistent
+sidebars, day/night, camera presets and header actions. Add the checks for changed
+mechanisms (for example `doors` or `shower-resize`) to the delivery review, or use
+`full` to select all registered checks. A comma list selects explicit check names.
+The runner builds from the installed engine and
+current template, serves only its test directory over loopback HTTP, executes
+isolated browser contexts and writes one aggregate report. Existing dependencies
+are required; the runner never installs software or enables server-side saving.
+A missing environment or unsupported fixture is reported as not executed, never
+as a pass. Report test failure separately from unavailable environment.
+
+Use `scripts/browser_artifact_evidence.mjs` for common browser-report binding.
+Each result hashes the HTML response actually loaded by the browser and its
+embedded engine. Template, original-case and source fingerprints are linked
+through the matching build manifest; the browser does not independently rebuild
+those inputs. Require receipts for this run's exact target URL and fingerprints,
+not just another page's passing report. Build metadata hashes the input and
+template bytes actually read, and rejects engine or input changes during build.
+A URL, version label or old passing report alone cannot accept a different file.
+Rebuilding after a browser check requires a new check on that artifact. Keep
+technical interaction results separate from visual, device and human acceptance.
+
+### Independent cross-layout regression
+
+Use `scripts/workbench_cross_layout.py --out NEWDIR --node EXISTING_NODE
+--browser EXISTING_CHROME --playwright-module EXISTING_PLAYWRIGHT` for shared UI or
+component changes. Its default `core,components,floors` checks run on independent
+renamed rectangular, concave/rotated and furniture-free single-room fixtures from
+`production/workbench_regression_cases.py`. These are synthetic test data, never
+proposed or accepted household designs. No user case or saved tab is imported.
+Core copy/history tests discover rooms and editable objects at runtime; a room
+material edit tests persistence when furniture is absent. Components are selected
+by runtime mechanism/type and dragged along their transformed local axes. Check
+actual plan/mesh subparts, undo/redo and reload; no fixed apartment ID or insertion
+coordinate may stand in for those checks.
+Before measuring a resize grip's screen transform, wait for finite layout
+transitions to finish and for the viewport layout to settle. A sidebar transition
+can otherwise move the grip during the drag. Verify the pointer hits the grip and
+the requested dimension actually changes; an unchanged object cannot certify
+fixed-subpart resizing. Keep width/depth directions in local object coordinates.
+
+The matrix requires every declared check and the shower/vanity/bathtub/door scopes
+on its equipped fixtures. A passing aggregate component test cannot hide a missing
+required mechanism. Missing components and a single-room focus pair are explicitly
+not_applicable on the empty fixture; that absence must not be fabricated as a pass.
+Do not silently drop a failing fixture or replace it with a copy of another shape.
+The suite stops only its temporary HTTP/browser processes and preserves inputs.
+`release_smoke.py --with-cross-layout` includes this matrix; browser dependencies
+remain explicit and are never installed automatically. Missing tools are blocked,
+not successful cross-layout coverage. Keep actual delivery-case checks separate.
 
 Wall geometry edits mark original room/floor partitions and their areas as
 pending; undoing to the original geometry clears that state. Do not silently
@@ -66,9 +151,9 @@ Verify export, edit, refresh, second export and isolation from the original. Als
 
 ## Explicit floor connection finishes
 
-Keep approved room boundaries and room area semantics unchanged. For reviewed connection bands, use explicit `model.floorConnections` finish-only polygons bound to an adjacent room through `materialRoomId`. They are not new rooms. Reject overlapping patches, overlap with rooms/walls, invalid material links and geometry outside the footprint.
+Treat `model.floorConnections` as reviewed input finish patches bound to an existing room through `materialRoomId`, not as new rooms or inferred room merges. Preserve the source drawing/ownership area basis separately from calculated net finish area. Conflicting material ownership and unsupported geometry require input correction rather than a guessed fill.
 
-Render the same polygons/materials in 2D and 3D; retain them in standalone HTML and production meshes, with stable IDs. Show connection area separately, count it once in material/floor totals, and do not inflate individual room or ownership areas. Changes to patch geometry/ownership invalidate finish scope. Do not silently infer new patches after wall edits; existing partitions remain pending until a revised layout is confirmed.
+The default H5 build normalizer merges these input patches into their material-owning room and emits canonical room polygons plus `.floors.json` evidence; normalized `floorConnections` is empty. Render and export that same normalized geometry/material state in 2D, 3D, standalone HTML and production meshes. Count each resulting floor region once: do not add the original patch area a second time. Current net room finish area may change after wall-overlap removal and patch merging; source-labelled or ownership area does not change. Preserve the input patch IDs and area changes in source/build evidence, not as duplicate rendered floor regions. When normalization is explicitly disabled for a recorded compatibility case, keep its independent patches and count their area separately once; that exception is not finish acceptance. Geometry/ownership changes invalidate finish scope. After wall edits, retain the partition-pending status until a revised layout is confirmed.
 
 ## Lighting and visual evaluation
 
@@ -132,3 +217,47 @@ cross-browser or cross-device recovery guarantee can be inferred from unit tests
 Actual save/reopen and portable-download/reopen checks must be distinguished from
 source/storage-helper tests. Never claim a user's current edits were read or
 preserved unless their actual data was inspected or the same cache reopened.
+
+## Component completeness and restrained finishes
+
+Generate skirting from the floor-level wall union boundary, including short corner
+returns and jambs. Keep ordinary windowsill bases continuous, doors and demolition
+open, room switches respected and rotated fixed joinery avoided. Avoid per-wall
+midpoint room assignment and arbitrary end shortening. Include explicitly approved
+`model.floorConnections` when assigning the room owner of an exposed wall edge;
+a narrow finish-only bridge must not cause missing skirting between the wall and
+the room polygon. Do not move room polygons or guess new bridges. This is an axis-aligned
+concept-wall implementation; new wall shapes need separate verification.
+These checks cover synthetic geometry and input/build behavior; browser appearance
+and frame performance remain unverified for this revision.
+
+Toilets include a seat, lid, hinges and closed pedestal base within their saved
+envelope. Refrigerator door divisions follow the component proportions; preserve
+explicit product design if supplied rather than inferring a real model from width.
+Close thin chair back edges, cabinet joint backing and curtain-box end caps while
+keeping intentional openings such as curtain slots and basin bowls open. Match
+door-trim width to the nominal clear aperture; do not narrow the usable doorway.
+
+Material-only changes preserve geometry, palette, layout and light settings.
+Share small non-colour roughness maps, distinguish fabric/lacquer/stone/metal,
+and exclude transparent glass and emissive fixture lenses from blanket overrides.
+Do not interpret geometry or build passes as visual/performance acceptance.
+
+Maintenance checks: scripts/test_component_details.mjs, test_skirting_outline.mjs
+and test_material_finishes.mjs use INTERIOR_TEST_NODE_MODULES pointing to existing
+Three.js/esbuild dependencies; they never install packages.
+
+
+## Embedded floor image lifecycle
+
+Use `floor-texture-runtime.js` with the optional per-case finishes documented in
+`h5-interaction-presentation.md`. Preserve the current procedural map until
+successful image decoding; do not blank the floor on load/failure. Decode only
+selected embedded images, share cached floor materials and release replaced or
+retired maps, including callbacks that arrive after a style switch. Physical UV
+scale, sRGB colour space and albedo roughness must be explicit. Test success,
+failure, disposal before completion, unsupported/default selections and offline
+HTML inclusion with `scripts/test_floor_textures.mjs`.
+
+### Exact room/wall finish boundaries
+H5 build normalizes orthogonal room finish polygons against the same wall-face/endpoint geometry used in the mesh. Merge explicit threshold/finish patches into their material-owning room, subtract actual floor-level solid walls and clip to footprint. Repair only small connected gaps (default120mm maximum travel); never fill large unknown space or cross a wall. Tiny detached overruns (at most tolerance² area) may join the physically adjacent room, with reported owner/area changes. Ambiguous free overlaps, unsupported topology or unassigned large gaps fail with a `.floors.json` report instead of a silent bounding-box fill. Normalization must be idempotent. Store the resulting room polygons as the canonical model so plan, mesh, area and labels use the same boundary. Walls, openings, furniture and manual finish choices stay unchanged. Material boundaries in real open passages remain passable. Explicit floorBoundaryPolicy.enabled=false is a recorded compatibility exception, not acceptance.

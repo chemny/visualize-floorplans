@@ -109,7 +109,7 @@ class WorkflowTest(unittest.TestCase):
         self.assertEqual(plan["tasks"][0]["kind"], "canonical")
         self.assertIn("原木奶油", plan["tasks"][0]["request"]["prompt"])
 
-    def test_twelve_default_styles_compile_three_boards_without_omissions(self):
+    def test_nine_default_styles_compile_one_board_without_omissions(self):
         template = json.loads((Path(MODULE.__file__).parents[1]/"assets/project-template.json").read_text())
         data = copy.deepcopy(self.sample)
         data["design"]["style_options"] = template["design"]["style_options"]
@@ -117,12 +117,21 @@ class WorkflowTest(unittest.TestCase):
         data["outputs"]["style_preview"] = "style_comparison_boards"
         MODULE.validate_manifest(data, Path("/tmp/project.json"), True)
         plan = MODULE.compile_plan(data, Path("/tmp/floorplan.png"))
-        self.assertEqual(plan["task_count"], 3)
+        self.assertEqual(plan["task_count"], 1)
         ids = [item for task in plan["tasks"] for item in task["style_ids"]]
         self.assertEqual(ids, [o["id"] for o in template["design"]["style_options"]])
-        self.assertEqual(len(set(t["output"] for t in plan["tasks"])), 3)
-        self.assertEqual([x for t in plan["tasks"] for x in t["panel_labels"]], list("ABCDEFGHIJKL"))
+        self.assertEqual(len(set(t["output"] for t in plan["tasks"])), 1)
+        self.assertEqual([x for t in plan["tasks"] for x in t["panel_labels"]], list("ABCDEFGHI"))
         self.assertTrue(all(t["reference_images"] == plan["tasks"][0]["reference_images"] for t in plan["tasks"]))
+        self.assertIn("strict 3x3 grid with exactly nine", plan["tasks"][0]["request"]["prompt"])
+        self.assertEqual(len(plan["tasks"][0]["style_ids"]), 9)
+        self.assertEqual(plan["tasks"][0]["output"], "outputs/styles/nine-style-preview.png")
+        for option in template["design"]["style_options"]:
+            self.assertIn(option["generation_prompt"], plan["tasks"][0]["request"]["prompt"])
+        data["design"]["selected_style"] = "contemporary_french"
+        french = MODULE.compile_plan(data, Path("/tmp/floorplan.png"))
+        self.assertIn("法式风格", french["tasks"][0]["request"]["prompt"])
+        self.assertIn("herringbone oak", french["tasks"][0]["request"]["prompt"])
         data["design"]["selected_style"] = "champagne_pearl"
         chosen = MODULE.compile_plan(data, Path("/tmp/floorplan.png"))
         self.assertTrue(all(t["kind"] != "style_preview" for t in chosen["tasks"]))
@@ -130,6 +139,20 @@ class WorkflowTest(unittest.TestCase):
         data["outputs"]["style_preview"] = "four_style_grid"
         with self.assertRaises(MODULE.ManifestError):
             MODULE.validate_manifest(data, Path("/tmp/project.json"), True)
+
+    def test_historical_twelve_styles_keep_three_boards(self):
+        data = copy.deepcopy(self.sample)
+        ids = ["modern_minimal", "wood_cream", "modern_luxury", "modern_chinese",
+               "midcentury_modern", "song_eastern", "contemporary_french", "italian_luxury",
+               "champagne_pearl", "milan_greige", "paris_art_deco", "sculptural_cream"]
+        data["design"]["style_options"] = [dict(id=i, name=i, palette=["white"], materials=["wood"]) for i in ids]
+        data["design"]["selected_style"] = None
+        data["outputs"]["style_preview"] = "style_comparison_boards"
+        MODULE.validate_manifest(data, Path("/tmp/project.json"), True)
+        plan = MODULE.compile_plan(data, Path("/tmp/floorplan.png"))
+        self.assertEqual(plan["task_count"], 3)
+        self.assertEqual([i for t in plan["tasks"] for i in t["style_ids"]], ids)
+        self.assertTrue(all("strict 2x2 grid with exactly four" in t["request"]["prompt"] for t in plan["tasks"]))
 
     def test_rejects_empty_room_list(self) -> None:
         data = copy.deepcopy(self.sample)
@@ -755,6 +778,15 @@ class WorkflowTest(unittest.TestCase):
         review["assets"][0]["hard_checks"]["layout_matches_source"]["passed"] = False
         with self.assertRaises(DELIVERY_VALIDATOR_MODULE.DeliveryReviewError):
             DELIVERY_VALIDATOR_MODULE.validate_delivery(plan, review)
+
+    def test_delivery_requires_inventory_and_whole_home_framing_review(self) -> None:
+        plan = DELIVERY_MODULE.compile_delivery(copy.deepcopy(self.sample))
+        for key in ('furniture_equipment_count_preserved', 'whole_home_framing_complete'):
+            review = self.complete_delivery_review(plan)
+            record = next(r for r in review['assets'] if key in r['hard_checks'])
+            del record['hard_checks'][key]
+            with self.subTest(check=key), self.assertRaises(DELIVERY_VALIDATOR_MODULE.DeliveryReviewError):
+                DELIVERY_VALIDATOR_MODULE.validate_delivery(plan, review)
 
     def test_delivery_validator_rejects_silent_asset_kind_substitution(self) -> None:
         plan = DELIVERY_MODULE.compile_delivery(copy.deepcopy(self.sample))

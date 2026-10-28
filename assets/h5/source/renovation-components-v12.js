@@ -1,3 +1,6 @@
+import {artworkTexture,wallPanelTexture} from './wall-decoration-texture.js';
+import {wallDecorProfile} from './wall-decoration-style.js';
+import {finishMaterial} from './material-finish.js';
 import * as THREE from 'three';
 // Editable concept dimensions in mm; no product maxima or construction specification.
 const def=(type,name,w,d,h,elevation,mount,role='ceiling',lit=false)=>({type,name,w,d,h,elevation,mount,role,lit});
@@ -43,7 +46,7 @@ export const TOP_TYPES=new Set(['pendant','downlight','tracklight',...RENOVATION
 export const LIT_TYPES=new Set(['pendant','downlight','tracklight',...RENOVATION_SPECS.filter(s=>s.lit).map(s=>s.type)]);
 export function renovationModel(f,p,night=false){
  const w=f.w/1000,d=f.d/1000,h=f.h/1000,g=new THREE.Group();
- const material=(role,color,extra={})=>{const m=new THREE.MeshStandardMaterial({color:color||p[role]||f.color,roughness:role==='metal'?.32:role==='upholstery'?.93:.65,metalness:role==='metal'?.65:0,...extra});m.userData.ownedFurnitureDetail=true;m.userData.finishRole=role;return m;};
+ const material=(role,color,extra={})=>{const m=new THREE.MeshStandardMaterial({color:color||p[role]||f.color,roughness:role==='metal'?.32:role==='upholstery'?.93:.65,metalness:role==='metal'?.65:0,...extra});m.userData.ownedFurnitureDetail=true;m.userData.finishRole=role;return finishMaterial(m);};
  const shell=material(RENOVATION_MAP[f.type].role,f.color),dark=material('frame'),metal=material('metal'),glow=material('light','#ffffff',{emissive:'#ffffff',emissiveIntensity:night?1.2:1.0});
  glow.userData.visibleFixtureLens=true;
  const B=(a,b,c,x=0,y=0,z=0,m=shell)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(Math.max(a,.001),Math.max(b,.001),Math.max(c,.001)),m);o.position.set(x,y+b/2,z);o.receiveShadow=true;o.castShadow=!['ledstrip','cabinetlight','floordrain'].includes(f.type);g.add(o);return o;};
@@ -56,7 +59,7 @@ export function renovationModel(f,p,night=false){
  case 'spotlight':C(w/2,h);C(w*.34,.003,0,-.0006,0,glow);break;
  case 'linearlight':case 'ledstrip':case 'cabinetlight': B(w,h,d);B(w*.97,h*.12,d*.75,0,-.0006,0,glow);break;
  case 'cove':B(w,h,.015,0,0,-d/2+.0075);B(w,.018,d,0,h-.018);B(w,h*.35,.015,0,h*.65,d/2-.0075);break;
- case 'curtainbox': B(w,h,.018,0,0,-d/2+.009);B(w,h,.018,0,0,d/2-.009);B(w,.018,d,0,h-.018);break;
+ case 'curtainbox': B(w,h,.018,0,0,-d/2+.009);B(w,h,.018,0,0,d/2-.009);B(w,.018,d,0,h-.018);[-1,1].forEach(sign=>{const end=B(.018,h,d,sign*(w/2-.009));end.name='curtainbox-end-cap';});break;
  case 'accesshatch':B(w,h,d);B(w-.024,.003,d-.024,0,0,0,material('ceiling',p.ceiling));[-.35,.35].forEach(x=>B(.03,.003,.006,w*x,0,d*.36,dark));break;
  case 'airvent':case 'returnvent':case 'exhaustvent':slats();break;
  case 'curtainrail':B(w,h,d,0,0,0,metal);B(w*.96,h*.25,d*.22,0,0,0,dark);break;
@@ -70,8 +73,9 @@ export function renovationModel(f,p,night=false){
   const mesh=new THREE.Mesh(geo,cloth);mesh.name=f.curtainLayer==='sheer'?'sheer-curtain':'blackout-curtain';mesh.castShadow=f.curtainLayer!=='sheer';mesh.receiveShadow=true;g.add(mesh);break;
  }
  case 'rollerblind':B(w,.03,d,0,h-.03);B(w,h-.025,.012,0,0,d*.36);const o=C(.022,w,0,0,0,metal);o.rotation.z=Math.PI/2;o.position.set(0,h-.022,0);B(w,.012,d*.6,0,0,d*.2,metal);break;
- case 'skirting':case 'backsplash':case 'threshold':case 'transition':case 'wallpanel':B(w,h,d);break;
- case 'doortrim': {const t=Math.min(.055,w*.08);[-1,1].forEach(s=>B(t,h,d,s*(w/2-t/2)));B(w,h*.023,d,0,h-h*.023);break;}
+ case 'skirting':case 'backsplash':case 'threshold':case 'transition':B(w,h,d);break;
+ case 'wallpanel': {const profile=wallDecorProfile(f.decorStyleId);const m=material(profile.finish==='wood'?'wood':'wall',f.colorStyleMode==='fixed'?f.color:(profile.finish==='wood'?p.wood:p.wall));m.map=wallPanelTexture(f.decorStyleId||'modern_minimal');B(w,h,d,0,0,0,m);break;}
+ case 'doortrim': {const t=Math.min(.035,w*.08);[-1,1].forEach(s=>B(t,h,d,s*(w/2-t/2)));B(w,h*.023,d,0,h-h*.023);break;}
  case 'windowtrim': {const t=.035;[-1,1].forEach(s=>B(t,h,d,s*(w/2-t/2)));B(w,t,d);B(w,t,d,0,h-t);break;}
  case 'switchplate':case 'socketplate':case 'equipmentoutlet':B(w,h,d);if(f.type==='switchplate')B(w*.72,h*.78,.003,0,h*.11,d/2+.001);else{for(const x of [-w*.18,w*.18])B(.007,h*.22,.003,x,h*.46,d/2+.001,dark);B(.007,h*.12,.003,0,h*.18,d/2+.001,dark);}break;
  case 'floordrain':B(w,h,d,0,0,0,metal);for(let i=-2;i<=2;i++)B(w*.7,.002,.005,0,h-.002,d*.13*i,dark);break;
@@ -80,8 +84,10 @@ export function renovationModel(f,p,night=false){
  case 'walllamp':B(w,h,d*.6);B(w*.85,h*.02,d*.5,0,0,d*.25,glow);break;
  case 'tablelamp':C(w*.42,h*.07,0,0,0,metal);C(.009,h*.6,0,0,0,metal);C(w/2,h*.33,0,h*.67);C(w*.45,.004,0,h*.67-.0006,0,glow);break;
  case 'wallart': {
-  B(w,h,d,0,0,0,metal);const face=d/2+.001;B(w-.035,h-.035,.002,0,.0175,face,material('canvas','#f2eee5'));
-  B(w*.32,h*.53,.001,-w*.20,h*.20,face+.002,material('paint','#c4ad88'));B(w*.25,h*.32,.001,w*.19,h*.16,face+.003,material('paint','#dbcebb'));B(w*.10,h*.40,.001,w*.11,h*.35,face+.004,material('paint','#aeb3a3'));break;
+  const profile=wallDecorProfile(f.decorStyleId),frame=material(profile.frame,f.colorStyleMode==='fixed'?f.color:p[profile.frame]);
+  B(w,h,d,0,0,0,frame);const border=['floral','landscape'].includes(profile.art)?.055:.025;
+  const canvas=material('canvas','#ffffff');canvas.map=artworkTexture(f.decorStyleId||'modern_minimal');canvas.roughness=.95;
+  const plane=new THREE.Mesh(new THREE.PlaneGeometry(Math.max(.02,w-border),Math.max(.02,h-border)),canvas);plane.position.set(0,h/2,d/2+.0005);g.add(plane);break;
  }
  case 'mirrorpanel':B(w,h,d,0,0,0,metal);B(w-.025,h-.025,.003,0,.0125,d/2+.002,material('glass','#d9e4e3',{metalness:.88,roughness:.07}));break;
  case 'mirrorlight':B(w,h,d,0,0,0,metal);B(w*.95,h*.8,.003,0,h*.1,d/2+.002,glow);break;

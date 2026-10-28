@@ -1,16 +1,22 @@
+import {paintWallDecor} from './wall-decoration-texture.js';
+import {vanityBasinGeometry} from './vanity-basin.js';
+import {paintFrenchPanels} from './french-panel-pattern.js';
+import {finishMaterial} from './material-finish.js';
 import * as T from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 const cache=new Map();
 export function texture(kind){if(cache.has(kind))return cache.get(kind);const c=document.createElement('canvas');c.width=c.height=512;const g=c.getContext('2d');let seed=731;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};g.fillStyle='#fafafa';g.fillRect(0,0,512,512);
-if(kind==='wood'){for(let i=0;i<1300;i++){g.strokeStyle=`rgba(95,67,39,${.015+random()*.075})`;g.lineWidth=.3+random();const x=random()*512;g.beginPath();g.moveTo(x,0);for(let y=0;y<=512;y+=16)g.lineTo(x+Math.sin(y*.025+i)*2,y);g.stroke();}for(let x=0;x<512;x+=128){g.fillStyle='#9d8c7730';g.fillRect(x,0,1,512);g.fillRect(x,(x*1.7)%400,128,1);}}
+if(kind.startsWith('decor_')){paintWallDecor(g,512,kind.slice(6));}
+else if(kind==='french_panel'){paintFrenchPanels(g,512);}
+else if(kind==='wood'){for(let i=0;i<1300;i++){g.strokeStyle=`rgba(95,67,39,${.015+random()*.075})`;g.lineWidth=.3+random();const x=random()*512;g.beginPath();g.moveTo(x,0);for(let y=0;y<=512;y+=16)g.lineTo(x+Math.sin(y*.025+i)*2,y);g.stroke();}for(let x=0;x<512;x+=128){g.fillStyle='#9d8c7730';g.fillRect(x,0,1,512);g.fillRect(x,(x*1.7)%400,128,1);}}
 else if(kind==='stone'){for(let i=0;i<12;i++){g.strokeStyle='#a19a8d16';g.lineWidth=.5+random()*1.5;g.beginPath();let x=random()*512;g.moveTo(x,0);for(let y=0;y<=512;y+=12){x+=(random()-.5)*12;g.lineTo(x,y);}g.stroke();}}
 else if(kind==='fabric'||kind==='rug'){for(let i=0;i<512;i++){g.strokeStyle=i%2?'#b8b1a025':'#ffffff70';g.beginPath();g.moveTo(i,0);g.lineTo(i,512);g.stroke();g.beginPath();g.moveTo(0,i);g.lineTo(512,i);g.stroke();}}
 else{for(let i=0;i<20000;i++){g.fillStyle=`rgba(100,90,78,${random()*.045})`;g.fillRect(random()*512,random()*512,1,1);}if(kind==='tile'){g.strokeStyle='#a4a399';g.lineWidth=1.5;g.strokeRect(.8,.8,510.4,510.4);}}
 const tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;tx.wrapS=tx.wrapT=T.RepeatWrapping;tx.userData.shared=true;cache.set(kind,tx);return tx;}
-export function material(color,kind='plain'){const m=new T.MeshPhysicalMaterial({color,roughness:kind==='stone'?.3:kind==='metal'?.25:kind==='lacquer'?.42:kind==='fabric'?.8:.85,metalness:kind==='metal'?.65:0,clearcoat:kind==='lacquer'?.25:0,clearcoatRoughness:.45,envMapIntensity:kind==='metal'?1:kind==='lacquer'?.45:kind==='stone'?.38:kind==='fabric'?.18:.1});if(['wood','stone','tile','fabric','plaster','rug'].includes(kind)){m.map=texture(kind);m.bumpMap=m.map;m.bumpScale=kind==='rug'?.008:.002;if(['wood','stone','tile'].includes(kind))m.color.set(color);}return m;}
+export function material(color,kind='plain'){const m=new T.MeshPhysicalMaterial({color,roughness:kind==='stone'?.3:kind==='metal'?.25:kind==='lacquer'?.42:kind==='fabric'?.8:.85,metalness:kind==='metal'?.65:0,clearcoat:kind==='lacquer'?.25:0,clearcoatRoughness:.45,envMapIntensity:kind==='metal'?1:kind==='lacquer'?.45:kind==='stone'?.38:kind==='fabric'?.18:.1});if(kind.startsWith('decor_')||['wood','stone','tile','fabric','plaster','rug','french_panel'].includes(kind)){m.map=texture(kind);if(kind==='french_panel'||kind.startsWith('decor_')){m.map=m.map.clone();m.map.repeat.set(1/1.6,1/2.7);m.map.needsUpdate=true;}m.bumpMap=m.map;m.bumpScale=kind==='rug'?.008:.002;if(['wood','stone','tile'].includes(kind))m.color.set(color);}return m;}
 function rectangle(w,d,r=.025){const s=new T.Shape(),x=-w/2,z=-d/2;r=Math.min(r,w/4,d/4);s.moveTo(x+r,z);s.lineTo(x+w-r,z);s.quadraticCurveTo(x+w,z,x+w,z+r);s.lineTo(x+w,z+d-r);s.quadraticCurveTo(x+w,z+d,x+w-r,z+d);s.lineTo(x+r,z+d);s.quadraticCurveTo(x,z+d,x,z+d-r);s.lineTo(x,z+r);s.quadraticCurveTo(x,z,x+r,z);return s;}
 export function furniture(f){const group=new T.Group(),w=f.w/1000,d=f.d/1000,h=f.h/1000;group.userData.furniture=f.id;const p=f.finishes||{wood:'#dec9aa',metal:'#b5a186',stone:'#f1eee8',ceramic:'#f6f3ee',glass:'#c6d8d5'},spec=f.finishSpec;
-const role=(color,kind,key)=>{const actualKind=kind==='wood'&&spec?.furnitureWoodFinish==='lacquer'?'lacquer':kind;const m=material(color,actualKind);m.userData.finishRole=key;if(spec){if(kind==='fabric')m.roughness=spec.fabricRoughness;if(kind==='wood')m.roughness=spec.furnitureWoodFinish==='lacquer'?spec.lacquerRoughness:spec.woodRoughness;if(kind==='stone')m.roughness=spec.stoneRoughness;if(kind==='metal')m.roughness=spec.metalRoughness;if(kind==='lacquer')m.roughness=spec.lacquerRoughness;}return m;};
+const role=(color,kind,key)=>{const actualKind=kind==='wood'&&spec?.furnitureWoodFinish==='lacquer'?'lacquer':kind;const m=material(color,actualKind);m.userData.finishRole=key;if(spec){if(kind==='fabric')m.roughness=spec.fabricRoughness;if(kind==='wood')m.roughness=spec.furnitureWoodFinish==='lacquer'?spec.lacquerRoughness:spec.woodRoughness;if(kind==='stone')m.roughness=spec.stoneRoughness;if(kind==='metal')m.roughness=spec.metalRoughness;if(kind==='lacquer')m.roughness=spec.lacquerRoughness;}return finishMaterial(m,actualKind);};
 const linen=role(f.color,'fabric','upholstery'),shell=role(new T.Color(f.color).multiplyScalar(.88),'fabric','upholstery'),cream=role(p.pillow||p.ceramic,'fabric','textile'),oak=role(p.wood,'wood','wood'),gold=role(p.metal,'metal','metal'),stone=role(p.stone,'stone','stone'),lacquer=role(f.color,'lacquer','cabinet'),dark=material('#343937'),white=role(p.ceramic,'plain','ceramic');
 const box=(a,b,c,x,y,z,m=linen,r=.012)=>{const mesh=new T.Mesh(r?new RoundedBoxGeometry(Math.max(a,.004),Math.max(b,.004),Math.max(c,.004),3,Math.min(r,a/3,b/3,c/3)):new T.BoxGeometry(a,b,c),m);mesh.position.set(x,y,z);mesh.castShadow=mesh.receiveShadow=true;group.add(mesh);return mesh;};
 const cyl=(radius,height,x,y,z,m=gold,ratio=1)=>{const mesh=new T.Mesh(new T.CylinderGeometry(radius,radius,height,32),m);mesh.position.set(x,y,z);mesh.scale.z=ratio;mesh.castShadow=mesh.receiveShadow=true;group.add(mesh);return mesh;};
@@ -47,11 +53,11 @@ else if(f.type==='floorlamp'){cyl(w*.32,.03,0,.015,0,gold);cyl(.012,h*.8,0,h*.4,
 else if(f.type==='bathtub'){slab([{x:0,w:w*.82,d:d*.7}]);box(w*.77,.025,d*.65,0,h*.2,0,white,.02);for(const x of[-w*.41,w*.41])box(.035,h*.8,d*.72,x,h*.6,0,white,.015);for(const z of[-d*.36,d*.36])box(w*.8,h*.8,.035,0,h*.6,z,white,.015);}
 else{const kind=f.type==='bookshelf'?'bookshelf':f.type==='wardrobe'?'wardrobe':'base';cabinet(h,kind);
  if(['sink','basin'].includes(f.type)){
-  const count=f.basins||1,bw=Math.min(f.type==='sink'?.78:.55,(w-.1)/count-(count===2?.045:0)),bd=Math.min(.36,d*.66),centers=count===2?[-w*.24,w*.24]:[0];
-  slab(centers.map(x=>({x,w:bw,d:bd})));const inner=f.type==='sink'?material('#9aaba9','metal'):white,depth=.17;
-  for(const cx of centers){const bottom=box(bw-.025,.015,bd-.025,cx,h-depth,0,inner,.012);bottom.userData.basin=true;
-   for(const x of[-bw/2+.007,bw/2-.007])box(.014,depth,bd,cx+x,h-depth/2,0,inner,.004);for(const z of[-bd/2+.007,bd/2-.007])box(bw,depth,.014,cx,h-depth/2,z,inner,.004);cyl(.023,.004,cx,h-depth+.01,0,gold);
-   if(f.type==='basin')faucet(cx,-d*.4);
+  const count=f.basins||1,layout=f.type==='basin'?vanityBasinGeometry(f):null,bw=layout?layout.width/1000:Math.min(.78,(w-.1)/count-(count===2?.045:0)),bd=layout?layout.depth/1000:Math.min(.36,d*.66),centers=layout?layout.centers.map(x=>x/1000):(count===2?[-w*.24,w*.24]:[0]),bz=layout?layout.z/1000:0;
+  slab(centers.map(x=>({x,z:bz,w:bw,d:bd})));const inner=f.type==='sink'?material('#9aaba9','metal'):white,depth=.17;
+  for(const cx of centers){const bottom=box(bw-.025,.015,bd-.025,cx,h-depth,bz,inner,.012);bottom.userData.basin=true;bottom.name='vanity-basin-bottom';bottom.userData.bowlWidth=bw*1000;bottom.userData.bowlDepth=bd*1000;
+   for(const x of[-bw/2+.007,bw/2-.007])box(.014,depth,bd,cx+x,h-depth/2,bz,inner,.004);for(const z of[-bd/2+.007,bd/2-.007])box(bw,depth,.014,cx,h-depth/2,bz+z,inner,.004);cyl(.023,.004,cx,h-depth+.01,bz,gold);
+   if(f.type==='basin')faucet(cx,layout.faucetZ/1000);
   }
   if(f.type==='sink')faucet(0,-d*.4);
   if(f.type==='basin'&&f.mirror!==false&&h<2.5){const mh=Math.min(.8,2.75-h-.22),mw=w*.9,my=h+.18+mh/2,z=-d/2+.015;

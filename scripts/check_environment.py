@@ -10,7 +10,7 @@ def main():
     versions = {}
     if sys.version_info < (3, 11):
         errors.append("Python 3.11 or newer is required")
-    for name in ("Pillow", "PyMuPDF"):
+    for name in ("Pillow", "PyMuPDF", "numpy"):
         try:
             versions[name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:

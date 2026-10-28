@@ -1,0 +1,208 @@
+{
+  "schema": "h5-engine-provenance/1",
+  "sourceSha256": "821aaa0b73de545053cd59e6a857fee726cb28a91684251dc9fadd2707f99507",
+  "inputs": [
+    {
+      "path": "assets/h5/source/app.js",
+      "sha256": "17670ab2d0b073ecbf084ba9bbd904e7d521dd2489c4dd9bc4c69d044aa3019b"
+    },
+    {
+      "path": "assets/h5/source/architectural-presets.js",
+      "sha256": "6a6c48379d9e422592c4f7b128f020ca8a182038995edf8f0df3ab23754e455e"
+    },
+    {
+      "path": "assets/h5/source/bathtub-body.js",
+      "sha256": "dc2b6b5ad0f7d8e7a4a5190e76d264705a88a25caa8de1db9bccdd15b3cc530b"
+    },
+    {
+      "path": "assets/h5/source/data.js",
+      "sha256": "02511c053ed92724b05fb0b44204c72115a7971448fd406ba436e803444c4cda"
+    },
+    {
+      "path": "assets/h5/source/dimension-chains.js",
+      "sha256": "4196caf759a8f0daaa776b5cea642ae52cbc60cee9f7016c6314b43215f0aa2d"
+    },
+    {
+      "path": "assets/h5/source/dimensions-v9.js",
+      "sha256": "d401137a475711ef566c93e9282c4da5506d159a0cf7f770fc8b4023f6b1d95c"
+    },
+    {
+      "path": "assets/h5/source/enhancements.js",
+      "sha256": "3e6492b51625b244bad62bc4196e51b9b79478883ec6fdce51a0cb0b6a6a8fc7"
+    },
+    {
+      "path": "assets/h5/source/floor-texture-runtime.js",
+      "sha256": "2c38a106556dcc36e3305f3c5c9bcc05829fe5f0d2f2dcca0018c6f47934ea32"
+    },
+    {
+      "path": "assets/h5/source/french-panel-pattern.js",
+      "sha256": "46d44152d71126e50448024cfe39d163c64e0aadbf4aa6bd23dada29afc3eab1"
+    },
+    {
+      "path": "assets/h5/source/furniture-alignment.js",
+      "sha256": "49219f0caa3dc6d17801c8e08e647a46950fb2775128cca8030a2dc85c9998c2"
+    },
+    {
+      "path": "assets/h5/source/furniture-batching.js",
+      "sha256": "d934e168f535fa6748cb357bf877f91e78fd1ce24b520e1f89cc4a2d4aab9010"
+    },
+    {
+      "path": "assets/h5/source/furniture-detail-v11.js",
+      "sha256": "1992ab699497dd3f981f89167b0f19ba98115add338b9fa7b520236c84304346"
+    },
+    {
+      "path": "assets/h5/source/furniture-size.js",
+      "sha256": "c8a102f759c59334fea500540e19558c5292d4c47e51c15717d73c2b209b06fd"
+    },
+    {
+      "path": "assets/h5/source/lamp-models.js",
+      "sha256": "32b433d1817a0d152ca02ac5bb6fa7cae7e03bcd852bfa25add7a6e28738283c"
+    },
+    {
+      "path": "assets/h5/source/lamp-style.js",
+      "sha256": "b22523e14053ff1c028b7bba823e66d141d8ac64d9b97fa6d158aa1dd3829355"
+    },
+    {
+      "path": "assets/h5/source/lighting-profile.js",
+      "sha256": "7480bee0708fe8c8b62a5129d5bb7ba8c19e1e17d15cdebddbdb71489994281a"
+    },
+    {
+      "path": "assets/h5/source/lighting-runtime.js",
+      "sha256": "b271e1240daa858cca9e6b675e24d9fea80ce7791b47739e27fd9d2e6e2a3fc8"
+    },
+    {
+      "path": "assets/h5/source/material-finish.js",
+      "sha256": "86c40694dbba3ec6b221a9ead07d21661668bf9569cc14b5d3895b1bd281fb0e"
+    },
+    {
+      "path": "assets/h5/source/material-presentation.js",
+      "sha256": "ac7c7dc0ca1a78c78858ecc98977ca7f1f8e5f489884979c87ee1613ae19e8c6"
+    },
+    {
+      "path": "assets/h5/source/package.json",
+      "sha256": "1239d4d885dcad42201a27ed9324f8f0f760b78700d8db9ced39a511cffe7eae"
+    },
+    {
+      "path": "assets/h5/source/pointer-lock-diagnostics.js",
+      "sha256": "a652d7766ddd47a087401854a1341f3d4ebb932734ace94aebe3ee4a94ccbe74"
+    },
+    {
+      "path": "assets/h5/source/presentation-profile.js",
+      "sha256": "8bed3c56c0863957377bac14d64f8d67d3a6f8143fcd2ab9716f3a2ee86bab7c"
+    },
+    {
+      "path": "assets/h5/source/production-contract.js",
+      "sha256": "2f4b58af8d986fe9e9cde2546cfb2a41e839677f49c05b55d5bf694753cafcd5"
+    },
+    {
+      "path": "assets/h5/source/project-service-client.js",
+      "sha256": "783d3ed01839d13b8832037d9d748284843ca2551cfdd71640f2752573d90082"
+    },
+    {
+      "path": "assets/h5/source/renovation-components-v12.js",
+      "sha256": "4cac5a8c1e0fbcf7327c87a239cceaf842eddbef7ceafbb37d0edee1a8d3af9a"
+    },
+    {
+      "path": "assets/h5/source/room-area-status.js",
+      "sha256": "f9f908540da0ac83216d87d8c958fe50723ebd8563286ebd22bc2567ff87d6ab"
+    },
+    {
+      "path": "assets/h5/source/room-labels.js",
+      "sha256": "394f587f59395e94d715e866beaf561dbeba551b7f1d687d793e71e1b5d031eb"
+    },
+    {
+      "path": "assets/h5/source/scheme-migration.js",
+      "sha256": "922a2c1512e19788206c7ca53d8a2125e59b5c028b78ec0a30563a3e0c18d13d"
+    },
+    {
+      "path": "assets/h5/source/scheme-storage.js",
+      "sha256": "127c8eb131afe214d7868e09d3144ab1d260cf4984146d5d3f3c73a1e3f52659"
+    },
+    {
+      "path": "assets/h5/source/section-view.js",
+      "sha256": "b31972a36678b82dfede54ca229c1bffcfb72882f01ad7b954a1e26ce8d66023"
+    },
+    {
+      "path": "assets/h5/source/shower-door.js",
+      "sha256": "3ac8fadb6479b5528e81a914aedfaf334eaa0baa51b6c7f8918ebefde2f6d1d8"
+    },
+    {
+      "path": "assets/h5/source/shower-runtime.js",
+      "sha256": "fb7b43fa8c01d25e4e83be769becf65365267284a0ac36e01df720aaa1b9c3b8"
+    },
+    {
+      "path": "assets/h5/source/skirting-runs.js",
+      "sha256": "23c44c594e379ebe9f2559d19ff6b8e70324f1aa1d8a26c38a868edc872dacf5"
+    },
+    {
+      "path": "assets/h5/source/sliding-door.js",
+      "sha256": "4f3b528c338f36069426064d96e1cf51f58be0bb4a3e90da3399ddcad795ef92"
+    },
+    {
+      "path": "assets/h5/source/soft-furniture-v10.js",
+      "sha256": "8752180e6afcf615a03aea13321079793609d60cd1659ba2c20fa11b4a8f05bc"
+    },
+    {
+      "path": "assets/h5/source/styles-v8.js",
+      "sha256": "f90274efddc40e74b53343d707e0c5130fdd8913da7d81ecc21e7001d3c5d77f"
+    },
+    {
+      "path": "assets/h5/source/tabletop-decor.js",
+      "sha256": "4639a20cfa6635279e057034fac9d182395fe7c7bac596b53ee8ca90dcbd1405"
+    },
+    {
+      "path": "assets/h5/source/vanity-basin.js",
+      "sha256": "023a9a1c9266c1728b8c8d09302c854e0d02d37c81b886a43e1e3985ce5d24c9"
+    },
+    {
+      "path": "assets/h5/source/version.js",
+      "sha256": "7f6a7830b915a9a4b86cfda47394a9ae5a7880f268ede02de75e6b9874c48b9d"
+    },
+    {
+      "path": "assets/h5/source/walk-collision.js",
+      "sha256": "ad37a09b134af816305b6eaa4d97dfde8d2f976bb2a6de764adc9f651dc9caaa"
+    },
+    {
+      "path": "assets/h5/source/wall-decoration-style.js",
+      "sha256": "b69cfd95e948e0f77aaca4f34433d8b776c6e3dd38fbc525c3facf8724ed52c4"
+    },
+    {
+      "path": "assets/h5/source/wall-decoration-texture.js",
+      "sha256": "3ad2bbb249b287ab4d74dd7a804063d6b06348a1a0d65a48c1798a7dc8a6fa11"
+    },
+    {
+      "path": "assets/h5/source/wall-edits.js",
+      "sha256": "05c3196ba7097a331dba87739fa4d8496ab1c70f7697447953f0d3f6b3b7d697"
+    },
+    {
+      "path": "assets/h5/source/walls.js",
+      "sha256": "495e0b0ba5d6f50f27c5b9de2a3b8548b0ebd860574a7434e79a40b23b7d2a6f"
+    },
+    {
+      "path": "assets/h5/source/wood-floor-textures.js",
+      "sha256": "5f05620fc85e8bb1ff86abf9ae0d75a58c88edd2530117338d6f5b799184a443"
+    },
+    {
+      "path": "assets/h5/source/workbench-v8.css",
+      "sha256": "9561f4fded07964b869baf29becae08813cff60009aab0d3fecfe27fa67ce5e3"
+    },
+    {
+      "path": "assets/h5/version.json",
+      "sha256": "3eaf2519342f04da275c3c0f3bd53465557199d460a00d48c5a3897e61b602bd"
+    }
+  ],
+  "engineSha256": "620e499603fde5e2f923892dd0f6ddf27b4f5a9b78e720b19ad3dd11659a59e4",
+  "registrySha256": "79ec99aef2daeb2d0d7807cb2e135baa94295dbd80735d68573a64329540b839",
+  "compiler": {
+    "name": "esbuild",
+    "version": "0.25.10",
+    "options": {
+      "bundle": true,
+      "minify": true,
+      "format": "iife",
+      "target": "es2020",
+      "legalComments": "inline"
+    }
+  },
+  "scope": "Installed source and bundled engine/registry correspondence; not UI, visual or layout acceptance"
+}

@@ -116,6 +116,18 @@ class QualityGates(unittest.TestCase):
         s = self.image_stage(); s['images'][0]['checks']['openings']['status'] = 'fail'
         self.assertEqual(self.save()['status'], 'failed')
 
+    def test_missing_count_or_framing_inspection_blocks_despite_other_checks(self):
+        for key in ('object_count', 'framing'):
+            with self.subTest(key=key):
+                s = self.image_stage()
+                del s['images'][0]['checks'][key]
+                self.assertEqual(self.save()['status'], 'failed')
+
+    def test_stale_scheme_blocks_images_even_when_all_visual_fields_pass(self):
+        self.image_stage()
+        self.bundle['schemeSha256'] = 'e' * 64
+        self.assertEqual(self.save()['status'], 'failed')
+
     def test_reference_swap_blocks_despite_updated_artifact_hash(self):
         s = self.image_stage(); Image.new('RGB', (16, 9), 'red').save(self.root / 'reference.png')
         s['artifacts']['reference'] = self.asset('reference.png', 'input')

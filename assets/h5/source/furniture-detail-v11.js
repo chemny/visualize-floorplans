@@ -1,3 +1,4 @@
+import {finishMaterial} from './material-finish.js';
 import {tabletopDecor} from './tabletop-decor.js';
 import * as T from 'three';
 import {refinedFurniture,material,rigid,soft,pillow,lineMesh,roundedLoop,finishGroup,projectedUV,addMesh} from './soft-furniture-v10.js';
@@ -7,7 +8,7 @@ const limit=(v,a,b)=>Math.max(a,Math.min(b,v));
 function cylinder(g,r,h,pos,m,name,rTop=r){return addMesh(g,new T.CylinderGeometry(rTop,r,h,32,1),m,name,pos);}
 function rod(g,a,b,r,m,name,rTop=r){const A=new T.Vector3(...a),B=new T.Vector3(...b),o=addMesh(g,new T.CylinderGeometry(rTop,r,A.distanceTo(B),12),m,name);o.position.copy(A).add(B).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),B.sub(A).normalize());return o;}
 function ring(g,r,t,pos,m,name,sx=1,sz=1){const o=addMesh(g,new T.TorusGeometry(r,t,8,48),m,name,pos);o.rotation.x=-Math.PI/2;o.scale.set(sx,sz,1);return o;}
-function veneer(f){const p=f.finishes||{},s=f.finishSpec||{};return {wood:material(p.wood||f.color,'wood','wood',s),body:material(f.color,'plain','cabinet',s),fabric:material(f.color,'fabric','upholstery',s),metal:material(p.metal||'#a89479','metal','metal',s),dark:material('#343937','plain','detail-shadow',s),stone:material(p.stone||'#eee9df','plain','stone',s),ceramic:new T.MeshPhysicalMaterial({color:p.ceramic||'#f5f2eb',roughness:.24,clearcoat:.55,clearcoatRoughness:.3}),glass:new T.MeshPhysicalMaterial({color:p.glass||'#c8d5cd',roughness:.12,transparent:true,opacity:.15,depthWrite:false})};}
+function veneer(f){const p=f.finishes||{},s=f.finishSpec||{};return {wood:material(p.wood||f.color,'wood','wood',s),body:material(f.color,'plain','cabinet',s),fabric:material(f.color,'fabric','upholstery',s),metal:material(p.metal||'#a89479','metal','metal',s),dark:material('#343937','plain','detail-shadow',s),stone:material(p.stone||'#eee9df','plain','stone',s),ceramic:new T.MeshPhysicalMaterial({color:p.ceramic||'#f5f2eb',roughness:.24,clearcoat:.28,clearcoatRoughness:.3}),glass:new T.MeshPhysicalMaterial({color:p.glass||'#c8d5cd',roughness:.12,transparent:true,opacity:.15,depthWrite:false})};}
 function markOwned(g){g.traverse(o=>{if(!o.isMesh)return;for(const m of Array.isArray(o.material)?o.material:[o.material])if(m&&!m.userData.borrowedDetail)m.userData.ownedFurnitureDetail=true;});}
 function body(g,f){
  g.userData.bodyForDimensions=true;finishGroup(g,f);
@@ -35,6 +36,7 @@ function cupboard(g,f,m){
  for(const y of [bottom+t/2,h-t/2])rigid(g,w-2*t,t,d-.012,[0,y,-.006],m.body,'cabinet-horizontal',.0018);
  rigid(g,w-2*t,h-bottom-2*t,t,[0,(h+bottom)/2,-d/2+t/2],m.body,'cabinet-back',.0015);
  const n=Math.max(1,Math.round(w/.53)),pw=(w-2*t)/n;
+ if(f.type!=='bookshelf')addMesh(g,new T.BoxGeometry(w-2*t,h-bottom-2*t,.003),m.dark,'cabinet-joint-backing',[0,(h+bottom)/2,front-.014]);
  if(f.type==='bookshelf'){
   const levels=Math.max(3,Math.round((h-bottom)/.38));
   for(let i=1;i<n;i++)rigid(g,t,h-bottom-2*t,d-.02,[-w/2+t+i*pw,(h+bottom)/2,-.004],m.wood,'bookcase-stile',.0015);
@@ -61,6 +63,11 @@ function curvedChair(g,f,m){
  const bw=w-.045,bh=Math.max(.13,h-seatY-.062),positions=[],uv=[],idx=[],nx=24,ny=12;
  for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++){const u=i/nx*2-1,v=j/ny,x=bw/2*u,y=seatY+.055+v*bh,z=-d/2+.037+.06*u*u-.018*v;positions.push(x,y,z);uv.push((x+bw/2)/.24,v*bh/.24);}
  for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const a=j*(nx+1)+i;idx.push(a,a+1,a+nx+1,a+1,a+nx+2,a+nx+1);}
+ const sideCount=positions.length/3,frontIndices=[...idx];
+ for(let i=0;i<sideCount;i++){positions.push(positions[i*3],positions[i*3+1],positions[i*3+2]-.010);uv.push(uv[i*2],uv[i*2+1]);}
+ for(let i=0;i<frontIndices.length;i+=3)idx.push(frontIndices[i]+sideCount,frontIndices[i+2]+sideCount,frontIndices[i+1]+sideCount);
+ const boundary=[];for(let i=0;i<=nx;i++)boundary.push(i);for(let j=1;j<=ny;j++)boundary.push(j*(nx+1)+nx);for(let i=nx-1;i>=0;i--)boundary.push(ny*(nx+1)+i);for(let j=ny-1;j>0;j--)boundary.push(j*(nx+1));
+ for(let i=0;i<boundary.length;i++){const a=boundary[i],b=boundary[(i+1)%boundary.length];idx.push(a,a+sideCount,b,b,a+sideCount,b+sideCount);}
  const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.setIndex(idx);geo.computeVertexNormals();
  const fm=m.fabric.clone();fm.side=T.DoubleSide;addMesh(g,geo,fm,'chair-curved-back');
  const edge=[];for(let i=0;i<=nx;i++)edge.push(positions.slice((ny*(nx+1)+i)*3,(ny*(nx+1)+i)*3+3));lineMesh(g,edge,m.wood,'chair-back-top',.007);
@@ -85,20 +92,34 @@ function coffee(g,f,m){const w=f.w/1000,d=f.d/1000,h=f.h/1000,t=.027,r=w/2-.001,
  for(let i=0;i<3;i++){const a=i*Math.PI*2/3;rod(g,[Math.cos(a)*w*.28,0,Math.sin(a)*d*.28],[Math.cos(a)*w*.24,h-t,Math.sin(a)*d*.24],.008,m.wood,'coffee-table-leg',.015);}
 }
 function fridge(g,f,m){const w=f.w/1000,d=f.d/1000,h=f.h/1000,pl=.045;rigid(g,w,h-pl,d-.038,[0,(h+pl)/2,-.019],m.body,'fridge-shell',.009);rigid(g,w-.035,pl,d-.055,[0,pl/2,-.022],m.dark,'fridge-plinth',.002);
- const split=h*.29;for(const [y,hh]of [[(pl+split)/2,split-pl-.006],[(split+h)/2,h-split-.006]]){rigid(g,w-.006,hh,.018,[0,y,d/2-.019],m.body,'fridge-door',.006);rod(g,[w*.35,y-.095,d/2-.006],[w*.35,y+.095,d/2-.006],.003,m.metal,'fridge-grip');}
+ const seal=(ww,hh,x,y)=>{const z=d/2-.029;for(const sign of [-1,1]){addMesh(g,new T.BoxGeometry(.002,hh,.002),m.dark,'fridge-door-gasket',[x+sign*(ww/2-.002),y,z]);addMesh(g,new T.BoxGeometry(ww,.002,.002),m.dark,'fridge-door-gasket',[x,y+sign*(hh/2-.002),z]);}};
+ if(w>.85){for(const sign of [-1,1]){seal(w/2-.001,h-pl-.003,sign*w/4,(h+pl)/2);rigid(g,w/2-.004,h-pl-.006,.018,[sign*w/4,(h+pl)/2,d/2-.019],m.body,'fridge-side-by-side-door',.006);rod(g,[sign*.028,h*.48,d/2-.006],[sign*.028,h*.65,d/2-.006],.003,m.metal,'fridge-grip');}}
+ else{const split=h*.29;for(const [y,hh]of [[(pl+split)/2,split-pl-.006],[(split+h)/2,h-split-.006]]){seal(w-.003,hh+.003,0,y);rigid(g,w-.006,hh,.018,[0,y,d/2-.019],m.body,'fridge-door',.006);rod(g,[w*.35,y-.095,d/2-.006],[w*.35,y+.095,d/2-.006],.003,m.metal,'fridge-grip');}}
  for(let i=0;i<10;i++)rigid(g,w*.65,.002,.002,[0,.010+i*.0028,d/2-.019],m.body,'fridge-vent',.0005);
  rigid(g,w*.26,.018,.001,[0,h*.75,d/2-.008],m.dark,'fridge-control-strip',.001);
 }
-function toilet(g,f,m){const w=f.w/1000,d=f.d/1000,h=f.h/1000,seat=Math.min(.44,h*.62),r=w*.45,cy=seat-.025,z=d*.13;
- const profile=[[.64,0],[.67,.025],[.68,.12],[.83,.20],[.96,cy-.065],[1,cy-.02],[.95,cy],[.78,cy-.01],[.65,cy-.09],[.40,.14],[.10,.12],[0,.12]].map(([rr,y])=>new T.Vector2(rr*r,y));
- const geo=new T.LatheGeometry(profile,48),inside=m.ceramic.clone();inside.color.multiplyScalar(.87);geo.clearGroups();for(let a=0;a<48;a++){const offset=a*(profile.length-1)*6;geo.addGroup(offset,6*6,0);geo.addGroup(offset+6*6,(profile.length-1-6)*6,1);}
- const mesh=addMesh(g,geo,[m.ceramic,inside],'toilet-curved-bowl',[0,0,z]);mesh.scale.z=d*.34/r;
- rigid(g,w*.58,.20,d*.37,[0,.10,-d*.19],m.ceramic,'toilet-rear-pedestal',.035);
- ring(g,r*.88,.011,[0,cy+.014,z],m.ceramic,'toilet-seat-rim',1,d*.34/r);
- rigid(g,w*.86,h-seat*.65,d*.23,[0,(h+seat*.65)/2,-d*.35],m.ceramic,'toilet-tank',.034);
- cylinder(g,.020,.002,[0,h-.001,-d*.35],m.metal,'toilet-flush-button');
- cylinder(g,.022,.004,[0,.126,z],m.dark,'toilet-bowl-drain');
+// A closed lid and a broad seat share the original fixture envelope.
+function ovalPlate(g,rx,rz,thickness,y,z,m,name,hole=null){
+ const shape=new T.Shape();shape.absellipse(0,0,rx,rz,0,Math.PI*2,false,0);
+ if(hole){const cut=new T.Path();cut.absellipse(0,0,hole[0],hole[1],0,Math.PI*2,true,0);shape.holes.push(cut);}
+ const geo=new T.ExtrudeGeometry(shape,{depth:thickness,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.002,bevelThickness:.002,curveSegments:32});
+ geo.rotateX(-Math.PI/2);return addMesh(g,geo,m,name,[0,y,z]);
 }
+function toilet(g,f,m){
+ const w=f.w/1000,d=f.d/1000,h=f.h/1000,seat=Math.min(.42,h*.60),r=w*.44,cy=seat-.025,z=d*.12;
+ // Smooth skirted pedestal; fewer abrupt changes than the former lathed bowl.
+ const profile=[[.63,0],[.67,.018],[.69,cy*.34],[.79,cy*.65],[.96,cy-.055],[1,cy-.015],[.98,cy],[.80,cy],[.72,cy-.04],[.43,cy*.43],[0,cy*.40]].map(([rr,y])=>new T.Vector2(rr*r,y));
+ const bowl=addMesh(g,new T.LatheGeometry(profile,40),m.ceramic,'toilet-curved-bowl',[0,0,z]);bowl.scale.z=d*.34/r;
+ const bottom=addMesh(g,new T.CircleGeometry(r*.63,40),m.ceramic,'toilet-base-cap',[0,0,z]);bottom.rotation.x=Math.PI/2;bottom.scale.y=d*.34/r;
+ rigid(g,w*.57,cy*.68,d*.35,[0,cy*.34,-d*.20],m.ceramic,'toilet-rear-pedestal',.025);
+ ovalPlate(g,r*.97,d*.33,.014,cy+.005,z,m.ceramic,'toilet-seat',[r*.69,d*.235]);
+ ovalPlate(g,r*.98,d*.335,.018,cy+.025,z,m.ceramic,'toilet-lid');
+ for(const x of [-w*.19,w*.19])rigid(g,.025,.018,.035,[x,cy+.019,z-d*.29],m.metal,'toilet-lid-hinge',.003);
+ const tankBottom=seat*.66;
+ rigid(g,w*.83,h-tankBottom,d*.23,[0,(h+tankBottom)/2,-d*.35],m.ceramic,'toilet-tank',.025);
+ cylinder(g,.020,.002,[0,h-.001,-d*.35],m.metal,'toilet-flush-button');
+}
+
 function enrich(base,f,m){
  const w=f.w/1000,d=f.d/1000,h=f.h/1000;
  // Preserve holes, faucets, door glazing and stable component identity. New
@@ -112,6 +133,9 @@ function enrich(base,f,m){
   }else if(f.type==='shower'){
    rigid(base,.15,.002,.075,[w*.28,.029,-d*.30],m.metal,'shower-drain',.003);for(let i=0;i<7;i++)rigid(base,.003,.001,.055,[w*.28-.057+i*.019,.031,-d*.30],m.dark,'shower-drain-slot',.0005);
    rod(base,[w*.29,h*.40,-d*.31],[w*.29,h*.68,-d*.31],.007,m.metal,'shower-rail');
+   // Front glass receives a small pull; the shower footprint and panels stay intact.
+   rod(base,[-w*.30,h*.43,d/2+.008],[-w*.30,h*.55,d/2+.008],.006,m.metal,'shower-door-pull');
+   for(const y of [h*.43,h*.55])rigid(base,.018,.018,.010,[-w*.30,y,d/2+.005],m.metal,'shower-pull-mount',.002);
   }else if(f.type==='hood'){
    for(let i=0;i<14;i++)rigid(base,w*.70,.001,.002,[0,.025,-d*.23+i*d*.035],m.dark,'hood-filter-slot',.0003);
    for(const x of [-w*.32,w*.32])cylinder(base,.018,.002,[x,.006,d*.28],m.ceramic,'hood-light');
@@ -163,5 +187,6 @@ export function wholeHomeFurniture(f,base){
  if(f.type==='dresser'){const a=new T.Group();a.name='dressing-table-accessories';a.userData.accessories=true;const w=f.w/1000,d=f.d/1000,y=f.h/1000,z=-d/2+.065;const mirror=new T.Mesh(new T.CircleGeometry(.28,64),new T.MeshPhysicalMaterial({color:'#dce1dd',metalness:.94,roughness:.08,side:T.DoubleSide}));mirror.position.set(0,y+.36,z);mirror.scale.y=1.10;a.add(mirror);const rim=addMesh(a,new T.TorusGeometry(.286,.007,10,64),m.metal,'dressing-mirror-frame',[0,y+.36,z]);rim.scale.y=1.10;rod(a,[0,y,z],[0,y+.085,z],.008,m.metal,'mirror-stand');rigid(a,.18,.012,.10,[0,y+.006,z+.01],m.metal,'mirror-base',.004);rigid(a,.22,.012,.13,[-w*.31,y+.006,0],m.stone,'cosmetic-tray',.012);for(let i=0;i<3;i++)cylinder(a,.018,.065+i*.012,[-w*.31+(i-1)*.045,y+.015,0],m.ceramic,'cosmetic-bottle');markOwned(a);root.add(a);}
 
  const decor=tabletopDecor(f,m);if(decor){markOwned(decor);root.add(decor);}
+ const finished=new Set();root.traverse(o=>{if(o.isMesh)for(const mat of Array.isArray(o.material)?o.material:[o.material])if(!finished.has(mat)){finished.add(mat);finishMaterial(mat);}});
  root.userData.detailAssembly=FULL_REVISION;root.userData.furniture=f.id;return root;
 }

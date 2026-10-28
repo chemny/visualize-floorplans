@@ -12,6 +12,7 @@ def main():
   subprocess.run([sys.executable,str(Path(__file__).with_name('h5.py')),'run',*args],check=True)
   return
  ap=argparse.ArgumentParser();ap.add_argument('--engine',choices=['blender']);ap.add_argument('--bundle',required=True);ap.add_argument('--config',required=True);ap.add_argument('--views');ap.add_argument('--out',required=True);ap.add_argument('--blender');ap.add_argument('--ffmpeg');ap.add_argument('--ffprobe');ap.add_argument('--animation',action='store_true');ap.add_argument('--resolution',type=int,default=640);a=ap.parse_args()
+ if a.animation:raise SystemExit('Blender animation disabled until hash-bound route and dynamic-preview gates are integrated; use the reviewed H5 capture workflow. Stills remain available.')
  out=Path(a.out).resolve()
  if out.exists() and any(out.iterdir()):raise SystemExit('Output directory must be empty; use a new revision directory.')
  bpath=Path(a.bundle).resolve();bundle=json.loads(bpath.read_text(encoding='utf-8'))

@@ -25,24 +25,19 @@ more images; retained unaffected pixels still need review against it. Reuse an
 unchanged confirmation, not a fresh user question. Legacy runs without a binding
 require a new reviewed run; do not fabricate retrospective gate success.
 
-New projects use the 12 `style_options` in `assets/project-template.json`.
-Keep four-option historical manifests compatible; do not silently change an
-existing selected scheme. Follow `guided-user-workflow.md` for the default
-three-direction recommendation and host-tool comparison; a direct choice skips
-comparison. The legacy script supports only 4/8/12 options, rendered as four-panel
-boards, with `outputs.style_preview: style_comparison_boards`. These are expanded
-comparisons when requested, not the default first-use questionnaire. Do not send
-three options into that script or silently pad the user's selection scope.
-Both paths must pass `references/style-selection-gate.md` before presenting a
-style-selection question, and again before selected-style production. A planned
-prompt or a text shortlist is not a generated and displayed comparison board.
+New projects use the nine style_options and generation_prompt fields in
+assets/project-template.json. Undecided users see ONE 3x3 board, as specified
+in guided-user-workflow.md and prompt-contracts.md. Direct choice skips comparison.
+plan_project.py supports nine as one board, and historical 4/8/12 manifests as
+four-panel boards. Preserve historical manifests and selected schemes; do not
+silently rename IDs or migrate their finishes. Both paths pass the style-selection
+gate before asking for a choice and before selected-style production.
 
-The expanded catalog consolidates case variants rather than treating aliases as
-new styles: 现代雅奢 stays under 现代轻奢; 当代东方 under 现代新中式;
-当代法式/法式当代奢雅 under 克制法式优雅; 意式轻奢/深色奢华 under
-意式克制奢华. 香槟珍珠、米兰暖灰、巴黎装饰艺术、奶油雕塑感 retain
-their separate material/design identities. Do not import case-specific furniture
-coordinates, ceiling heights or household preferences into these presets.
+Keep contemporary_french, italian_luxury and paris_art_deco IDs stable under
+their new default names 法式风格、意式暖奢、巴黎艺术. 欧式奢华 uses the distinct
+european_luxury ID, not the historical modern_luxury direction. 日式风格、东方宋式
+and 奶油雕塑 are not default choices; retain historical records without promoting
+them into new-project defaults. The nine are design directions, not rankings.
 
 Before style choice, compile without `--delivery-plan`. These comparison tasks
 use the legacy preview plan, not the primary-image state machine. First complete
@@ -89,6 +84,13 @@ different output location is supported when the actual file is recorded.
 Changing bytes after approval blocks dependent tasks.
 
 ## Correct an image or revise the scheme
+
+Classify the requested change before regenerating. A display-name-only change
+keeps the style ID, generation direction, accepted image bytes and approvals;
+store the new label in case presentation metadata and update labels only. If a
+label is embedded in pixels, retain the accepted original and recompose only the
+label area. A new style definition changes prompts and requires new image review.
+Do not interpret a rename as permission to redesign furniture or finishes.
 
 For an image error relative to the unchanged confirmed scheme:
 

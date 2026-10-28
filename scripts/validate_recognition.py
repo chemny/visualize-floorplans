@@ -58,7 +58,7 @@ def evidence_codes(item: dict[str, Any], label: str) -> set[str]:
 
 
 def validate_recognition(data: dict[str, Any]) -> dict[str, Any]:
-    require(data.get("schema_version") == "0.2", "schema_version must be 0.2")
+    require(data.get("schema_version") in {"0.2", "0.3"}, "schema_version must be 0.2 or 0.3")
     require(bool(data.get("source_image")), "source_image is required")
 
     linework = data.get("linework")
@@ -99,6 +99,14 @@ def validate_recognition(data: dict[str, Any]) -> dict[str, Any]:
         if kind in DOOR_KINDS:
             require(bool(codes & DOOR_SIGNALS),
                     f"door {element_id} lacks door symbol or user confirmation")
+            if data['schema_version'] == '0.3':
+                model = element.get('door_model')
+                count = element.get('leaf_count')
+                require(model in {'single','double','hidden','sliding'}, f'door {element_id} requires door_model')
+                require(type(count) is int and count == (2 if model == 'double' else count if model == 'sliding' else 1) and (model != 'sliding' or count in (2,3)), f'door {element_id} invalid leaf_count')
+                ends = element.get('hinge_ends')
+                require(ends == [] if model == 'sliding' else ends == ['start','end'] if model == 'double' else ends in (['start'],['end']), f'door {element_id} invalid hinge_ends')
+                require(bool(element.get('source_observation')), f'door {element_id} requires independent source_observation')
         elif kind == "window":
             require(bool(codes & WINDOW_SIGNALS),
                     f"window {element_id} lacks window-frame evidence")
@@ -132,6 +140,7 @@ def validate_recognition(data: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "status": "ok",
+        "door_count_fields_checked": data["schema_version"] == "0.3",
         "linework_count": len(linework),
         "element_count": len(elements),
         "zone_count": len(zones),

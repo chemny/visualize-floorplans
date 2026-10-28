@@ -10,6 +10,7 @@ def args():
  ap=argparse.ArgumentParser();ap.add_argument('--bundle',required=True);ap.add_argument('--route');ap.add_argument('--out',required=True);ap.add_argument('--animation',action='store_true');ap.add_argument('--stills',action='store_true');ap.add_argument('--views');ap.add_argument('--resolution',type=int,default=640);return ap.parse_args(sys.argv[sys.argv.index('--')+1:])
 
 def run(a):
+ if a.animation:raise ValueError('Blender animation disabled: reviewed route/preview capture gates not integrated')
  out=Path(a.out).resolve();out.mkdir(parents=True,exist_ok=True);bundle=json.loads(Path(a.bundle).read_text(encoding='utf-8'));assert bundle.get('schema')=='floor-visualization-production/1.0','Unsupported production schema';assert all(v['status']=='confirmed' for v in bundle['confirmations'].values()),'Unconfirmed scheme';data=bundle['scene'];route=json.loads(Path(a.route).read_text(encoding='utf-8')) if a.route else None
  if route and route['schemeSha256']!=bundle['schemeSha256']:raise ValueError('Route belongs to another scheme')
  bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
