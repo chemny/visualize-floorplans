@@ -1,4 +1,4 @@
-"""Local H5 entrypoint. No installations, external services or automatic approval.
+"""H5 entrypoint. No installations or automatic approval. Remote rendering/processing is explicit opt-in.
 
 Build/export/prepare/capture/audit/run/package use one case and its actual meshes.
 An existing case is required; templates never imply an approved floorplan.
@@ -121,7 +121,7 @@ def build(case_path,out_path):
     if out.exists(): raise ValueError('Output HTML already exists; use a new revision filename')
     try: normalized,floor_boundary=normalize_floor_boundaries(raw)
     except ValueError as error:
-        dump(out.with_suffix('.floors.json'),{'status':'failed','error':str(error)})
+        dump(out.with_suffix('.floors.json'),getattr(error,'report',{'status':'failed','error':str(error)}))
         raise
     dump(out.with_suffix('.floors.json'),floor_boundary)
     case=validate_case(apply_room_light_defaults(normalized))
@@ -131,6 +131,11 @@ def build(case_path,out_path):
     dump(out.with_suffix('.doors.json'),door_operation)
     if case.get('doorLayoutPolicy',{}).get('required') and (door_operation['status']!='pass' or door_operation['pathStatus']!='checked'):
         raise ValueError('Door operation review failed; inspect '+str(out.with_suffix('.doors.json')))
+    from desk_placement import review_desks
+    desk_review=review_desks(case)
+    dump(out.with_suffix('.desks.json'),desk_review)
+    if case.get('deskPlacementPolicy',{}).get('required') and desk_review['status']!='pass':
+        raise ValueError('Desk entry approach review failed; inspect '+str(out.with_suffix('.desks.json')))
     from facility_use_review import review_facilities
     facility_use = review_facilities(case)
     dump(out.with_suffix('.facilities.json'),facility_use)
@@ -286,12 +291,33 @@ def require_capture_review(args):
 
 def parser():
     ap=argparse.ArgumentParser(description=__doc__);sub=ap.add_subparsers(dest='command',required=True)
-    sub.add_parser('doctor',help='Read-only dependency availability; never installs or runs a regression suite')
-    p=sub.add_parser('tour-pages',help='Generate three-stage tour pages from a bound rehearsal; never captures video');p.add_argument('--rehearsal',required=True);p.add_argument('--job',help='Optional bound video/narration JSON');p.add_argument('--out',required=True);p.add_argument('--ffprobe',help='Existing ffprobe for supplied video verification')
+    p=sub.add_parser('case-upgrade-check',help='Review legacy migration and case-bound demo media; no automatic edits or approval');p.add_argument('--case',required=True);p.add_argument('--source',required=True);p.add_argument('--build');p.add_argument('--media-manifest');p.add_argument('--scheme-sha256');p.add_argument('--out',required=True)
+    p=sub.add_parser('remote-production',help='Frozen SSH/Windows task; no installs or service changes');p.add_argument('--action',required=True,choices=('prepare','start','status','resume','collect'));p.add_argument('--job');p.add_argument('--out',required=True)
+    p=sub.add_parser('video-upscale',help='Explicit short enlargement comparison, no diffusion or full film');p.add_argument('--job',required=True);p.add_argument('--out',required=True);p.add_argument('--ffmpeg',required=True);p.add_argument('--ffprobe',required=True);p.add_argument('--comfy')
+    p=sub.add_parser('video-upscale-pages',help='Shared auxiliary enlargement comparison page');p.add_argument('--result',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('video-quality',help='Global/local temporal diagnostics, not acceptance');p.add_argument('--job',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('delivery-check',help='Read-only final picture/audio/playback/version checks');p.add_argument('--job',required=True);p.add_argument('--out',required=True);p.add_argument('--ffmpeg',required=True);p.add_argument('--ffprobe',required=True)
+    p=sub.add_parser('doctor',help='Read-only dependency availability; never installs or runs a regression suite');p.add_argument('--for',dest='feature',choices=['basic','video','blender','remote','quality','delivery'],default='basic');p.add_argument('--blender');p.add_argument('--ffmpeg');p.add_argument('--ffprobe');p.add_argument('--node');p.add_argument('--browser');p.add_argument('--playwright-module')
+    p=sub.add_parser('blender-review-film',help='Explicitly authorized complete silent review film from validated exact route');p.add_argument('--job',required=True);p.add_argument('--out',required=True);p.add_argument('--blender',required=True);p.add_argument('--ffmpeg',required=True)
+    p=sub.add_parser('blender-draft',help='Bounded exact-route dynamic sample, never full animation');p.add_argument('--job',required=True);p.add_argument('--out',required=True);p.add_argument('--blender',required=True);p.add_argument('--ffmpeg',required=True)
+    p=sub.add_parser('render-prepare',help='Prepare shared standard/Blender branch from an approved exact route; no video');p.add_argument('--job',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('tour-pages',help='Generate four-stage tour pages from a bound rehearsal; never captures video');p.add_argument('--rehearsal',required=True);p.add_argument('--job',help='Optional bound preview/decorated video/narration JSON');p.add_argument('--out',required=True);p.add_argument('--ffprobe',help='Existing ffprobe for supplied video verification')
+    p=sub.add_parser('decoration-plan',help='Prepare exact-frame image tasks; does not call image or remote services');p.add_argument('--job',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('decoration-check',help='Check source, frame bindings and image review evidence');p.add_argument('--plan',required=True)
+    p=sub.add_parser('decoration-render',help='Explicit remote ComfyUI opt-in; no installation or narration');p.add_argument('--plan',required=True);p.add_argument('--remote',required=True);p.add_argument('--client-module',required=True);p.add_argument('--ffmpeg',required=True);p.add_argument('--segment',action='append')
+    p=sub.add_parser('decoration-assemble',help='Assemble checked segment timelines into a silent pending-review video');p.add_argument('--plan',required=True);p.add_argument('--out',required=True);p.add_argument('--ffmpeg',required=True);p.add_argument('--ffprobe',required=True)
     for name in ('narration-prepare','narration-compose'):
         p=sub.add_parser(name,help='Requires explicit approval of exact source video before narration work');p.add_argument('--job',required=True);p.add_argument('--out',required=True);p.add_argument('--ffmpeg')
-    p=sub.add_parser('plan-tour',help='One frozen job -> joint candidates, bounded repairs and synchronized rehearsal; never video');p.add_argument('--job',required=True);p.add_argument('--out',required=True)
-    p=sub.add_parser('design-tour',help='Brief -> ordered shallow observation path and semantic camera, no video');p.add_argument('--bundle',required=True);p.add_argument('--brief',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('plan-route',help='Stage 1: rooms, openings, ordered path and returns; no cameras, frames or approval');p.add_argument('--job',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('record-approval',help="Write the camera rehearsal or exact-video approval from the user's verbatim words; refuses agent names, empty evidence and unfinished rehearsals");p.add_argument('--kind',required=True,choices=('camera','video'));p.add_argument('--pending',required=True);p.add_argument('--confirmed-by',required=True);p.add_argument('--evidence',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('tour-draft',help='Seconds-long camera draft with diagnostics; never for confirmation');p.add_argument('--bundle',required=True);p.add_argument('--brief',required=True);p.add_argument('--out',required=True);p.add_argument('--runtime');p.add_argument('--node')
+    p=sub.add_parser('validate-corpus',help='Run route, brief and camera draft for every case in a manifest and compare with recorded baselines');p.add_argument('--manifest',required=True);p.add_argument('--out',required=True);p.add_argument('--only',action='append')
+    p=sub.add_parser('optimize-stations',help='Choose observation stations by exported-mesh audit inside the approved route tolerance; verifies and undoes moves that add turn failures');p.add_argument('--brief',required=True);p.add_argument('--plan',required=True);p.add_argument('--runtime',required=True);p.add_argument('--out',required=True);p.add_argument('--node');p.add_argument('--no-verify',action='store_true')
+    p=sub.add_parser('brief-from-route',help='Camera brief from an approved spatial route, with an assumptions list; no cameras, no approval');p.add_argument('--plan',required=True);p.add_argument('--out',required=True);p.add_argument('--maximum-seconds',type=float);p.add_argument('--coverage-minimum-percent',type=float);p.add_argument('--coverage-off',action='store_true');p.add_argument('--camera-options',choices=('tuned','basic'),default='tuned');p.add_argument('--eye-mm',type=float,default=1600);p.add_argument('--eye-reason');p.add_argument('--fov',type=float,default=76);p.add_argument('--overrides')
+    p=sub.add_parser('record-route-approval',help="Write the route approval from the user's verbatim words; refuses agent names and empty evidence");p.add_argument('--pending',required=True);p.add_argument('--confirmed-by',required=True);p.add_argument('--evidence',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('tour-stage-status',help='Read-only four-stage status from actual bound files; never grants approval');p.add_argument('--job',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('plan-tour',help='Stage 2 from an approved route: joint camera candidates, bounded repairs and rehearsal; never video');p.add_argument('--job',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('design-tour',help='Lower-level camera design from an approved route; no video');p.add_argument('--bundle',required=True);p.add_argument('--brief',required=True);p.add_argument('--out',required=True);p.add_argument('--spatial-plan');p.add_argument('--spatial-review')
     p=sub.add_parser('build',help='Case JSON -> offline single-file workbench');p.add_argument('--case',required=True);p.add_argument('--out',required=True)
     p=sub.add_parser('prepare',help='Actual mesh bundle -> H5 renderer runtime');p.add_argument('--bundle',required=True);p.add_argument('--out',required=True);p.add_argument('--preview',action='store_true');p.add_argument('--width',type=int,default=1280);p.add_argument('--height',type=int,default=720)
     p=sub.add_parser('quality',help='Verify source/image/tour review records without granting approval');p.add_argument('--bundle',required=True);p.add_argument('--review',required=True);p.add_argument('--stage',action='append',choices=quality.STAGES);p.add_argument('--out',required=True);p.add_argument('--accepted',action='store_true')
@@ -315,8 +341,39 @@ def main():
     args=parser().parse_args()
     if args.command=='doctor':
         runtime={'python':sys.version.split()[0],'node':os.environ.get('FLOOR_VIS_NODE') or shutil.which('node'),'browserOverride':os.environ.get('FLOOR_VIS_BROWSER'),'playwrightModuleOverride':os.environ.get('FLOOR_VIS_PLAYWRIGHT'),'ffmpeg':shutil.which('ffmpeg'),'ffprobe':shutil.which('ffprobe'),'blenderOptional':shutil.which('blender'),'bundledEngine':(ASSETS/'engine.js').exists(),'bundledRenderer':(ASSETS/'runtime/renderer.html').exists(),'installsPerformed':False,'regressionExecuted':False}
-        print(json.dumps(runtime,ensure_ascii=False,indent=2));return
+        from runtime_requirements import inspect as inspect_runtime
+        runtime['selectedFeature']=inspect_runtime(args.feature,vars(args))
+        print(json.dumps(runtime,ensure_ascii=False,indent=2))
+        if runtime['selectedFeature']['status']!='pass':raise SystemExit(1)
+        return
+    elif args.command=='case-upgrade-check':
+        from case_upgrade import inspect
+        target=Path(args.out)
+        if target.exists():raise ValueError('Use a new review report path')
+        result=inspect(args.case,args.source,args.build,args.media_manifest,args.scheme_sha256);dump(target,result);print(json.dumps(result,ensure_ascii=False,indent=2))
+        if result['status']=='blocked':raise SystemExit(2)
+        return
     elif args.command=='build': result=build(args.case,args.out)
+    elif args.command=='remote-production':
+        import remote_production as remote
+        if args.action=='prepare':
+            if not args.job:raise ValueError('--job required for prepare')
+            result=remote.prepare(read(args.job),Path(args.job).resolve().parent,args.out)
+        elif args.action in ('start','resume'):result=remote.start(args.out,resume=args.action=='resume')
+        else:result=getattr(remote,args.action)(args.out)
+        print(json.dumps(result,ensure_ascii=False,indent=2));return
+    elif args.command=='video-upscale':
+        from video_upscale import execute
+        result=execute(read(args.job),Path(args.job).resolve().parent,args.out,args.ffmpeg,args.ffprobe,args.comfy)
+    elif args.command=='video-upscale-pages':
+        from video_upscale import page
+        result=page(read(args.result),Path(args.result).resolve().parent,args.out)
+    elif args.command=='video-quality':
+        from tour_media_quality import inspect
+        result=inspect(read(args.job),Path(args.job).resolve().parent,args.out)
+    elif args.command=='delivery-check':
+        from tour_delivery import inspect
+        result=inspect(read(args.job),Path(args.job).resolve().parent,args.out,args.ffmpeg,args.ffprobe)
     elif args.command=='review-template':
         out=fresh(args.out);dump(out/'quality-review.json',quality.template(read(args.bundle)));result=out
     elif args.command=='quality':
@@ -325,17 +382,79 @@ def main():
         print(json.dumps(report,ensure_ascii=False,indent=2))
         if report['status']=='failed' or (args.accepted and not report['readyForAcceptedDelivery']):raise ValueError('Quality gate blocked; inspect '+str(out/'quality.json'))
         result=out
+    elif args.command=='blender-review-film':
+        from blender_review_film import run as run_film
+        result=run_film(read(args.job),Path(args.job).resolve().parent,args.out,args.blender,args.ffmpeg)
+    elif args.command=='blender-draft':
+        from blender_draft import run as run_draft
+        result=run_draft(read(args.job),Path(args.job).resolve().parent,args.out,args.blender,args.ffmpeg)
+    elif args.command=='render-prepare':
+        from tour_render import prepare as prepare_render
+        result=prepare_render(read(args.job),Path(args.job).resolve().parent,args.out)
     elif args.command=='tour-pages':
         from tour_pages import build as build_pages
         job=read(args.job) if args.job else {}
         build_pages(args.rehearsal,args.out,job,Path(args.job).resolve().parent if args.job else None,args.ffprobe)
         result=args.out
+    elif args.command.startswith('decoration-'):
+        import tour_decorated as decorated
+        if args.command=='decoration-plan':result=decorated.prepare(decorated.read(args.job),args.out)
+        elif args.command=='decoration-check':
+            plan=decorated.read(args.plan);decorated.validate_plan(plan)
+            for segment in plan['segments']:
+                if segment['id'] in plan.get('frozenSegments',{}):decorated.assembly_receipt(plan,segment,Path(args.plan).parent)
+                else:decorated.ready(plan,segment)
+            result={'status':'ready','segments':len(plan['segments']),'approvalGranted':False}
+        elif args.command=='decoration-render':
+            decorated.remote_render(args.plan,args.remote,args.client_module,args.ffmpeg,args.segment)
+            result={'status':'segments_generated_pending_review','plan':args.plan,'approvalGranted':False}
+        else:result=decorated.assemble(args.plan,args.out,args.ffmpeg,args.ffprobe)
     elif args.command in ('narration-prepare','narration-compose'):
         from tour_stage_gate import prepare as prepare_narration, compose as compose_narration
         job=read(args.job);base=Path(args.job).resolve().parent
         if args.command=='narration-prepare':prepare_narration(job,base,args.out)
         else:compose_narration(job,base,args.out,args.ffmpeg)
         result=args.out
+    elif args.command=='plan-route':
+        from tour_spatial_plan import run as run_route
+        plan=run_route(read(args.job),Path(args.job).resolve().parent,args.out)
+        print(json.dumps({'status':plan['status'],'distanceM':round(plan['distanceM'],3),'issues':plan['issues'],'output':str(args.out),'approvalGranted':False},ensure_ascii=False,indent=2))
+        return
+    elif args.command=='record-approval':
+        import record_approval
+        record=(record_approval.record_camera if args.kind=='camera' else record_approval.record_video)(args.pending,args.out,args.confirmed_by,args.evidence)
+        print(json.dumps({'status':record['status'],'kind':args.kind,'output':str(args.out),'note':'Any change to the bound files invalidates it'},ensure_ascii=False));return
+    elif args.command=='tour-draft':
+        from tour_draft import draft as make_draft
+        summary,_,_=make_draft(args.bundle,args.brief,args.out,args.runtime,args.node);print(json.dumps(summary,ensure_ascii=False,indent=2));return
+    elif args.command=='validate-corpus':
+        from validate_case import run_corpus
+        if Path(args.out).exists():raise ValueError('Use a new output directory')
+        rows=run_corpus(args.manifest,args.out,set(args.only) if args.only else None)
+        for r in rows:print(r['id'],r['status'],r.get('failure') or '',[x['code'] for x in r.get('problems',[])])
+        if any(r['status']=='regressed' for r in rows):raise SystemExit(1)
+        return
+    elif args.command=='optimize-stations':
+        from optimize_stations import optimize as optimize_stations
+        _,report=optimize_stations(args.brief,args.plan,args.runtime,args.out,args.node,verify=not args.no_verify)
+        print(json.dumps({'moved':[r['name'] for r in report if r['moved']],'kept':[r['name'] for r in report if not r['moved']],'output':str(args.out)},ensure_ascii=False));return
+    elif args.command=='brief-from-route':
+        from brief_from_route import build as build_brief
+        target=Path(args.out)
+        if target.exists():raise ValueError('Use a new output directory')
+        brief,notes=build_brief(args.plan,{'maximumSeconds':args.maximum_seconds,'coverageMinimumPercent':args.coverage_minimum_percent,'coverageOff':args.coverage_off,'cameraOptions':args.camera_options,'eyeMm':args.eye_mm,'eyeReason':args.eye_reason,'fovDegrees':args.fov,'overrides':read(args.overrides) if args.overrides else None})
+        dump(target/'brief.json',brief);dump(target/'brief-assumptions.json',notes)
+        print(json.dumps({'stations':len(brief['rooms']),'passThrough':[x['station'] for x in notes['passThrough']]+notes['routePassThrough'],'output':str(target)},ensure_ascii=False));return
+    elif args.command=='record-route-approval':
+        from record_approval import record_route
+        record_route(args.pending,args.out,args.confirmed_by,args.evidence)
+        print(json.dumps({'status':'approved','output':str(args.out),'note':'Bound to the plan, bundle and page hashes; any change invalidates it'},ensure_ascii=False));return
+    elif args.command=='tour-stage-status':
+        from tour_stage_chain import evaluate
+        target=Path(args.out)
+        if target.exists():raise ValueError('Use a new stage state path')
+        state=evaluate(read(args.job),Path(args.job).resolve().parent);dump(target,state);print(json.dumps(state['stages'],ensure_ascii=False,indent=2))
+        return
     elif args.command=='plan-tour':
         from tour_pipeline import run
         result=run(read(args.job),args.out)
@@ -343,6 +462,8 @@ def main():
         if result.get('engineeringStatus')!='pass':raise ValueError('Engineering stage requires action; inspect closeout-report.json and contract-report.json. No capture performed.')
         return
     elif args.command=='design-tour':
+        from tour_stage_chain import require_camera_entry
+        require_camera_entry({'bundle':args.bundle,'spatialPlan':args.spatial_plan,'spatialReview':args.spatial_review})
         from design_homeowner_tour import design
         out=fresh(args.out);tour,config,report=design(read(args.bundle),read(args.brief))
         for name,value in [('tour.json',tour),('camera-config.json',config),('design-report.json',report)]:dump(out/name,value)

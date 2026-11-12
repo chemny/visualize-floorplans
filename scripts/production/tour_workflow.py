@@ -50,6 +50,36 @@ def intent_check(t,c):
   fail.extend('Choreography: '+issue['code']+' / '+issue.get('chapter',issue.get('message','')) for issue in inspect(t,c)['issues'])
  return {'failures':fail,'chapters':reports,'limitations':'Intent declarations and rotation metrics do not prove visibility or comfort. Direction changes are diagnostic; no universal reversal-count threshold.'}
 
+def shaped_distance_times(f,policy):
+ """Seconds per frame interval for walking: capped cruise, slower where the frame says so, eased into every stop
+ and (a little quicker) out of it. Only ever lengthens an interval, so it cannot break a motion limit."""
+ cruise=policy['cruiseMps'];floor=policy.get('floorMps',.15);stop_accel=cruise/policy['rampSeconds'];start_accel=cruise/policy.get('startRampSeconds',policy['rampSeconds']);arc=[0.]
+ for a,b in zip(f,f[1:]):arc.append(arc[-1]+math.dist(a['pointMm'],b['pointMm']))
+ stops=sorted(arc[i] for i in range(len(f)) if i in (0,len(f)-1) or math.dist(f[i-1]['pointMm'],f[i]['pointMm'])<.5 or (i+1<len(f) and math.dist(f[i]['pointMm'],f[i+1]['pointMm'])<.5))
+ dists=[math.dist(f[i]['pointMm'],f[i+1]['pointMm']) for i in range(len(f)-1)];out=[0.]*(len(f)-1);speeds=[floor]*(len(f)-1)
+ for i in range(len(f)-1):
+  d=dists[i]
+  if d<1e-6:continue
+  mid=(arc[i]+arc[i+1])/2;k=bisect.bisect_left(stops,mid);before=(mid-stops[k-1])/1000 if k>0 else 1e9;after=(stops[k]-mid)/1000 if k<len(stops) else 1e9
+  speeds[i]=min(f[i].get('speedLimitMps',cruise),cruise,math.sqrt(floor**2+2*start_accel*before),math.sqrt(floor**2+2*stop_accel*after))
+ for i in range(len(f)-1):
+  if dists[i]>1e-6:out[i]=dists[i]/1000/speeds[i]
+ return limit_acceleration(f,out,policy)
+
+def limit_acceleration(f,times,policy):
+ """Neighbouring walking intervals may not differ by more than the ramps allow, whatever slowed them
+ (a narrow gap, a bend, or a turn-rate limit). Only ever lengthens an interval."""
+ cruise=policy['cruiseMps'];stop_accel=cruise/policy['rampSeconds'];start_accel=cruise/policy.get('startRampSeconds',policy['rampSeconds'])
+ dists=[math.dist(f[i]['pointMm'],f[i+1]['pointMm']) for i in range(len(f)-1)];moving=[i for i in range(len(f)-1) if dists[i]>1e-6 and times[i]>0]
+ speeds={i:dists[i]/1000/times[i] for i in moving}
+ for a,b in zip(moving,moving[1:]):
+  if b==a+1:speeds[b]=min(speeds[b],math.sqrt(speeds[a]**2+2*start_accel*dists[b]/1000))
+ for a,b in zip(reversed(moving[:-1]),reversed(moving[1:])):
+  if b==a+1:speeds[a]=min(speeds[a],math.sqrt(speeds[b]**2+2*stop_accel*dists[a]/1000))
+ out=list(times)
+ for i in moving:out[i]=max(times[i],dists[i]/1000/speeds[i])
+ return out
+
 def retime(t,c,limits):
  """Time each segment by maximum movement/yaw/pitch effort, then chapter reading budget.
  Never compress the calculated budget to fit an arbitrary fixed duration.
@@ -59,6 +89,9 @@ def retime(t,c,limits):
  for key in ['maximumSpeedMps','maxYawDegreesPerSecond','maxPitchDegreesPerSecond']:
   if not isinstance(limits.get(key),(int,float)) or not math.isfinite(limits[key]) or limits[key]<=0:raise ValueError('Positive finite timing limit required: '+key)
  density=[max(math.dist(a['pointMm'],b['pointMm'])/1000/limits['maximumSpeedMps'],abs(b['yawRadians']-a['yawRadians'])*180/math.pi/limits['maxYawDegreesPerSecond'],abs(b['pitchRadians']-a['pitchRadians'])*180/math.pi/limits['maxPitchDegreesPerSecond'],1/fps/10) for a,b in zip(f,f[1:])]
+ if c.get('speedPolicy'):
+  density=[max(a,b) for a,b in zip(density,shaped_distance_times(f,c['speedPolicy']))]
+  density=limit_acceleration(f,density,c['speedPolicy'])
  # Optional chapter budgets may be stricter than the global motion ceilings.
  # This keeps observation pace while permitting faster already-seen connections.
  for ch in c.get('chapters',[]):
@@ -76,6 +109,7 @@ def retime(t,c,limits):
  padded=density[:]
  radius=max(1,round(.2*fps))
  for i,v in enumerate(density):padded[i]=max(v,sum(density[max(0,i-radius):i+radius+1])/len(density[max(0,i-radius):i+radius+1]))
+ if c.get('speedPolicy'):padded=limit_acceleration(f,padded,c['speedPolicy'])
  records=[];last_end=0
  for ch in c.get('chapters',[]):
   a,z=st.get(ch.get('from')),st.get(ch.get('to'))
@@ -155,6 +189,7 @@ def require_preview(review_path,tour_path,runtime):
  if not review_path:raise ValueError('Full production/HD capture requires --preview-review; make a low-cost dynamic preview first')
  p=Path(review_path);r=json.loads(p.read_text());t=json.loads(Path(tour_path).read_text())
  if r.get('schema')!='homeowner-preview-review/1' or r.get('status')!='passed' or not r.get('reviewedBy'):raise ValueError('Preview review must record an actual reviewer and passed status')
+ if r.get('approvalSource')!='explicit_user_confirmation' or not str(r.get('confirmedBy','')).strip() or not str(r.get('evidence','')).strip():raise ValueError('Dynamic preview needs explicit user confirmation; an engineering pass or reviewer name is insufficient')
  if r.get('tourSha256')!=sha(tour_path) or r.get('schemeSha256')!=t['schemeSha256']:raise ValueError('Preview review is stale for this tour/scheme')
  if r.get('rendererSha256')!=sha(Path(runtime)/'renderer.html'):raise ValueError('Preview renderer changed')
  if r.get('sceneReviewSha256')!=scene_review_sha(runtime) or r.get('geometrySha256')!=sha(Path(runtime)/'geometry.bin'):raise ValueError('Preview scene geometry/materials changed')

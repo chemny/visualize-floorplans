@@ -43,7 +43,7 @@ class TourWorkflowTests(unittest.TestCase):
    checks={k:True for k in ['turnSamplesViewed','wholePreviewViewed','subjectsReadable','paceComfortable','noBlankCaptureEdges']};arts={}
    for k in ['turnSamples','wholePreview','subjectAudit','meshAudit']:
     q=p/(k+'.json');q.write_text(json.dumps({'tourSha256':sha(p/'tour.json'),'schemeSha256':'case','status':'pass','meshAudit':{'hits':[]},'errors':[]}));arts[k]={'path':q.name,'sha256':sha(q)}
-   r={'schema':'homeowner-preview-review/1','status':'passed','reviewedBy':'actual reviewer','tourSha256':sha(p/'tour.json'),'schemeSha256':'case','sceneReviewSha256':scene_review_sha(p),'geometrySha256':sha(p/'geometry.bin'),'rendererSha256':sha(p/'renderer.html'),'checks':checks,'artifacts':arts};q=p/'review.json';q.write_text(json.dumps(r));require_preview(q,p/'tour.json',p)
+   r={'schema':'homeowner-preview-review/1','status':'passed','reviewedBy':'actual reviewer','approvalSource':'explicit_user_confirmation','confirmedBy':'fixture user','evidence':'Synthetic gate test only','tourSha256':sha(p/'tour.json'),'schemeSha256':'case','sceneReviewSha256':scene_review_sha(p),'geometrySha256':sha(p/'geometry.bin'),'rendererSha256':sha(p/'renderer.html'),'checks':checks,'artifacts':arts};q=p/'review.json';q.write_text(json.dumps(r));require_preview(q,p/'tour.json',p)
    scene['renderSettings']['size']=[1920,1080];(p/'scene.json').write_text(json.dumps(scene));require_preview(q,p/'tour.json',p)
    scene['materials']=['changed'];(p/'scene.json').write_text(json.dumps(scene))
    with self.assertRaises(ValueError):require_preview(q,p/'tour.json',p)

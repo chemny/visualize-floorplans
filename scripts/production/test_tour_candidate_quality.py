@@ -13,6 +13,11 @@ from tour_workflow import markers,metrics
 from tour_rules import trajectory
 
 
+from unittest.mock import patch
+_entry=patch('tour_stage_chain.require_camera_entry',return_value=None)
+def setUpModule():_entry.start()
+def tearDownModule():_entry.stop()
+
 class ClearPlanner:
     def blocked(self,p):return False
     def line_free(self,a,b):return True
@@ -282,6 +287,20 @@ class CandidateQualityTests(unittest.TestCase):
         self.assertTrue(all(e.p.line_free(a,b) for a,b in zip(path,path[1:])))
         with self.assertRaisesRegex(ValueError,'collides'):
             e.connection_path(t['frames'][0]['pointMm'],[2800,2000],{'pathWaypoints':[[1200,2000]]})
+
+
+class ProtectedConstraints(unittest.TestCase):
+    def test_turn_and_backward_walking_cannot_be_traded_for_fewer_flags(self):
+        from tour_candidate_quality import protect_satisfied_constraints
+        baseline={'issues':[]}
+        for code in ('excessive_transit_turn','sustained_backward_walking'):
+            report=protect_satisfied_constraints({'issues':[{'code':code,'chapter':'a → b'}]},baseline)
+            self.assertEqual([x['code'] for x in report['checks']['introducedConstraintRegressions']],[code]);self.assertEqual(report['status'],'needs_revision')
+    def test_an_issue_the_seed_already_had_is_not_a_regression(self):
+        from tour_candidate_quality import protect_satisfied_constraints
+        issue={'code':'excessive_transit_turn','chapter':'a → b'}
+        report=protect_satisfied_constraints({'issues':[dict(issue)]},{'issues':[dict(issue)]})
+        self.assertEqual(report['checks']['introducedConstraintRegressions'],[])
 
 if __name__=='__main__':unittest.main()
 

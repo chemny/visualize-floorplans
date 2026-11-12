@@ -45,7 +45,7 @@ def inspect(tour, config):
     from camera_gaze import PROFILE as P
     for key, value in config.get('motionReviewLimits',{}).items():
         if value>json.loads(P.read_text(encoding='utf-8'))['reviewLimits'].get(key,value) and not exception(config,'motion_limit_override'):fail('unexplained_motion_limit_override',field=key)
-    choreography={'maximumTransitYawDegrees':180,'maximumObservationReversals':1,'maximumTransitFraction':.55}
+    choreography={'maximumTransitYawDegrees':180,'maximumObservationReversals':1,'maximumTransitFraction':.8}
     for key,limit in choreography.items():
         if config.get('choreographyPolicy',{}).get(key,limit)>limit and not exception(config,'choreography_limit_override'):fail('unexplained_choreography_limit_override',field=key)
     locks=config.get('timingLocks',{})

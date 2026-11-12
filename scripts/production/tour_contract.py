@@ -49,6 +49,12 @@ def inspect(bundle,tour,config):
     checks['trajectory']=trajectory(tour,config);issues.extend(checks['trajectory']['issues'])
     from tour_forward_motion import inspect as forward_motion
     checks['forwardMotion']=forward_motion(tour,config);issues.extend(checks['forwardMotion']['issues'])
+    from tour_stop_smoothness import inspect as stop_smoothness
+    checks['stopSmoothness']=stop_smoothness(tour,config);issues.extend(checks['stopSmoothness']['issues'])
+    from tour_small_room_depth import inspect as small_room_depth
+    checks['smallRoomDepth']=small_room_depth(bundle,tour,config);issues.extend(checks['smallRoomDepth']['issues'])
+    from tour_forward_motion import verify_policy
+    checks['smallRoomBackOut']=verify_policy(bundle,config);issues.extend(checks['smallRoomBackOut']['issues'])
     from tour_core_targets import inspect as core_targets
     checks['coreTargets']=core_targets(bundle,config);issues.extend(checks['coreTargets']['issues'])
     if tour.get('schemeSha256')!=bundle.get('schemeSha256'):issue('scheme_mismatch')
@@ -112,7 +118,7 @@ def inspect(bundle,tour,config):
                     last_episode=episode
             if ch['name'] in floors:
                 found_floor_names.add(ch['name'])
-                if duration+1e-8<floors[ch['name']]:issue('viewing_time_compressed',chapter=ch['name'])
+                if duration+.5/tour['fps']+1e-8<floors[ch['name']]:issue('viewing_time_compressed',chapter=ch['name'])  # time is whole frames: half a frame is rounding, not compression
             sweep=ch.get('singleSweepDegrees')
             if sweep is None:issue('missing_sweep_direction',chapter=ch['name'])
             else:

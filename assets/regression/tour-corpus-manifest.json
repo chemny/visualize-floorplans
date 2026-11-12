@@ -1,0 +1,103 @@
+{
+  "schema": "homeowner-validation-corpus/1",
+  "_instructions": "Machine-local real cases (paths below exist on the author machine only; other machines skip them). Run: h5.py validate-corpus --manifest THIS --out NEW_DIR. A case regresses when a stage fails, a protected issue appears that the baseline lacked, the worst connection turns more than the baseline plus slack, the route stations change, or the route gets 10% longer. Baselines record numbers, not quality; refresh them only after the user has judged the result better. Never contains approvals.",
+  "cases": [
+    {
+      "id": "jujian-3br2ba",
+      "bundle": "/Users/neo/Codex/inbox/jujian-camera-20261103/bundle/production-bundle.json",
+      "runtime": "/Users/neo/Codex/inbox/jujian-camera-20261103/runtime",
+      "maximumSeconds": 100,
+      "coverageMinimumPercent": 80,
+      "meshAudit": true,
+      "optimizeStations": false,
+      "note": "当前家装助手户型；路线已由用户确认",
+      "baseline": {
+        "stationNames": [
+          "玄关",
+          "洗手台",
+          "公卫",
+          "次卧",
+          "阳台",
+          "客厅",
+          "主卧",
+          "主卫",
+          "书房",
+          "餐厅",
+          "厨房"
+        ],
+        "routeDistanceM": 35.23,
+        "maxTransitTurnDegrees": 180,
+        "protectedIssues": [
+          "abrupt_stop",
+          "sustained_backward_walking",
+          "transit_turn_beyond_path"
+        ],
+        "totalSeconds": 102.0,
+        "recorded": "2026-11-02 after smooth motion defaults; numbers only, not a quality judgement"
+      },
+      "entranceOpeningId": "W09:0",
+      "entranceSource": "用户确认过的入户门（交接文档第3节）",
+      "schemeSha256": "76a9319486f0bcbf409a1ee497ac7f6678936475a72f2d663f10033c8455d88c"
+    },
+    {
+      "id": "french-3br2ba",
+      "bundle": "/Users/neo/Codex/inbox/tour-current-french-20261028/export/production-bundle.json",
+      "caseFile": "/Users/neo/Codex/inbox/layout-candidate-review-20261024/french-style-native-20261028/case.json",
+      "maximumSeconds": 100,
+      "coverageMinimumPercent": 80,
+      "note": "法式住宅；路线未经用户判断",
+      "baseline": {
+        "stationNames": [
+          "过道",
+          "餐厅",
+          "客厅",
+          "阳台",
+          "主卧",
+          "衣帽间",
+          "套卫",
+          "厨房",
+          "公卫",
+          "儿童房",
+          "客书房"
+        ],
+        "routeDistanceM": 47.9,
+        "maxTransitTurnDegrees": 262,
+        "protectedIssues": [
+          "excessive_transit_turn",
+          "transit_turn_beyond_path"
+        ],
+        "totalSeconds": 112.8,
+        "recorded": "2026-11-02 after smooth motion defaults; numbers only, not a quality judgement"
+      }
+    },
+    {
+      "id": "two-bed",
+      "bundle": "/Users/neo/Codex/inbox/interior-design-userplan-regression-20261024/bath-review-20261024/actual-layout-bundle-v3.json",
+      "caseFile": "/Users/neo/Codex/inbox/interior-design-userplan-regression-20261024/bath-review-20261024/case-current.json",
+      "maximumSeconds": 100,
+      "coverageMinimumPercent": 80,
+      "note": "两卧案例；路线未经用户判断",
+      "baseline": {
+        "stationNames": [
+          "玄关",
+          "储藏间",
+          "卫生间",
+          "餐厅",
+          "客厅",
+          "阳台",
+          "主卧",
+          "厨房",
+          "客房"
+        ],
+        "routeDistanceM": 38.04,
+        "maxTransitTurnDegrees": 204,
+        "protectedIssues": [
+          "abrupt_stop",
+          "excessive_transit_turn"
+        ],
+        "totalSeconds": 86.9,
+        "recorded": "2026-11-02 after smooth motion defaults; numbers only, not a quality judgement"
+      }
+    }
+  ]
+}

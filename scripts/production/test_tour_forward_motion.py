@@ -18,21 +18,21 @@ class ForwardMotionTests(unittest.TestCase):
             self.assertEqual(inspect(t, c)['status'], 'pass')
 
     def test_backwards_fails_including_observe_label(self):
-        t, c = self.fixture(180)
+        t, c = self.fixture(180, count=37)
         c['chapters'][0]['phase'] = 'observe'
         r = inspect(t, c)
         self.assertEqual(r['issues'][0]['code'], 'sustained_backward_walking')
-        self.assertEqual(r['issues'][0]['seconds'], 1)
+        self.assertEqual(r['issues'][0]['seconds'], 1.5)
 
     def test_stationary_and_low_speed_not_backward_walking(self):
         for speed in (0, .1, .2):
             t, c = self.fixture(180, speed)
             self.assertFalse(inspect(t, c)['issues'])
 
-    def test_exact_half_second_and_brief_glance(self):
-        t, c = self.fixture(180, count=13)
+    def test_exact_one_second_and_brief_glance(self):
+        t, c = self.fixture(180, count=25)
         self.assertFalse(inspect(t, c)['issues'])
-        t, c = self.fixture(180, count=14)
+        t, c = self.fixture(180, count=26)
         self.assertTrue(inspect(t, c)['issues'])
 
     def test_wraparound_uses_shortest_midpoint(self):
@@ -42,8 +42,8 @@ class ForwardMotionTests(unittest.TestCase):
         self.assertEqual(inspect(t, c)['status'], 'pass')
 
     def test_splitting_chapters_does_not_hide_continuous_reverse(self):
-        t, c = self.fixture(180)
-        t['visits'].insert(1, {'name': 'mid', 'frame': 12})
+        t, c = self.fixture(180, count=37)
+        t['visits'].insert(1, {'name': 'mid', 'frame': 18})
         c['chapters'] = [{'name': 'one', 'from': 'a', 'to': 'mid'}, {'name': 'two', 'from': 'mid', 'to': 'b'}]
         r = inspect(t, c)
         self.assertEqual(r['issues'][0]['chapters'], ['one', 'two'])

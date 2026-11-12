@@ -1,4 +1,6 @@
-# 视频前的动线动画确认（硬门槛）
+# 视频前的镜头预演确认（硬门槛）
+
+这是四阶段中的第②步，前提是第①步空间路线已获用户确认（`unified-tour-production.md`）。本文 `homeowner-route-approval/1` 是历史schema名，含义为镜头预演确认；它不能替代路线确认，路线确认也不能替代它。没有路线链的预演不能捕获。
 
 先展示并确认动线动画，再制作任何三维视频。文字参观顺序、静态路线图、碰撞通过、用户同意“生成视频”，都不能代替这一步。此门槛同样适用于低清预览、局部转场样片和直接调用浏览器捕获；`--preview`、`--range` 不得绕过。也不得另写截图帧循环、将 tour 改写成 views 或手工拼接编码来规避确认。
 
@@ -45,7 +47,7 @@ python scripts/production/route_rehearsal.py --tour TOUR --config CAMERA_CONFIG 
 python scripts/production/h5.py capture --runtime RUNTIME --tour TOUR --out NEW_CAPTURE --full --preview --route-review APPROVED_ROUTE_REVIEW --node NODE --playwright-module PLAYWRIGHT --browser CHROME
 ```
 
-批准之后依次做网格与主体检查、风险转场样片、完整低成本动态预览、需要时正式/高清捕获。正式/高清还必须提供独立 `--preview-review`；二维预演确认不代替后续三维观看与成片验收。生成后检查实际时长是否仍等于预演，不能在渲染阶段另造路径或拉长节奏。
+批准之后依次做网格与主体检查、风险转场样片、完整低成本动态预览、需要时正式/高清捕获。正式/高清还必须提供独立 `--preview-review`，其中 `approvalSource: explicit_user_confirmation`、`confirmedBy`、`evidence` 记录用户确认，`reviewedBy` 与工程审计不能代替；二维预演确认不代替后续三维观看与成片验收。生成后检查实际时长是否仍等于预演，不能在渲染阶段另造路径或拉长节奏。
 
 观察点默认每房一个、最多两个；第二点需要理由。单点最终时长上限3秒，同时位置/朝向静止上限0.5秒；与每房进出总预算同时校验。家具目标和避障路径点不另算停留，禁止逐件停点。
 
@@ -77,4 +79,4 @@ python scripts/production/h5.py capture --runtime RUNTIME --tour TOUR --out NEW_
 Python 与直接浏览器入口调用同一校验器；普通生产入口及最终成片验收保持独立。
 
 
-三阶段页签与媒体同步按 `tour-presentation-pages.md`：路线页保留开始/结束节点，视频与讲解页右侧为同步大幅路线图。首阶段不混入视频或默认三维播放器；真实三维审阅仍为独立必要证据。
+四阶段页签与媒体同步按 `tour-presentation-pages.md`：路线页保留开始/结束节点，第二步实时三维预演，装修视频与讲解页右侧为同步大幅路线图。首阶段不混入视频或默认三维播放器；真实三维审阅仍为独立必要证据。

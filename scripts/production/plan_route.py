@@ -3,7 +3,8 @@ Standard library only. Windows remain obstacles. No teleports or room clips.
 """
 import argparse, json, math, heapq
 from pathlib import Path
-from door_checks import door_leaves, is_closed, sliding_geometry, leaf_segments
+from door_checks import door_leaves, is_closed, sliding_geometry, leaf_segments, segment_in_body
+from door_operation_review import segment_distance
 from shower_door import enclosure_segments
 
 def inside(p,poly):
@@ -60,7 +61,27 @@ class Planner:
     self.leaves.extend(enclosure_segments(f));continue
    if f.get('planPoint') or f['type'] in ['rug','tv','stove','waterheater','acwall','threshold','skirting','doortrim','windowtrim','waterinlet','drainoutlet','floordrain','transition'] or f.get('elevation',0)>1100:continue
    self.furniture.append(f)
-  self.cache={}
+  self.cache={};self.comfort=config.get('comfortClearanceMm',0);self.comfort_weight=config.get('comfortWeight',2.5);self._gaps=None
+ def gap_at(self,p):
+  """Clear space between the body edge and the nearest wall or door leaf, mm; 0 when touching."""
+  best=min((dist_segment(p,a,b)-t for a,b,t in self.walls+self.leaves),default=1e9)
+  return max(0.,best-self.radius)
+ def cell_gap(self,k):
+  # One vectorised pass over the whole plan the first time comfort is asked for.
+  if self._gaps is None:
+   import numpy as np
+   xs=[q[0] for q in self.b['model'].get('footprint',[])] or [0,1];ys=[q[1] for q in self.b['model'].get('footprint',[])] or [0,1];g=self.grid
+   x0,x1=int(min(xs)//g)-40,int(max(xs)//g)+40;y0,y1=int(min(ys)//g)-40,int(max(ys)//g)+40
+   X,Y=np.meshgrid(np.arange(x0,x1+1)*g,np.arange(y0,y1+1)*g,indexing='ij');best=np.full(X.shape,1e9)
+   for a,b,t in self.walls+self.leaves:
+    dx,dy=b[0]-a[0],b[1]-a[1];n=dx*dx+dy*dy or 1.;u=np.clip(((X-a[0])*dx+(Y-a[1])*dy)/n,0,1);best=np.minimum(best,np.hypot(X-a[0]-u*dx,Y-a[1]-u*dy)-t)
+   self._gaps=(x0,y0,np.maximum(0.,best-self.radius))
+  x0,y0,grid=self._gaps;i,j=k[0]-x0,k[1]-y0
+  return float(grid[i,j]) if 0<=i<grid.shape[0] and 0<=j<grid.shape[1] else 1e9
+ def line_comfort(self,a,b,floor):
+  """A shortcut may not run closer to walls than the path it replaces (within floor)."""
+  n=max(1,math.ceil(math.dist(a,b)/120))
+  return all(self.gap_at([a[k]+(b[k]-a[k])*i/n for k in (0,1)])>=floor for i in range(n+1))
  def blocked(self,p):
   r=self.radius
   # Approved openings bridge room polygon insets; union with narrow door/threshold strips.
@@ -94,7 +115,12 @@ class Planner:
    if self.free(k) and self.line_free(p,self.point(k)):return k
   raise ValueError('No safely connected walkable point near '+str(p))
  def line_free(self,a,b):
-  n=max(1,math.ceil(math.dist(a,b)/25));return all(not self.blocked([a[k]+(b[k]-a[k])*i/n for k in (0,1)]) for i in range(n+1))
+  # Sampling retains the existing domain/footprint check, but must not certify
+  # thin handles or a short furniture-corner intersection between samples.
+  n=max(1,math.ceil(math.dist(a,b)/25))
+  if any(self.blocked([a[k]+(b[k]-a[k])*i/n for k in (0,1)]) for i in range(n+1)):return False
+  if any(segment_distance(a,b,c,d)<half+self.radius for c,d,half in self.walls+self.leaves):return False
+  return not any(segment_in_body(a,b,f,self.radius) for f in self.furniture)
  def astar(self,a,b):
   a=self.nearest(a);b=self.nearest(b);q=[(0,0,a)];came={};cost={a:0}
   while q:
@@ -107,14 +133,18 @@ class Planner:
    for dx,dy in [(1,0),(-1,0),(0,1),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
     n=(k[0]+dx,k[1]+dy)
     if not self.free(n) or dx and dy and (not self.free((k[0]+dx,k[1])) or not self.free((k[0],k[1]+dy))):continue
-    ng=g+math.hypot(dx,dy)
+    ng=g+math.hypot(dx,dy)*(1+(self.comfort_weight*max(0.,1-self.cell_gap(n)/self.comfort) if self.comfort else 0))
     if ng<cost.get(n,float('inf')):cost[n]=ng;came[n]=k;heapq.heappush(q,(ng+math.dist(n,b),ng,n))
   raise ValueError('Unreachable tour leg '+str((a,b)))
  def simplify(self,pts):
   out=[pts[0]];i=0
   while i<len(pts)-1:
    j=len(pts)-1
-   while j>i+1 and not self.line_free(pts[i],pts[j]):j-=1
+   floor=0
+   while j>i+1:
+    if self.comfort:floor=min(self.comfort,min(self.gap_at(q) for q in pts[i:j+1]))-60
+    if self.line_free(pts[i],pts[j]) and (not self.comfort or self.line_comfort(pts[i],pts[j],max(0,floor))):break
+    j-=1
    out.append(pts[j]);i=j
   return out
  def round(self,pts):

@@ -1,0 +1,37 @@
+{
+  "schema": "homeowner-spatial-job/1",
+  "_instructions": "Stage 1 only. bundle plus caseFile is enough for an automatic proposal; other fields override it. Delete unused nulls. Never add frames or cameras. Never invent approval.",
+  "bundle": null,
+  "caseFile": null,
+  "planImage": null,
+  "planBounds": null,
+  "entranceOpeningId": null,
+  "entranceSource": null,
+  "startPoint": null,
+  "bodyRadiusMm": 180,
+  "gridMm": 80,
+  "order": {
+    "mode": "fixed",
+    "source": null
+  },
+  "visits": [
+    {
+      "name": null,
+      "roomId": null
+    }
+  ],
+  "excludedRooms": [],
+  "budget": {
+    "maximumSeconds": null
+  },
+  "search": {
+    "maximumPlanningSeconds": 180,
+    "candidatesPerVisit": 5
+  },
+  "cameraEnvelope": {
+    "maximumDeviationMm": 900,
+    "visitedRoomDeviationMm": 2800,
+    "maximumLengthRatio": 1.3,
+    "stationToleranceMm": 2800
+  }
+}

@@ -20,6 +20,11 @@ class RuleTests(unittest.TestCase):
    ('limits',lambda t,c:c['observationPointPolicy'].update(maximumStillSeconds=100,maximumSecondsPerPoint=100),'unexplained_observation_limit_override')]:
    with self.subTest(name=name):
     t,c=copy.deepcopy(self.t),copy.deepcopy(self.c);mutate(t,c);self.assertIn(expected,{i['code'] for i in contract(self.b,t,c)['issues']})
+ def test_case_yaw_limit_above_profile_needs_a_written_exception(self):
+  c=copy.deepcopy(self.c);c['motionReviewLimits']={'maxYawDegreesPerSecond':45}
+  self.assertIn('unexplained_motion_limit_override',{i['code'] for i in contract(self.b,self.t,c)['issues']})
+  c['ruleExceptions']=list(c.get('ruleExceptions',[]))+[{'code':'motion_limit_override','reason':'用户同意本案转头速度上限提到45度/秒'}]
+  self.assertNotIn('unexplained_motion_limit_override',{i['code'] for i in contract(self.b,self.t,c)['issues']})
  def test_shared_profile_matches_all_generation_entries(self):
   self.assertEqual((profile()['eyeMm'],profile()['horizontalFovDegrees']),(1600,76))
   from plan_route import plan
@@ -33,11 +38,20 @@ class RuleTests(unittest.TestCase):
   p=object.__new__(Planner);p.line_free=lambda a,b:False
   with self.assertRaisesRegex(ValueError,'rounded corner'):p.round([[0,0],[1000,0],[1000,1000]])
   class P:
+   # safe_path now retries with extra clearance by building another planner from planner.b/cfg/radius,
+   # so the stub carries those and every planner it builds also fails to round.
+   b={};cfg={};radius=100
+   def __init__(self,bundle=None,config=None):pass
    astar=lambda s,a,b:[a,[1000,0],b]
    line_free=lambda s,a,b:True
    simplify=lambda s,p:p
    round=lambda s,p:(_ for _ in ()).throw(ValueError('No safe rounded corner'))
-  with self.assertRaisesRegex(ValueError,'rounded corner'):safe_path(P(),[0,0],[1000,1000])
+  import compact_tour_visits
+  original=compact_tour_visits.Planner;compact_tour_visits.Planner=P
+  try:
+   # Whatever the retry says, a sharp corner must never come back as a path.
+   with self.assertRaisesRegex(ValueError,'rounded (corner|route)'):safe_path(P(),[0,0],[1000,1000])
+  finally:compact_tour_visits.Planner=original
  def test_clear_corner_has_smooth_tangent_but_safe_chords(self):
   p=object.__new__(Planner);p.line_free=lambda a,b:True
   points=p.round([[0,0],[1000,0],[1000,1000]])

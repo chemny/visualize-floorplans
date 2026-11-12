@@ -3,13 +3,55 @@
 这是一条制作任务流程，不是一次计算必然成功的承诺。一次启动后在资源范围内比较候选、
 检查、局部修正；合格后呈现预演，失败则明确保留诊断状态。流程不代签用户确认，不生成视频。
 
-## 唯一规划入口
+## 四阶段与入口
+
+顺序固定：①参观路线 → ②镜头预演 → ③视频审阅 → ④讲解成片。每阶段有独立的用户确认，上游变化使下游确认失效。
+工程自检通过不等于用户确认；合成测试批准不能进入真实入口。
+
+| 阶段 | 入口 | 输入门槛 | 用户确认记录 |
+|---|---|---|---|
+| ① 参观路线 | `h5.py plan-route` | 冻结 bundle、实际入户门、有序访问 | `homeowner-spatial-approval/1` |
+| ② 镜头预演 | `h5.py plan-tour`、`design-tour` | 路线已批准且哈希一致 | `homeowner-route-approval/1`（历史schema名，含义为镜头预演确认）；正式/高清另需 `homeowner-preview-review/1` |
+| ③ 视频审阅 | `h5.py capture`、Blender、远程 | ②已确认，且路线链仍有效 | `homeowner-video-approval/1` |
+| ④ 讲解成片 | `narration-prepare`、`narration-compose` | ③确切视频已确认 | 第四步审阅 |
+
+`h5.py tour-stage-status --job STATE_JOB --out NEW_FILE` 只读实际文件并报告各阶段状态：
+`approved`、`pending_user_confirmation`、`not_prepared`、`not_generated`、`needs_revision`、`stale_or_invalid`、`blocked_by_upstream`。它不授予批准。
+
+### ① 参观路线
+
+`python scripts/production/h5.py plan-route --job SPATIAL_JOB --out FRESH_DIRECTORY`
+
+任务模板：`assets/h5/tour/spatial-job-template.json`。任务只含房间、门洞和顺序；含 `frames`、`cameraKeys`、`tour` 会被拒绝。
+
+- 入口：`entranceOpeningId` 必须是实际门，`entranceSource` 写明依据。门外起终点由该门生成声明的外部通行范围。起点在外却未声明时报告 `outside_declared_domain`，与墙体、门扇、家具碰撞分开诊断。人体半径不得低于160mm，不用缩小半径或关闭碰撞制造通过。
+- 站位：引擎从房间几何生成候选（净空、离门深度、二维墙体视线）；开放空间的分区用 `anchor` 绑定实际家具。历史镜头帧不作为默认站位。不可达的孤立空位不作候选。
+- 最少输入：`{"schema","bundle","caseFile"}`。入口读 `caseFile` 的 `entranceOpenings`（必须恰好一个，不从几何猜），门外起点沿门轴取最近的无遮挡点，访问清单取全部房间。同时含沙发、餐桌、洗手台中两种以上的房间，按实际家具拆成分区。没有可站位置或与入口不连通的房间列入“未走入”，页面可见。自动填写项记入 `autoFilled`。
+- 顺序：`fixed` 必须注明来源，按该顺序规划；`shortest` 是引擎提议，同样等待用户确认。规则：门内所在房间排第一，其余求最短环线；正反两向路程差在5%内时，选从门内看去正前方、视线不被墙挡的方向。判定依据记入 `order.direction`。不把公共区优先用于此入口；旧展示优先级只在 `design-tour` 的 brief 分组中生效，需要时用 `fixed` 明确给出。
+- 重复路段：重走走廊和重过同一门都计成本，不设绝对禁止。输出 `retraces` 区分 `required_bottleneck`（去掉原路后不可达）、`required_single_exit_branch`（单出口房间）、`alternative_exists`（有替代路径，留待用户判断）。`roomExits` 是出口证据；两门房间不会误判为单门。
+- 用时只是粗略估算，不是成片时长。结果不声称全局最优。
+
+输出：`spatial-plan.json`、`route.html` 及三个待准备页、`spatial-review.pending.json`（始终 pending）、`stage-state.json`。失败时输出 `spatial-diagnostics.json`，不生成路线。
+
+确认：向用户展示此 `route.html`，只有用户明确接受后才另存确认记录，schema `homeowner-spatial-approval/1`，status `approved`，`approvalSource: explicit_user_confirmation`，`confirmedBy` 为真实用户，`evidence` 为用户原话，三项 `orderApproved`、`pathApproved`、`necessaryReturnsApproved` 均为 true，`plan`、`bundle`、`presentedPage` 绑定路径与哈希。代理或测试身份签名会被拒绝。
+
+### ② 镜头预演：允许范围
+
+镜头任务增加 `spatialPlan`、`spatialReview`。缺少或未批准时在读取其余输入前拒绝，不创建输出。
+
+候选与最终结果都按 `cameraEnvelope` 检查：门洞穿越序列必须完全一致；访问站位须按序到达（默认2800mm内）；访问房间内偏离默认不超过2800mm，其他位置不超过900mm；总路程不超过批准路线的1.3倍；起终点不变。安全圆弧和房间内站位微调在范围内，不要求折线完全相同。越出范围时报告退回路线确认（`spatial_route_*`、`spatial_opening_sequence`、`spatial_visit_order` 等），不选为通过结果。范围写在 `spatial-plan.json` 里，随路线一起确认。
+
+捕获入口（`h5.py capture`、`h5_browser.mjs`、Blender、远程）在批准预演之外重新验证路线批准、哈希和路线符合性；缺少路线链的旧预演不能捕获。
+
+## 镜头规划入口
+
+镜头选项、新案例清单、经验和未解决问题：`tour-camera-options-and-lessons.md`。路线确认后用 `h5.py record-route-approval` 记录；镜头 brief 用 `h5.py brief-from-route` 生成（或从 `camera-brief-template.json` 手写），开跑前自动核对与路线一致。
 
 原生门洞构图修正、显式局部冻结、同源前后对照和阶段工程结果见
 `tour-native-revision.md`。共享工具由标准入口调用；显式修订范围之外的帧不得由
 全局平滑改写。所有原有硬关卡和独立用户确认继续生效。
 
-`python scripts/production/h5.py plan-tour --job CASE_JOB --out FRESH_DIRECTORY`
+`python scripts/production/h5.py plan-tour --job CASE_JOB --out FRESH_DIRECTORY`（须先有已批准的 `spatialPlan` + `spatialReview`）
 
 输入模板：`assets/h5/tour/production-job-template.json`。
 任务绑定同一冻结bundle、runtime、家具PNG和画布毫米边界。新案例提供当前brief；
@@ -18,8 +60,7 @@
 
 ## 自动流程
 
-1. 锁定输入与案例预算。新brief沿用公共区→主卧套区→其他卧室→辅助空间的展示优先级，
-   同级才优化距离；用户固定顺序优先。完整参观回到同一入口。
+1. 核对已批准路线并锁定输入与案例预算。新brief沿用公共区→主卧套区→其他卧室→辅助空间的展示优先级，同级才优化距离；用户固定顺序优先。结果的顺序须与已批准路线一致，不一致的退回路线确认，因此 brief 须按已批准路线写 `fixedOrder`。完整参观回到同一入口。
 2. 为需修订的房间生成真实门洞支持的浅入站位、邻域安全点、扫描方向和可选短移动路径。
    主体目标决定构图；默认一个观察点，第二个需要既有明确理由。不能按家具增加停点。
    门扇遮挡时允许适度走到门扇另一侧，不能机械地把所有浅入位置限制在同一距离。
@@ -31,9 +72,10 @@
 5. 全片契约用于选优：碰撞/语义错误不可被节省秒数抵消。没有全部通过的候选只作诊断。
    根据报告定位失败观察窗及相邻连接，扩大这些窗口的候选搜索，已有效的布局不动。
    设置轮数、完整评估次数和时间上限；耗尽不意味着已经证明问题无解。
-6. 冻结选中时间线，自动生成 `tour-presentation-pages.md` 规定的三阶段页面。默认页签只含
-   二维路线、机位/朝向、开始至结束节点及时间点；无视频时后两页显示待生成，不放空播放器。
-   真实三维检查另存 `camera-preview.html`，保留完整画幅和同步数据，不能以二维预演代替真实播放检查。
+6. 冻结选中时间线，自动生成 `tour-presentation-pages.md` 规定的四阶段页面。
+   此处 `route.html` 是在已确认路线上核对朝向与节奏的二维页；第二步用同源runtime提供真实三维镜头预演。
+   尚未提供runtime或视频的步骤显示待准备/待生成，不放空播放器。兼容工具 `camera-preview.html`
+   不替代正式第二步，二维预演不能代替真实播放检查；完整中间三维MP4不是必要产物。
 7. 使用`tour_mesh_preflight.mjs`对同一导出三角网格做主体遮挡/投影检查，不访问浏览器、
    不截图、不编码。该证据依然不等于真实画面和动态舒适度；实际播放与用户批准保持pending。
    缺少Node或网格检查失败时，预演明确标诊断，不能给通过状态。
@@ -126,6 +168,8 @@
 
 案例配置的观察章可用 `candidatePoses` 提供有限的实际站位候选（最多32个）：
 `point`、可选 `endPoint`、`yawDegrees`、`panDegrees`、`pitchDegrees`。
+可选 `pitchFromDegrees` 指定起始俯仰，`pitchDegrees` 为结束俯仰；省略则保持恒定。
+局部评分按实际俯仰插值检查构图及俯仰速度，不用单个终点俯仰替代整个观看过程。
 共享引擎仍检查房间归属、真实避障路径、步速、扫描速度、目标、完整访问时间和最终覆盖；
 这些字段不是时间线，也不能直接成为通过结果。与基线完全相同的候选不得占用beam分支
 和局部修正名额。具体坐标和偏角只保留在案例配置。

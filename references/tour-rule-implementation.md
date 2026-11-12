@@ -62,17 +62,25 @@
 |---|---|---|
 | 连续交互播放与局部平顺性提案 | `tour_playback.py`、`rehearsal-player.js`、`tour_motion_comfort.py`、`tour_motion_compare.py` | `test_tour_playback.py/.mjs` 验证分数帧插值、单次交互绘制、捕获接口保留和模块绑定；`test_tour_motion_comfort.py` 验证局部范围、物理边界速度及拒绝不安全提案。样段不替代全片验收 |
 | 视线代理与实体碰撞分开 | `Planner.vision_leaves`、`clear_distance` | `test_tour_visibility_geometry.py`：斜门板不填满包围盒、平端墙不缩窄洞口、透明淋浴仍阻挡身体，真实网格审计仍独立执行 |
+| 窄通路的前向构图偏好 | `navigation_gaze` 的案例 `preferredHeadingDegrees` | `test_tour_navigation_preference.py`：收紧软偏好可减少斜看，旋转后的路线仍有效，端点构图保留；非法参数拒绝，最终运动/屏幕检查不豁免 |
 | 显式面积参考口径 | `tour_coverage.py`、`tour_contract.py` | `test_tour_coverage.py`、`test_tour_contract.py`：保留比例、差额及待审状态；默认硬门槛不变，不豁免倒走或碰撞 |
 | 场景核心功能独立核对 | `tour_core_targets.py/.mjs`、`core-functions.json`、`tour_contract.py`、mesh及捕获入口 | `test_tour_core_targets.py` 的遗漏、同框、互补点、首次访问、瞬时/过小与双语言一致性；`test_tour_core_mesh.mjs` 使用实际三角网格测试漏项、背后、遮挡与正例 |
+| 抬高设施的真实取景高度 | `tour_camera_evidence.target_anchor/target_samples` | `test_tour_camera_evidence.py` 核对灶台、水槽的 elevation 加本体半高；未抬高家具保持原高度。几何目标高度不代替实际网格可读检查 |
 | 正常向前走、退场面向门外 | `tour_forward_motion.py`、`tour_contract.py`、`navigation_gaze`、`JointPlanner.closing_pose` | `test_tour_forward_motion.py`：持续倒走、跨章节、静止/慢速、侧看、角度跨零、正常折返及东西两侧出口；最终帧契约拒绝，JS捕获要求同源检查 |
+| Blender与远程捕获不可绕过路线批准 | `blender_draft.py`、`route_rehearsal.py`、`remote_production.py` | `test_blender_route_gate.py`：缺失/待审/变更展示页、几何、场景、路线拒绝；重定位保留叶JSON身份 |
 | 参数、必填、范围例外、精确时间锁 | `tour_rules.py`、`tour_contract.py` | `test_tour_rules.py` 的五种漏检、配置一致性、作用范围、时间锁测试 |
 | 安全圆角、最终轨迹 | `plan_route.py`、`compact_tour_visits.py`、`tour_rules.trajectory` | 圆角失败不得退回折线；安全圆角正例；最终帧接缝冲击反例 |
 | 首次访问覆盖 | `tour_coverage.py`，正式入口显式传 config | 后续途经不能补足第一次漏看的反例；分母、墙遮挡和时间锚定既有测试 |
 | 精确案例例外 | `tour_rules.trajectory`、`tour_coverage.py` | 单房间例外不放行另一房间；单顶点例外不掩盖第二处超限；缺理由、未知/重复/越界作用域拒绝 |
 | 全片遮挡、重复、构图 | `tour_mesh_preflight.mjs`、`tour_screen_quality.mjs` | `test_tour_screen_quality.mjs`：冰箱/墙占屏、柜面、空白结尾、主体裁切、进房返扫及自然经过正例 |
+| 章节末尾的连续首次揭示与正常慢速退出 | `tour_screen_quality.mjs`、mesh逐样本速度 | 连续投影、相机单向和屏幕中心单向才识别为延续；丢失后再出现、屏幕回扫及缺投影证据仍按重复检查。慢速退出须真实移动且向通行方向收敛，静止、离开路径朝向和持续背行不获豁免；最终倒走契约仍独立拦截 |
 | 冻结外部帧的局部角度修订 | `tour_gaze_repair.py` | `test_tour_gaze_repair.py`：授权轴与窗口之外逐值不变，保留帧数/位置/时间；不收敛和不可连接边界拒绝 |
 | 原生门洞构图与有限修正 | `tour_doorway.py`、`tour_pipeline.py` | `test_tour_doorway.py`：真实孔径、旋转/改名、误拍墙修正、冻结外部；`test_tour_pipeline.py`：软缺口触发修正、软分不能抵消硬失败 |
 | 标准修订范围与阶段收口 | `tour_pipeline.py`、`tour_revision_review.py` | 越界一帧拒绝、searchOnly无HTML、工程结果独立；`scripts/test_tour_revision_review.py`：过期证据/未绑定人工记录/外景失败不得冒充通过 |
+| 新规划与修订的时间边界 | `tour_pipeline.JointPlanner.observation_frames`、job `planningMode` | `test_tour_pipeline.py`：新初稿不继承膨胀时长，移动观看按实际转向分配，显式锁不足拒绝，默认修订及显式下限/时间锁保留 |
+| 显式分阶段功能介绍 | `tour_core_targets.py/.mjs`、`tour_coverage.py`、`tour_room_budgets.py`、`tour_camera_evidence.py` | 核心设施首次明确介绍绑定、缺理由不启用、后续经过不补漏、分段预算与覆盖、单次过程内部反扫仍拒绝 |
+| 新规划的安全运动与曲线保留 | `tour_pipeline.py`、`tour_speed_profile.py` | `test_tour_pipeline.py`：真实障碍物弧线不拉直、固定观察点不漂移、加减速/转向计时、精确锁不足拒绝；默认修订及冻结范围回归 |
+| brief 意图完整传递 | `design_homeowner_tour.py` | `test_tour_design.py`：无序目标不被顺序列表覆盖，显式面积参考策略保留，外置干区跨物理区域连接不伪装为房内移动观看 |
 | 候选选优与反馈 | `tour_pipeline.py` | 候选真实网格调用与排序、已知播放失败、旧连接轨迹重检测试 |
 | 源码失效、视觉失败门槛 | `route_rehearsal.py`、`preview_gate.mjs` | 两种入口均拒绝缺失屏幕审计、旧引擎指纹、抽样冒充完整播放、失败播放记录 |
 
@@ -82,9 +90,13 @@
 
 ## 审核呈现能力
 
-呈现规则的唯一规范与逐项实现/验收表在 [三阶段审核呈现 SOP](tour-presentation-pages.md#6-规则实现验收清单)。
+渲染执行、降噪/局部稳定性、可选放大及最终交付采用
+[制作执行与交付契约](production-execution-and-delivery.md) 的原生入口及回归映射。
+执行契约为 `homeowner-production-sop/1`；它不改变原路线契约、不授予用户批准。
+
+呈现规则的唯一规范与逐项实现/验收表在 [四阶段审核呈现 SOP](tour-presentation-pages.md#6-规则实现验收清单)。
 规划、摄像机数值/网格验收与页面功能检查分开。标准生成入口与捕获后的页面入口均使用同一共享呈现器。
-不得以对照工具、嵌套旧页或病例专用外壳替代三阶段页面。此处不复制版式细则，避免多份规则冲突。
+不得以对照工具、嵌套旧页或病例专用外壳替代四阶段页面。此处不复制版式细则，避免多份规则冲突。
 
 ## 精确案例例外
 
@@ -158,3 +170,43 @@ python scripts/production/route_rehearsal.py bind-quality --manifest REHEARSAL_M
 - 连接预留时间与实际运动限制分离，案例可显式选用较小规划预留；最终检查不豁免：`tour_speed_profile.py`，校验见 `test_tour_speed_profile.py`。
 
 视频审阅与讲解制作之间的执行关卡：`tour_stage_gate.py`，共享 `h5.py narration-prepare/compose` 与生产页面包装均调用；见呈现 SOP“制作顺序与执行关卡”。反例及实际短媒体回归为 `test_tour_stage_gate.py`。
+
+## 四阶段拆分
+
+| 规则 | 实现 | 回归 |
+|---|---|---|
+| 路线不依赖镜头、帧 | `tour_spatial_plan.validate_job`、`build` | `test_tour_spatial_plan.RoutePlanning` |
+| 外部范围未声明与真实碰撞分开 | `tour_spatial_plan.explain_point`、`opening_passability` | 同上 |
+| 路线确认绑定计划、页面、bundle，代理和夹具不能签名 | `tour_spatial_plan.require_approval` | `ApprovalGate` |
+| 镜头入口消费路线确认 | `tour_stage_chain.require_camera_entry`（`tour_pipeline.run`、`h5.py design-tour`、`route_rehearsal.main`） | `EntryGates` |
+| 镜头不越出批准范围 | `tour_spatial_plan.conformance`、`tour_pipeline.attach_spatial_evidence` | `Conformance` |
+| 捕获重验路线链 | `tour_stage_chain.require_rehearsal_chain`（`require_route`）、`preview_gate.mjs requireSpatialChain` | `EntryGates`、`test_review_capture_release.mjs` |
+| 动态预览需用户确认 | `tour_workflow.require_preview`、`preview_gate.mjs requirePreview` | `test_tour_workflow.py`、`test_preview_gate.mjs` |
+| 上游变化阻断下游状态 | `tour_stage_chain.evaluate` | `StageState` |
+
+合成批准使用 `approvalSource: synthetic_test_fixture`，仅在测试显式打开模块开关时通过；命令行、任务文件和环境变量都无法打开。
+| 连接转头最少、不转圈 | `design_homeowner_tour.forward_plan`（连续展开 yaw） | `test_tour_flow_camera.MinimalTurning` |
+| 扫视联合选择 | `flow_candidates`、`forward_plan(coarse=True)` | `test_tour_flow_camera` |
+| 小房间回退及限额 | `tour_forward_motion`（`SMALL_ROOM_AREA_M2`、`BACK_OUT_*`、`verify_policy`）、`back_out_hold`、`tour_contract` | `test_tour_back_out.py` |
+| 重排连接不得引入转头过多或倒走 | `tour_candidate_quality.protect_satisfied_constraints` | `test_tour_candidate_quality.ProtectedConstraints` |
+| 对照版带画面检查、检查预算与预留 | `tour_pipeline.run`（`baseline_contract`、`phase_mesh_limit`、`_finalDeadline`） | 无专门单测；由完整规划运行核对 |
+| 走路俯仰与视高 | `design_homeowner_tour.design`（`pitchPolicy`）、`tour_rules.py`（`camera_profile_override`） | 无单测；只在预演里目视核对 |
+
+镜头选项的键、默认值、验证范围见 `tour-camera-options-and-lessons.md`。
+| 停顿缓停缓起、巡航分档 | `tour_workflow.shaped_distance_times`、`design_homeowner_tour.mark_speed_limits`、`tour_stop_smoothness.inspect`（`abrupt_stop`） | `test_tour_smooth_motion.py` |
+| 小空间只在门口、终段加速度限制 | `tour_small_room_depth.inspect`（`small_room_too_deep`）、`tour_workflow.limit_acceleration` | `test_tour_smooth_motion.py` |
+| 房间内回摆、近墙连续段、时间构成诊断 | `tour_camera_diagnostics.room_wobble`、`wall_facing_runs`、`time_breakdown`（只诊断，不判定通过） | `test_tour_spatial_plan.py` Diagnostics |
+| Blender 灯光配置键与单灯功率 | `blender_lighting_profile.validate`、`fixture_power`、`brightness_report`；`import_blender.configure_lighting` 调用 | `test_blender_lighting.py` |
+| Blender 提速对比（相似度、峰值信噪比、放大对比图）与快速质量档模板 | `compare_render_quality.py`、`blender-quality-fast-template.json`、`blender_render_quality.validate` | `test_compare_render_quality.py`、`test_blender_render_quality.py` |
+| 本案转头速度上限覆盖 | brief `motionReviewLimits` + `motion_limit_override` 例外；`design_homeowner_tour` 读取 | `test_tour_rules.py` |
+| 路径舒适净空（离墙偏好，不绕路） | `plan_route.Planner.cell_gap`、`design()` 的 `route()` 回退规则 | `test_tour_smooth_motion.ComfortClearance` |
+| 连接段转头：绝对 ≤180° 且比路线自身转弯多出 ≤90° | `tour_choreography.inspect`（`path_turning`、`transit_turn_beyond_path`），受 `protect_satisfied_constraints` 保护 | `test_tour_turn_limits.py` |
+| 路线确认记录只来自用户原话 | `record_approval.record_route`（`h5.py record-route-approval`） | `test_tour_spatial_plan.RecordApproval` |
+| brief 与已批准路线一致、经过不看的站位要列出 | `tour_stage_chain.check_brief_alignment`、`pass_through_stations`（`tour_pipeline.run` 开跑前调用） | `test_tour_spatial_plan.BriefAlignment` |
+| 从已批准路线生成镜头 brief 与假设清单 | `brief_from_route.build`（`h5.py brief-from-route`） | `test_tour_spatial_plan.BriefFromRoute`；三个真实户型的 `design()` 运行 |
+| 按章节的镜头诊断 | `tour_camera_diagnostics.build`（输出 `camera-diagnostics.json`） | `test_tour_spatial_plan.Diagnostics` |
+| 秒级镜头草稿 | `tour_draft.draft`（`h5.py tour-draft`） | `test_tour_spatial_plan.CorpusRegression`（合成案例走完整前半链） |
+| 站位按网格画面联合选择并复核撤销 | `optimize_stations`（`h5.py optimize-stations`） | `test_optimize_stations.py` |
+| 案例成绩表与基线比较 | `validate_case`（`h5.py validate-corpus`）、`assets/regression/tour-corpus-manifest.json` | `test_tour_spatial_plan.CorpusRegression` |
+| 镜头预演、整片视频确认记录 | `record_approval.record_camera`、`record_video`（`h5.py record-approval`） | `test_tour_spatial_plan.StageApprovals` |
+

@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import crypto from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {requireReviewRelease,requireRoute,ruleFingerprint} from './preview_gate.mjs';
+import {requireReviewRelease,requireRoute,ruleFingerprint,allowSyntheticSpatialFixturesForTests} from './preview_gate.mjs';
+allowSyntheticSpatialFixturesForTests();
 const here=path.dirname(fileURLToPath(import.meta.url));
 const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 const copy=v=>structuredClone(v);
@@ -27,7 +28,12 @@ function fixture(){
   const common={tourSha256:hash(paths.tour),configSha256:hash(paths.config),geometrySha256:hash(paths.geometry),schemeSha256:tour.schemeSha256,ruleFingerprint:ruleFingerprint()};
   Object.assign(files.contractReport,common,{bundleSha256:hash(paths.bundle)});Object.assign(files.screenAudit,common);Object.assign(files.visualReview,common);Object.assign(files.clearanceAudit,common,{sceneSha256:hash(paths.scene),rendererSha256:hash(paths.renderer)});
   for(const key of ['contractReport','screenAudit','visualReview','clearanceAudit'])fs.writeFileSync(paths[key],JSON.stringify(files[key]));
-  manifest.references=Object.fromEntries(['tour','config','bundle','scene','animation','contractReport','screenAudit','visualReview'].map(k=>[k,ref(k)]));manifest.geometrySha256=hash(paths.geometry);fs.writeFileSync(manifestPath,JSON.stringify(manifest));
+  const spatial={spatialPlan:{schema:'homeowner-spatial-plan/1',status:'pending_user_confirmation',schemeSha256:'synthetic',bundle:ref('bundle')}};
+  fs.writeFileSync(path.join(root,'spatialPlan.json'),JSON.stringify(spatial.spatialPlan));paths.spatialPlan=path.join(root,'spatialPlan.json');
+  spatial.spatialReview={schema:'homeowner-spatial-approval/1',status:'approved',approvalSource:'synthetic_test_fixture',confirmedBy:'synthetic fixture',evidence:'Synthetic test only',plan:ref('spatialPlan'),bundle:ref('bundle'),checks:{orderApproved:true,pathApproved:true,necessaryReturnsApproved:true}};
+  spatial.spatialConformance={schema:'homeowner-spatial-conformance/1',status:'pass',tourSha256:hash(paths.tour)};
+  for(const key of ['spatialReview','spatialConformance']){paths[key]=path.join(root,key+'.json');fs.writeFileSync(paths[key],JSON.stringify(spatial[key]));}
+  manifest.references=Object.fromEntries(['tour','config','bundle','scene','animation','contractReport','screenAudit','visualReview','spatialPlan','spatialReview','spatialConformance'].map(k=>[k,ref(k)]));manifest.geometrySha256=hash(paths.geometry);fs.writeFileSync(manifestPath,JSON.stringify(manifest));
   route.rehearsal={path:manifestPath,sha256:hash(manifestPath)};route.presentedAnimationSha256=hash(paths.animation);fs.writeFileSync(routePath,JSON.stringify(route));
   release.ruleFingerprint=ruleFingerprint();release.references={routeReview:{path:routePath,sha256:hash(routePath)},renderer:ref('renderer'),clearanceAudit:ref('clearanceAudit')};fs.writeFileSync(releasePath,JSON.stringify(release));
  }
@@ -71,7 +77,8 @@ test('both Python and browser entries use the same validator before loading a br
  const js=()=>spawnSync(process.execPath,[path.join(here,'h5_browser.mjs'),...args],{encoding:'utf8'});
  const source="import sys;from types import SimpleNamespace;sys.path.insert(0,sys.argv[1]);import h5;h5.require_capture_review(SimpleNamespace(command='capture',runtime=sys.argv[2],tour=sys.argv[3],review_release=sys.argv[4],node=sys.argv[5],preview=True,full=True))";
  const py=()=>spawnSync(process.env.FLOOR_VIS_PYTHON||'python3',['-c',source,here,f.runtime,f.paths.tour,f.releasePath,process.execPath],{encoding:'utf8'});
- for(const run of [js,py]){const r=run();assert.equal(r.status,0,r.stderr);}
+ // Real entries have no test switch: both must refuse the synthetic route approval identically.
+ for(const run of [js,py]){const r=run();assert.notEqual(r.status,0);assert.match(r.stderr,/actual user required/);}
  f.route.checks.animationViewed=false;f.refresh();for(const run of [js,py])assert.notEqual(run().status,0);
  const out=path.join(f.root,'no-output');const r=spawnSync(process.execPath,[path.join(here,'h5_browser.mjs'),'capture',...args.slice(1),'--out',out],{encoding:'utf8'});assert.notEqual(r.status,0);assert.equal(fs.existsSync(out),false);
 }));

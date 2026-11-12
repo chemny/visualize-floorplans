@@ -122,7 +122,8 @@ def assemble(engine,windows,navigation_policy,frozen_transits=None):
                 for field in ('eyeMm','horizontalFovDegrees','shiftY'):
                     if actual.get(field)!=expected.get(field):raise ValueError('Frozen transit camera profile differs from current framing')
             segments.append({'chapter':ch,'frames':chunk,'fixed':True,'count':len(chunk)-1});source=chunk[-1];continue
-        path=engine.connection_path(source['pointMm'],dest['pointMm'],ch);p=profile(path,engine.limits['maximumSpeedMps']*1000*(1-headroom),fps=fps)
+        speed_policy=engine.c.get('speedPolicy')
+        path=engine.connection_path(source['pointMm'],dest['pointMm'],ch);p=profile(path,min(engine.limits['maximumSpeedMps'],speed_policy['cruiseMps'] if speed_policy else 1e9)*1000*(1-headroom),acceleration=(speed_policy['cruiseMps']/speed_policy['rampSeconds']*1000 if speed_policy else 2850),fps=fps)
         limits=chapter_limits(engine.limits,ch)
         distances=p['arc'];local={**navigation_policy,**ch.get('navigationPolicy',{}),'maximumSpeedMps':limits['maximumSpeedMps'],'maxYawDegreesPerSecond':limits['maxYawDegreesPerSecond']}
         if local.get('gazeVia'):

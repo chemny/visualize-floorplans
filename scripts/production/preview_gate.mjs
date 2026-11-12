@@ -9,6 +9,7 @@ export function requirePreview(reviewPath,tourPath,runtime){
  if(!reviewPath)throw Error('Full production/HD capture requires --preview-review; review dynamic preview first');
  const r=read(reviewPath),t=read(tourPath),scene=read(path.join(runtime,'scene.json'));const resolve=a=>path.isAbsolute(a)?a:path.resolve(path.dirname(reviewPath),a);
  if(r.schema!=='homeowner-preview-review/1'||r.status!=='passed'||!r.reviewedBy)throw Error('Passed review with actual reviewer required');
+ if(r.approvalSource!=='explicit_user_confirmation'||!String(r.confirmedBy||'').trim()||!String(r.evidence||'').trim())throw Error('Dynamic preview needs explicit user confirmation; an engineering pass or reviewer name is insufficient');
  if(r.tourSha256!==hash(tourPath)||r.schemeSha256!==t.schemeSha256||r.geometrySha256!==hash(path.join(runtime,'geometry.bin'))||r.rendererSha256!==hash(path.join(runtime,'renderer.html')))throw Error('Stale tour/geometry/renderer review');
  const a=r.sceneArtifact;if(!a?.path||hash(resolve(a.path))!==a.sha256||sceneIdentity(read(resolve(a.path)))!==sceneIdentity(scene))throw Error('Preview scene changed; only resolution changes may transfer');
  for(const k of ['turnSamplesViewed','wholePreviewViewed','subjectsReadable','paceComfortable','noBlankCaptureEdges'])if(r.checks?.[k]!==true)throw Error('Preview check missing/failed: '+k);
@@ -17,6 +18,25 @@ export function requirePreview(reviewPath,tourPath,runtime){
   if(k.endsWith('Audit')){const d=read(resolve(a.path));if(d.tourSha256!==hash(tourPath)||d.schemeSha256!==t.schemeSha256)throw Error('Stale audit: '+k);if(k==='subjectAudit'&&d.status!=='pass')throw Error('Subject audit failed');if(k==='meshAudit'&&(!d.meshAudit||d.meshAudit.hits?.length||d.errors?.length))throw Error('Mesh audit failed');}
  }
  return r;
+}
+
+// Only tests call this. h5_browser exposes no flag or environment switch for it.
+let syntheticSpatialFixtures=false;
+export function allowSyntheticSpatialFixturesForTests(){syntheticSpatialFixtures=true;}
+const NON_SIGNERS=['synthetic','fixture','agent','codex','claude','assistant','自动','代签'];
+// Same stage-one chain as tour_stage_chain.require_rehearsal_chain for direct browser capture.
+function requireSpatialChain(m,tourPath,refPath){
+ const planRef=m.references.spatialPlan,reviewRef=m.references.spatialReview,reportRef=m.references.spatialConformance;
+ if(!planRef||!reviewRef||!reportRef)throw Error('Rehearsal has no approved spatial route; confirm the route, then regenerate the camera rehearsal');
+ const review=read(refPath(reviewRef)),plan=read(refPath(planRef)),signer=String(review.confirmedBy||'').toLowerCase();
+ const source=review.approvalSource,fixture=syntheticSpatialFixtures&&source==='synthetic_test_fixture';
+ if(!fixture&&(source!=='explicit_user_confirmation'||NON_SIGNERS.some(word=>signer.includes(word))))throw Error('Explicit spatial route confirmation by the actual user required; agents and fixtures cannot sign');
+ if(review.schema!=='homeowner-spatial-approval/1'||review.status!=='approved'||!signer.trim()||!String(review.evidence||'').trim())throw Error('Explicit spatial route confirmation required');
+ for(const k of ['orderApproved','pathApproved','necessaryReturnsApproved'])if(review.checks?.[k]!==true)throw Error('Incomplete spatial approval');
+ if(review.plan?.sha256!==planRef.sha256||plan.schema!=='homeowner-spatial-plan/1'||plan.status!=='pending_user_confirmation')throw Error('Spatial approval belongs to a different or unresolved plan');
+ if(review.bundle?.sha256!==m.references.bundle.sha256||plan.bundle?.sha256!==m.references.bundle.sha256||plan.schemeSha256!==m.schemeSha256)throw Error('Spatial route belongs to a different bundle or scheme');
+ const report=read(refPath(reportRef));
+ if(report.schema!=='homeowner-spatial-conformance/1'||report.status!=='pass'||report.tourSha256!==hash(tourPath))throw Error('Camera left the approved route or conformance is stale; return to route confirmation');
 }
 
 // Route approval precedes every video capture, including small diagnostic ranges.
@@ -38,6 +58,7 @@ function requireRouteEvidence(reviewPath,tourPath,runtime,release=null){
  if(m.timing.overBudget||m.timing.totalSeconds>m.timing.maximumSeconds+1e-6)throw Error('Over-budget route: replan and reconfirm timing');
  const cfg=read(refPath(m.references.config));
  if(!cfg.tourContract)throw Error('Missing tour contract; migrate legacy config and regenerate rehearsal before capture');
+ requireSpatialChain(m,tourPath,refPath);
  if(cfg.tourContract){
   const ref=m.references.contractReport;
   if(!ref)throw Error('Tour contract report missing; regenerate rehearsal');

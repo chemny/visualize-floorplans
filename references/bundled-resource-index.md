@@ -140,6 +140,12 @@ Paths below resolve from the Skill root. Consult when selecting a helper script 
 - 地图/逐行列表：`assets/h5/tour/route-panel.js`、`tour-media.js`、`tour-map.js`；短句字幕：`scripts/production/tour_subtitles.py`。
 - 回归：`test_tour_pages.py`、`test_tour_subtitles.py`、`test_tour_route_panel.mjs`；真实生成页检查：`scripts/test_tour_pages_browser.mjs`。
 
+- `assets/h5/tour/camera-brief-template.json`：镜头 brief 骨架；`scripts/production/tour_draft.py`、`optimize_stations.py`、`validate_case.py`（`assets/regression/tour-corpus-manifest.json`）、`scripts/production/brief_from_route.py`（`brief-from-route`）、`scripts/production/record_approval.py`（`record-route-approval`）、`tour_camera_diagnostics.py`（`camera-diagnostics.json`）。
+- `references/tour-camera-options-and-lessons.md`：镜头选项（最少转头、联合扫视、小房间回退、俯仰与视高）、通用引擎修正、调试经验与未解决问题；测试 `test_tour_flow_camera.py`、`test_tour_back_out.py`。
+- `scripts/production/tour_spatial_plan.py`、`tour_stage_chain.py`：第①阶段空间路线、路线确认校验、镜头符合性和四阶段状态；`assets/h5/tour/spatial-job-template.json` 为任务骨架，确认记录不自动批准。
 - `scripts/production/tour_stage_gate.py`：确切视频的用户确认、讲解准备和合成；`assets/h5/tour/narration-job-template.json` 为任务骨架，确认记录不自动批准。
 
 - `references/local-version-closeout.md`：本地阶段版本、完整回归入口、能力及案例验收边界。
+- `references/blender-lighting.md` — Blender 分支灯光配置的键、定光顺序、亮度参考、敞开门窗外的处理。
+- `references/blender-render-speed.md` — Blender 整片每帧耗时构成、提速实验结果与取舍。
+- `references/tour-production-playbook.md` — 参观视频制作手册：四阶段流程、各门槛、Blender 与远程渲染的做法和常见坑。

@@ -7,7 +7,7 @@ TEMPLATE=Path(__file__).resolve().parents[2]/'assets/h5/tour/rehearsal-template.
 CHECKS=('animationViewed','pathAndFacingApproved','durationAndRhythmApproved')
 def read(p):return json.loads(Path(p).read_text(encoding='utf-8'))
 def dump(p,v):Path(p).write_text(json.dumps(v,ensure_ascii=False,indent=2),encoding='utf-8')
-def build(tour_path,config_path,bundle_path,plan_path,bounds,out,budget_seconds,runtime,label=None):
+def build(tour_path,config_path,bundle_path,plan_path,bounds,out,budget_seconds,runtime,label=None,spatial=None):
  out=Path(out).resolve()
  if out.exists():raise ValueError('Use a fresh rehearsal directory')
  t,c,b=read(tour_path),read(config_path),read(bundle_path);fs=t['frames'];fps=t['fps']
@@ -66,15 +66,22 @@ def build(tour_path,config_path,bundle_path,plan_path,bounds,out,budget_seconds,
  import re
  page=re.sub(r'__([A-Z]+)__',lambda m:values[m[1]],page)
  out.mkdir(parents=True);shutil.copy2(Path(runtime)/'scene.json',out/'scene-reference.json');(out/'index.html').write_text(page,encoding='utf-8');dump(out/'timing.json',ledger)
- if c.get('tourContract'):dump(out/'tour-contract-report.json',contract_report)
+ if c.get('tourContract'):dump(out/'tour-contract-report.json',{**contract_report,'tourSha256':sha(tour_path),'configSha256':sha(config_path),'bundleSha256':sha(bundle_path),'schemeSha256':t['schemeSha256']})  # review-capture releases verify these bindings
  refs={k:{'path':str(Path(v).resolve()),'sha256':sha(v)} for k,v in {'tour':tour_path,'config':config_path,'bundle':bundle_path,'plan':plan_path,'animation':out/'index.html','timing':out/'timing.json','scene':out/'scene-reference.json'}.items()}
  if c.get('tourContract'):refs['contractReport']={'path':str(out/'tour-contract-report.json'),'sha256':sha(out/'tour-contract-report.json')}
- manifest={'schema':'homeowner-route-rehearsal/1','schemeSha256':t['schemeSha256'],'references':refs,'geometrySha256':sha(Path(runtime)/'geometry.bin'),'label':label,'planBounds':bounds,'status':'over_budget' if ledger['overBudget'] else 'needs_revision' if choreography['issues'] or coverage_failed or budgets_failed or points_failed or contract_failed else 'pending_user_review','timing':ledger};dump(out/'rehearsal.json',manifest)
+ if spatial:
+  from tour_spatial_plan import conformance
+  dump(out/'spatial-conformance.json',{**conformance(spatial['value'],t),'tourSha256':sha(tour_path)})
+  refs.update(spatialPlan={'path':str(Path(spatial['plan']).resolve()),'sha256':sha(spatial['plan'])},spatialReview={'path':str(Path(spatial['review']).resolve()),'sha256':sha(spatial['review'])},spatialConformance={'path':str(out/'spatial-conformance.json'),'sha256':sha(out/'spatial-conformance.json')})
+ manifest={'schema':'homeowner-route-rehearsal/1','stage':'camera_rehearsal','spatialGate':'approved' if spatial else 'missing','schemeSha256':t['schemeSha256'],'references':refs,'geometrySha256':sha(Path(runtime)/'geometry.bin'),'label':label,'planBounds':bounds,'status':'over_budget' if ledger['overBudget'] else 'needs_revision' if choreography['issues'] or coverage_failed or budgets_failed or points_failed or contract_failed else 'pending_user_review','timing':ledger};dump(out/'rehearsal.json',manifest)
  review={'schema':'homeowner-route-approval/1','status':'pending','approvalSource':'explicit_user_confirmation','confirmedBy':'','evidence':'','rehearsal':{'path':str(out/'rehearsal.json'),'sha256':sha(out/'rehearsal.json')},'presentedAnimationSha256':None,'checks':{k:False for k in CHECKS}}
  dump(out/'route-review.pending.json',review)
  return manifest
 
-def require_route(review_path,tour_path,runtime):
+def require_route(review_path,tour_path,runtime=None,*,runtime_scene=None,runtime_geometry=None):
+ # Bound file inputs also work after remote transport; no untracked runtime directory.
+ scene_path=Path(runtime_scene) if runtime_scene is not None else Path(runtime)/'scene.json'
+ geometry_path=Path(runtime_geometry) if runtime_geometry is not None else Path(runtime)/'geometry.bin'
  if not review_path:raise ValueError('Video capture requires --route-review: show and confirm the timed route animation first (including --preview/--range)')
  r=read(review_path);base=Path(review_path).resolve().parent
  resolve=lambda s:Path(s) if Path(s).is_absolute() else base/s
@@ -84,13 +91,16 @@ def require_route(review_path,tour_path,runtime):
  if not mp.is_file() or sha(mp)!=a.get('sha256'):raise ValueError('Rehearsal manifest missing/changed')
  m=read(mp)
  if m.get('schema')!='homeowner-route-rehearsal/1':raise ValueError('Invalid rehearsal')
+ if m.get('reviewScope')=='plan_only' or r.get('reviewScope')=='plan_only':raise ValueError('Plan-only route review does not authorize camera/video capture')
  for a in m['references'].values():
   q=Path(a['path']) if Path(a['path']).is_absolute() else mp.parent/a['path']
   if not q.is_file() or sha(q)!=a['sha256']:raise ValueError('Rehearsal source or displayed animation changed')
- if m['references']['tour']['sha256']!=sha(tour_path) or m['schemeSha256']!=read(tour_path)['schemeSha256'] or m['schemeSha256']!=read(Path(runtime)/'scene.json')['schemeSha256']:raise ValueError('Route or scheme changed; show a new animation')
+ if m['references']['tour']['sha256']!=sha(tour_path) or m['schemeSha256']!=read(tour_path)['schemeSha256'] or m['schemeSha256']!=read(scene_path)['schemeSha256']:raise ValueError('Route or scheme changed; show a new animation')
  if r.get('presentedAnimationSha256')!=m['references']['animation']['sha256']:raise ValueError('Approval does not identify displayed animation')
- if m.get('geometrySha256')!=sha(Path(runtime)/'geometry.bin'):raise ValueError('Runtime geometry changed')
- baseline=read(m['references']['scene']['path']);current=read(Path(runtime)/'scene.json')
+ from tour_stage_chain import require_rehearsal_chain
+ require_rehearsal_chain(m,mp.parent,tour_path)
+ if m.get('geometrySha256')!=sha(geometry_path):raise ValueError('Runtime geometry changed')
+ baseline=read(m['references']['scene']['path']);current=read(scene_path)
  for v in (baseline,current):v.get('renderSettings',{}).pop('size',None)
  if baseline!=current:raise ValueError('Runtime scene changed; resolution-only transfer is allowed')
  from tour_choreography import inspect
@@ -146,5 +156,8 @@ def main():
   a=ap.parse_args(sys.argv[2:]);m=bind_quality(a.manifest,a.screen_audit,a.visual_review);print(json.dumps({'status':m['status'],'approval':'pending'}));return
  ap=argparse.ArgumentParser(description=__doc__)
  for k in ('tour','config','bundle','plan','out','runtime'):ap.add_argument('--'+k,required=True)
- ap.add_argument('--label',help='Optional explicit purpose, e.g. rejected-route diagnosis; never imply approval');ap.add_argument('--bounds',type=float,nargs=4,required=True,metavar=('X','Y','WIDTH','HEIGHT'));ap.add_argument('--budget-seconds',type=float,required=True);a=ap.parse_args();m=build(a.tour,a.config,a.bundle,a.plan,a.bounds,a.out,a.budget_seconds,a.runtime,a.label);print(json.dumps({'status':m['status'],'output':a.out,'seconds':m['timing']['totalSeconds']},ensure_ascii=False))
+ ap.add_argument('--label',help='Optional explicit purpose, e.g. rejected-route diagnosis; never imply approval');ap.add_argument('--spatial-plan');ap.add_argument('--spatial-review');ap.add_argument('--bounds',type=float,nargs=4,required=True,metavar=('X','Y','WIDTH','HEIGHT'));ap.add_argument('--budget-seconds',type=float,required=True);a=ap.parse_args()
+ from tour_stage_chain import require_camera_entry
+ spatial=require_camera_entry({'bundle':a.bundle,'spatialPlan':a.spatial_plan,'spatialReview':a.spatial_review})
+ m=build(a.tour,a.config,a.bundle,a.plan,a.bounds,a.out,a.budget_seconds,a.runtime,a.label,spatial);print(json.dumps({'status':m['status'],'output':a.out,'seconds':m['timing']['totalSeconds']},ensure_ascii=False))
 if __name__=='__main__':main()

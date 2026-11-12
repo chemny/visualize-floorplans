@@ -12,6 +12,7 @@ from design_homeowner_tour import entry_apron,navigation_gaze,opening_candidates
 from tour_camera_evidence import target_anchor,ordered_bearings,visibility_planner,target_samples
 from tour_candidate_quality import (attach_screen_evidence,segment_effort,resample_segment,
     framing_cost,pitch_candidates,smooth_position_seams,protect_satisfied_constraints,connection_effort)
+from tour_speed_profile import profile as speed_profile,sample as speed_sample,coupled_clock,spatial_time
 
 
 def read(p):return json.loads(Path(p).read_text())
@@ -56,7 +57,16 @@ def attach_doorway_evidence(bundle,tour,config,report):
     report=copy.deepcopy(report)
     report.setdefault('checks',{})['doorwayComposition']=doorway_report(bundle,tour,config)
     return report
-def apply_timing_locks(tour,config):
+def attach_spatial_evidence(report,spatial,tour):
+    """A candidate leaving the approved route never wins; it returns to route confirmation."""
+    if not spatial:return report
+    from tour_spatial_plan import conformance
+    result=conformance(spatial['value'],tour)
+    report.setdefault('checks',{})['spatialRoute']=result
+    report['issues']+=[{**i,'message':'Candidate leaves the approved spatial route'} for i in result['issues']]
+    if result['issues']:report['status']='needs_revision'
+    return report
+def apply_timing_locks(tour,config,preserve_connection_clock=False):
     """Allocate only connection slack; never shorten a locked viewing window.
     This does not relax motion limits: the final contract still rejects unsafe
     resampling. If the minimum connection work cannot fit, reject the candidate.
@@ -74,6 +84,7 @@ def apply_timing_locks(tour,config):
     limits={**read(PROFILE)['reviewLimits'],**config.get('motionReviewLimits',{})}
     work={i:segment_effort(tour['frames'][m[chapters[i]['from']]:m[chapters[i]['to']]+1],chapter_limits(limits,chapters[i])) for i in free}
     minimum={i:max(1,math.ceil(sum(work[i])*fps-1e-8)) for i in free}
+    if preserve_connection_clock:minimum={i:max(minimum[i],counts[i]) for i in free}
     if available<sum(minimum.values()):raise ValueError(f'Connections cannot fit locked total time without exceeding minimum effort: required {sum(minimum.values())}, available {available} frames')
     slack=available-sum(minimum.values())
     if not free and slack:raise ValueError('No connection available for locked timing slack')
@@ -88,7 +99,7 @@ def apply_timing_locks(tour,config):
     for i,c in enumerate(chapters):
         source=tour['frames'][m[c['from']]:m[c['to']]+1];n=allocation[i]
         if n==len(source)-1:chunk=copy.deepcopy(source)
-        else:chunk=resample_segment(source,n,work.get(i))
+        else:chunk=resample_segment(source,n,None if preserve_connection_clock else work.get(i))
         frames.extend(chunk[1:]);visits.append({'name':c['to'],'frame':len(frames)-1})
     for i,f in enumerate(frames):f['frame']=i
     return {**tour,'frames':frames,'visits':visits,'seconds':len(frames)/fps}
@@ -172,11 +183,21 @@ class JointPlanner:
         from tour_core_targets import bind
         config=bind(bundle,config)
         self.b=bundle;self.t=tour;self.c=copy.deepcopy(config);self.search=search
-        self.c['viewingDurationFloors']=preserve_viewing_floors(tour,config)
+        self.new_plan=search.get('_planningMode')=='new'
+        # A generated seed is a proposal, not an approved viewing-time floor.
+        # Explicit floors/locks still apply to both modes. Seed-based revisions
+        # retain the previous behavior unless the job explicitly requests new planning.
+        self.c['viewingDurationFloors']=(copy.deepcopy(config.get('viewingDurationFloors',{}))
+            if self.new_plan else preserve_viewing_floors(tour,config))
+        if self.new_plan:
+            for ch in config['chapters']:
+                if ch['phase']=='observe' and not ch.get('movingView'):
+                    floors=self.c['viewingDurationFloors']
+                    floors[ch['name']]=max(floors.get(ch['name'],0),ch.get('minimumSeconds',0))
         self.m=markers(tour);self.fps=tour['fps'];self.limits={**read(PROFILE)['reviewLimits'],**config.get('motionReviewLimits',{})}
         radius=config['tourContract']['bodyRadiusMm'];access,_=entry_apron(bundle,{'entranceOpeningId':config['tourContract']['entranceOpeningId'],'startPoint':tour['frames'][0]['pointMm'],'bodyRadiusMm':radius}) if config['tourContract'].get('tourMode')=='full_tour' else ([],None)
-        self.p=Planner(bundle,{'bodyRadiusMm':radius+search.get('planningMarginMm',10),'accessPolygons':access,'gridMm':search.get('gridMm',50)})
-        self.rooms={r['id']:r for r in bundle['model']['rooms']};self.paths={};self.links={};self.pool={}
+        self.p=Planner(bundle,{'bodyRadiusMm':radius+search.get('planningMarginMm',10),'accessPolygons':access,'gridMm':search.get('gridMm',50),**config.get('pathComfort',{})})
+        self.rooms={r['id']:r for r in bundle['model']['rooms']};self.paths={};self.links={};self.pool={};self.motion_profiles={};self.view_motion_reports={};self.view_frame_counts={}
         # Use the same verified seed geometry for early budget estimates and
         # reconstruction. Re-running A* merely to price a camera-only edit used
         # to discard safe connections before they reached final checks.
@@ -198,6 +219,65 @@ class JointPlanner:
             if math.hypot(dx,dy)<100:raise ValueError('Entry framing target is too close')
             self.entry['yawRadians']=math.atan2(dy,dx)
             self.entry['pitchRadians']=math.atan2(q[2]-self.entry['eyeMm'],math.hypot(dx,dy))
+    def observation_frames(self,ch,choice=None):
+        original=self.m[ch['to']]-self.m[ch['from']]
+        if not self.new_plan:return original
+        locked=self.c.get('timingLocks',{}).get('viewingFrames',{}).get(ch['name'])
+        if locked is not None:
+            if isinstance(locked,bool) or not isinstance(locked,int) or locked<1:raise ValueError('Locked viewing frames must be a positive integer')
+            return locked
+        minimum=max(ch.get('minimumSeconds',0),self.c.get('viewingDurationFloors',{}).get(ch['name'],0))
+        if ch.get('movingView'):
+            minimum=max(minimum,original/self.fps)
+            if choice is not None:
+                limits=chapter_limits(self.limits,ch)
+                path=self.observation_path(ch,choice)
+                minimum=max(minimum,self.position_profile(path,limits)['seconds'],
+                    abs(math.degrees(choice['pan']))/(limits['maxYawDegreesPerSecond']*.98),
+                    abs(math.degrees(choice.get('pitch',0)-choice.get('pitchFrom',choice.get('pitch',0))))/(limits['maxPitchDegreesPerSecond']*.98))
+        count=max(1,math.ceil(minimum*self.fps-1e-8)) if minimum>0 else original
+        if not ch.get('movingView') or choice is None:return count
+        key=(ch['name'],tuple(map(tuple,self.observation_path(ch,choice))),count)
+        if key not in self.view_frame_counts:
+            maximum=min(count+math.ceil(2*self.fps),count*2)
+            self.view_frame_counts[key]=None
+            for proposal in range(count,maximum+1):
+                if time.monotonic()>self.deadline:raise ValueError('Moving observation timing reached the planning deadline')
+                if not self.observation_motion_report(ch,choice,proposal)['issues']:
+                    self.view_frame_counts[key]=proposal;break
+        if self.view_frame_counts[key] is None:raise ValueError('Moving observation cannot meet sampled trajectory limits within bounded additional time: '+ch['name'])
+        return self.view_frame_counts[key]
+    def observation_motion_report(self,ch,choice,count):
+        """Certify actual frame chords before a moving view becomes immutable."""
+        path=self.observation_path(ch,choice);key=(ch['name'],tuple(map(tuple,path)),count)
+        if key not in self.view_motion_reports:
+            from tour_rules import trajectory
+            motion=self.position_profile(path,chapter_limits(self.limits,ch))
+            frames=[{'pointMm':speed_sample(motion,motion['seconds']*j/count)} for j in range(count+1)]
+            frames[0]['pointMm']=choice['point'][:];frames[-1]['pointMm']=choice['endPoint'][:]
+            # Adjacent stationary views supply the zero-speed boundary context.
+            frames=[copy.deepcopy(frames[0])]+frames+[copy.deepcopy(frames[-1])]
+            config={'trajectoryPolicy':self.c.get('trajectoryPolicy',{}),'chapters':[ch],
+                    'ruleExceptions':[x for x in self.c.get('ruleExceptions',[]) if x.get('chapter') in (None,ch['name'])]}
+            sample={'fps':self.fps,'frames':frames,'visits':[{'name':ch['from'],'frame':1},{'name':ch['to'],'frame':count+1}]}
+            self.view_motion_reports[key]=trajectory(sample,config)
+        return self.view_motion_reports[key]
+    def observation_path(self,ch,choice):
+        # A fresh fixed station stays fixed; seed seam smoothing must not turn
+        # a stationary viewing window into a small loop around its anchor.
+        if self.new_plan and not ch.get('movingView') and math.dist(choice['point'],choice['endPoint'])<.1:
+            return [choice['point'],choice['point']]
+        path=choice.get('viewPath',[choice['point'],choice['endPoint']])
+        if self.new_plan and (not path or math.dist(path[0],choice['point'])>1e-6 or math.dist(path[-1],choice['endPoint'])>1e-6):
+            raise ValueError('Observation path must retain its exact selected endpoints')
+        return path
+    def position_profile(self,path,limits):
+        acceleration=min(2850.,self.c.get('trajectoryPolicy',{}).get('maximumPlanarAccelerationMps2',3)*1000*.95)
+        key=(tuple(map(tuple,path)),limits['maximumSpeedMps'],acceleration,self.fps)
+        if key not in self.motion_profiles:
+            self.motion_profiles[key]=speed_profile(path,maximum_speed=limits['maximumSpeedMps']*1000*.995,
+                acceleration=acceleration,fps=self.fps)
+        return self.motion_profiles[key]
     def path(self,a,b):
         key=tuple(a),tuple(b)
         if key not in self.paths:self.paths[key]=safe_path(self.p,a,b)
@@ -220,23 +300,90 @@ class JointPlanner:
     def incoming_path(self,a,b,observation):
         chapter=next((ch for ch in self.c['chapters'] if ch['phase']=='transit' and ch['to']==observation['from']),None)
         return self.connection_path(a,b,chapter)
+    def fresh_connection(self,source,dest,path,ch,nav_policy):
+        """Sample the existing safe arc with physical braking and local gaze work."""
+        limits=chapter_limits(self.limits,ch);motion=self.position_profile(path,limits)
+        points=motion['points'];distances=motion['arc']
+        if distances[-1]<1 or ch.get('navigationPolicy',{}).get('monotoneEndpointGaze'):
+            ys=[source['yawRadians']+delta(source['yawRadians'],dest['yawRadians'])*
+                (d/distances[-1] if distances[-1]>=1 else i/(len(points)-1)) for i,d in enumerate(distances)]
+        else:
+            local_nav={**nav_policy,**ch.get('navigationPolicy',{}),'maximumSpeedMps':limits['maximumSpeedMps'],'maxYawDegreesPerSecond':limits['maxYawDegreesPerSecond']}
+            key=('speed_profile',tuple(map(tuple,points)),round(source['yawRadians'],6),round(dest['yawRadians'],6),json.dumps(local_nav,sort_keys=True))
+            if key not in self.links:self.links[key]=navigation_gaze(self.p,points,distances,source['yawRadians'],dest['yawRadians'],local_nav)
+            ys=self.links[key]
+        clock=coupled_clock(motion,ys,limits['maxYawDegreesPerSecond'])
+        total=max(clock[-1],abs(math.degrees(dest['pitchRadians']-source['pitchRadians']))/limits['maxPitchDegreesPerSecond'])
+        n=max(1,math.ceil(total*self.fps-1e-8));frames=[]
+        import bisect
+        for j in range(n+1):
+            u=j/n;tm=spatial_time(motion,clock,clock[-1]*u);point=speed_sample(motion,tm)
+            k=max(0,min(len(points)-2,bisect.bisect_right(motion['time'],tm)-1))
+            fraction=math.dist(point,points[k])/max(1e-12,distances[k+1]-distances[k])
+            yaw=ys[k]*(1-fraction)+ys[k+1]*fraction if distances[-1]>=1 else ys[0]*(1-u)+ys[-1]*u
+            f=copy.deepcopy(source);f.update(pointMm=point,yawRadians=yaw,pitchRadians=source['pitchRadians']*(1-u)+dest['pitchRadians']*u);frames.append(f)
+        frames[0]=copy.deepcopy(source);frames[-1]=copy.deepcopy(dest);frames[-1]['yawRadians']=ys[-1]
+        return frames
+    def repair_fresh_positions(self,tour,config):
+        """Project sampled connection clocks without changing any viewing frame."""
+        from tour_rules import trajectory
+        if not self.new_plan or not trajectory(tour,config)['issues']:return tour
+        from tour_connection_motion import repair_positions_numpy
+        out=copy.deepcopy(tour)
+        try:
+            projected,evidence=repair_positions_numpy(tour,config,self.p,maximum_iterations=24000,
+                speed_headroom_fraction=0,acceleration_headroom_fraction=0,projection_tolerance_mm=1e-7,
+                deadline=self.deadline if math.isfinite(self.deadline) else None)
+            result=trajectory(projected,config);marks=markers(tour);fixed={0,len(tour['frames'])-1}
+            for ch in config['chapters']:
+                if ch['phase']=='observe':fixed.update(range(marks[ch['from']],marks[ch['to']]+1))
+            timebase=(len(projected['frames'])==len(tour['frames']) and projected['fps']==tour['fps']
+                      and projected['seconds']==tour['seconds'] and markers(projected)==marks)
+            observations=timebase and all(projected['frames'][i]==tour['frames'][i] for i in fixed)
+            points=not any(self.p.blocked(f['pointMm']) for f in projected['frames'])
+            edges=all(self.p.line_free(a['pointMm'],z['pointMm']) for a,z in zip(projected['frames'],projected['frames'][1:]))
+            caps=edge_limits(projected,config,'maximumSpeedMps',self.limits)
+            speed=all(math.dist(a['pointMm'],z['pointMm'])*self.fps/1000<=cap+1e-6
+                      for a,z,cap in zip(projected['frames'],projected['frames'][1:],caps))
+            accepted=bool(evidence.get('accepted') and not result['issues'] and timebase and observations and points and edges and speed)
+            evidence={**evidence,'status':'accepted' if accepted else 'rejected','accepted':accepted,
+                      'trajectoryIssues':result['issues'],'timebasePreserved':timebase,'observationFramesPreserved':observations,
+                      'bodyPointsSafe':points,'bodyEdgesSafe':edges,'chapterWalkingLimitsPassed':speed}
+            if accepted:out=projected
+        except (ValueError,TimeoutError,ImportError) as exc:
+            evidence={'status':'rejected','accepted':False,'reason':str(exc),'budgetExhausted':isinstance(exc,TimeoutError)}
+        out['positionProjection']=evidence
+        return out
     def baseline(self,ch):
         fs=self.t['frames'][self.m[ch['from']]:self.m[ch['to']]+1]
-        return {'point':fs[0]['pointMm'][:],'endPoint':fs[-1]['pointMm'][:],'yaw':fs[0]['yawRadians'],'pan':fs[-1]['yawRadians']-fs[0]['yawRadians'],'source':'seed','localCost':0,'pitch':fs[0]['pitchRadians']}
+        item={'point':fs[0]['pointMm'][:],'endPoint':fs[-1]['pointMm'][:],'yaw':fs[0]['yawRadians'],'pan':fs[-1]['yawRadians']-fs[0]['yawRadians'],'source':'seed','localCost':0,'pitch':fs[0]['pitchRadians']}
+        if self.new_plan:
+            item['viewPath']=[f['pointMm'][:] for f in fs]
+            item['pitchFrom']=fs[0]['pitchRadians'];item['pitch']=fs[-1]['pitchRadians']
+            if not ch.get('movingView'):item['endPoint']=item['point'][:]
+        return item
     def local_cost(self,ch,item):
-        room=self.rooms[ch['roomId']];poly=room['poly'];a=item['point'];z=item['endPoint'];seconds=(self.m[ch['to']]-self.m[ch['from']])/self.fps
+        room=self.rooms[ch['roomId']];poly=room['poly'];a=item['point'];z=item['endPoint'];seconds=self.observation_frames(ch,item)/self.fps
         region=self.rooms[ch.get('observationRegionId',ch['roomId'])]['poly']
-        path=item.get('viewPath',[a,z])
+        path=self.observation_path(ch,item)
+        movement=self.position_profile(path,chapter_limits(self.limits,ch)) if self.new_plan else None
+        if movement and movement['seconds']>seconds+1e-8:return None
+        if self.new_plan and ch.get('movingView') and self.observation_motion_report(ch,item,round(seconds*self.fps))['issues']:return None
         if length(path)/1000/seconds>self.limits['maximumSpeedMps']:return None
         if not inside(a,region) or not inside(z,region) or self.p.blocked(a) or self.p.blocked(z) or any(not self.p.line_free(x,y) for x,y in zip(path,path[1:])):return None
         if abs(math.degrees(item['pan']))/seconds>chapter_limits(self.limits,ch)['maxYawDegreesPerSecond']*.98:return None
-        frames=[{'pointMm':at_distance(path,length(path)*u),'yawRadians':item['yaw']+item['pan']*u} for u in [j/8 for j in range(9)]]
+        pitch=item.get('pitch',0);pitch_from=item.get('pitchFrom',pitch)
+        if abs(math.degrees(pitch-pitch_from))/seconds>chapter_limits(self.limits,ch)['maxPitchDegreesPerSecond']*.98:return None
+        frames=[{'pointMm':speed_sample(movement,movement['seconds']*u) if movement else at_distance(path,length(path)*u),
+                 'yawRadians':item['yaw']+item['pan']*u,'pitchRadians':pitch_from*(1-u)+pitch*u} for u in [j/8 for j in range(9)]]
         from tour_core_targets import targets
         ids=targets(ch);last=-1
+        hfov=self.c.get('cameraProfile',{}).get('horizontalFovDegrees',76)
+        target_half=math.radians(max(1,hfov/2-4))
         for subject in ids:
             targets=target_samples(self.b,subject);p=visibility_planner(self.b,self.p,subject);seen=[]
             for j,f in enumerate(frames):
-                if any(abs(delta(f['yawRadians'],math.atan2(q[1]-f['pointMm'][1],q[0]-f['pointMm'][0])))<=math.radians(34) and clear_distance(p,f['pointMm'],math.atan2(q[1]-f['pointMm'][1],q[0]-f['pointMm'][0]),math.dist(q[:2],f['pointMm']))>=math.dist(q[:2],f['pointMm'])-60 for q in targets):seen.append(j)
+                if any(abs(delta(f['yawRadians'],math.atan2(q[1]-f['pointMm'][1],q[0]-f['pointMm'][0])))<=target_half and clear_distance(p,f['pointMm'],math.atan2(q[1]-f['pointMm'][1],q[0]-f['pointMm'][0]),math.dist(q[:2],f['pointMm']))>=math.dist(q[:2],f['pointMm'])-60 for q in targets):seen.append(j)
             if not seen:return None
             if subject in ch.get('orderedViewTargets',[]):
                 candidates=[j for j in seen if j>=last]
@@ -245,7 +392,7 @@ class JointPlanner:
         grid=self.search.get('screenGridMm',450);points=[[x,y] for x in range(int(min(p[0] for p in poly))+grid//2,int(max(p[0] for p in poly)),grid) for y in range(int(min(p[1] for p in poly))+grid//2,int(max(p[1] for p in poly)),grid) if inside([x,y],poly)]
         seen=0
         for q in points:
-            if any(abs(delta(f['yawRadians'],math.atan2(q[1]-f['pointMm'][1],q[0]-f['pointMm'][0])))<=math.radians(38) and clear_distance(self.p,f['pointMm'],math.atan2(q[1]-f['pointMm'][1],q[0]-f['pointMm'][0]),math.dist(q,f['pointMm']))>=math.dist(q,f['pointMm'])-25 for f in frames):seen+=1
+            if any(abs(delta(f['yawRadians'],math.atan2(q[1]-f['pointMm'][1],q[0]-f['pointMm'][0])))<=math.radians(hfov/2) and clear_distance(self.p,f['pointMm'],math.atan2(q[1]-f['pointMm'][1],q[0]-f['pointMm'][0]),math.dist(q,f['pointMm']))>=math.dist(q,f['pointMm'])-25 for f in frames):seen+=1
         wall=sum(sum(clear_distance(self.p,f['pointMm'],f['yawRadians']+math.radians(v),900)<900 for v in (-30,-15,0,15,30))>=4 for f in frames)/len(frames)
         budget=next((r['maximumSeconds'] for r in self.c.get('roomBudgetPolicy',{}).get('rooms',[]) if r['roomIds']==[ch['roomId']]),None)
         approach_penalty=0
@@ -263,7 +410,7 @@ class JointPlanner:
         # Vertical framing affects proposals in both directions; a steep old
         # pitch is not a one-way lower bound on all future candidates.
         eye=self.t['frames'][0]['eyeMm'];hfov=self.c.get('cameraProfile',{}).get('horizontalFovDegrees',76)
-        vertical=sum(framing_cost(self.b,ch,f['pointMm'],f['yawRadians'],item.get('pitch',0),eye,hfov) for f in frames)/len(frames)
+        vertical=sum(framing_cost(self.b,ch,f['pointMm'],f['yawRadians'],f['pitchRadians'],eye,hfov) for f in frames)/len(frames)
         return (1-seen/max(1,len(points)))*8+wall*20+abs(item['pan'])*.15+approach_penalty+vertical*2
     def candidates(self,ch,round_index,repair=False):
         name=ch['name'];base=self.baseline(ch)
@@ -280,10 +427,14 @@ class JointPlanner:
                     if any(not isinstance(q,list) or len(q)!=2 or any(not isinstance(v,(int,float)) or isinstance(v,bool) or not math.isfinite(v) for v in q) for q in (point,end)):raise ValueError('Finite station coordinates required')
                     yaw,pan,pitch=[math.radians(pose[k]) for k in ('yawDegrees','panDegrees','pitchDegrees')]
                     if not all(math.isfinite(v) for v in (yaw,pan,pitch)):raise ValueError('Finite station angles required')
+                    pitch_from=pose.get('pitchFromDegrees',pose['pitchDegrees'])
+                    if isinstance(pitch_from,bool) or not isinstance(pitch_from,(int,float)) or not math.isfinite(pitch_from):raise ValueError('Finite station starting pitch required')
+                    pitch_from=math.radians(pitch_from)
                     # Duplicate seed poses used to occupy every beam branch and
                     # consume the local-alternative budget before any real edit.
-                    if math.dist(point,base['point'])<.1 and math.dist(end,base['endPoint'])<.1 and abs(delta(yaw,base['yaw']))<1e-7 and abs(pan-base['pan'])<1e-7 and abs(pitch-base['pitch'])<1e-7:continue
+                    if math.dist(point,base['point'])<.1 and math.dist(end,base['endPoint'])<.1 and abs(delta(yaw,base['yaw']))<1e-7 and abs(pan-base['pan'])<1e-7 and abs(pitch-base['pitch'])<1e-7 and abs(pitch_from-base.get('pitchFrom',base['pitch']))<1e-7:continue
                     item={'point':point[:],'endPoint':end[:],'yaw':yaw,'pan':pan,'pitch':pitch,'source':'case_station_proposal','viewPath':self.path(point,end)}
+                    if 'pitchFromDegrees' in pose:item['pitchFrom']=pitch_from
                     cost=self.local_cost(ch,item)
                 except (ValueError,KeyError,TypeError):continue
                 if cost is not None:pool.append({**item,'localCost':cost})
@@ -292,7 +443,7 @@ class JointPlanner:
                     # discovered facilities. Search bounded whole-function scans
                     # at the same proposed station before reporting infeasibility.
                     from tour_core_targets import scan_angles
-                    for yaw,pan in scan_angles(self.b,ch,point,(self.m[ch['to']]-self.m[ch['from']])/self.fps,self.limits['maxYawDegreesPerSecond']):
+                    for yaw,pan in scan_angles(self.b,ch,point,self.observation_frames(ch)/self.fps,self.limits['maxYawDegreesPerSecond']):
                         if time.monotonic()>self.deadline:break
                         for pitch in pitch_candidates(self.b,ch,point,yaw+pan/2,item['pitch'],self.entry['eyeMm'])[:3]:
                             variant={**item,'yaw':yaw,'pan':pan,'pitch':pitch,'source':'core_function_proposal'}
@@ -319,7 +470,7 @@ class JointPlanner:
             angles=[(base['yaw']+math.radians(offset),base['pan']) for offset in (0,-15,15,-30,30)]
             if not ch.get('orderedViewTargets'):
                 from tour_core_targets import scan_angles
-                angles=scan_angles(self.b,ch,point,(self.m[ch['to']]-self.m[ch['from']])/self.fps,self.limits['maxYawDegreesPerSecond'])+angles
+                angles=scan_angles(self.b,ch,point,self.observation_frames(ch)/self.fps,self.limits['maxYawDegreesPerSecond'])+angles
             if not ch.get('orderedViewTargets'):
                 target=target_anchor(self.b,ch['subjects'][0]);bearing=math.atan2(target[1]-point[1],target[0]-point[0]);span=min(abs(base['pan']),math.radians(55))
                 angles += [(bearing-sign*span/2,sign*span) for sign in (-1,1)]
@@ -340,7 +491,7 @@ class JointPlanner:
                 exit_path=dense_path(self.path(point,next_point),100)
                 k=next((i for i,q in enumerate(exit_path) if not inside(q,room['poly'])),0)
                 a=exit_path[min(k+2,len(exit_path)-2)];z=exit_path[min(k+6,len(exit_path)-1)];heading=math.atan2(z[1]-a[1],z[0]-a[0])
-                span=math.radians(min(70,(self.m[ch['to']]-self.m[ch['from']])/self.fps*self.limits['maxYawDegreesPerSecond']*.92))
+                span=math.radians(min(70,self.observation_frames(ch)/self.fps*self.limits['maxYawDegreesPerSecond']*.92))
                 if not ch.get('orderedViewTargets'):
                     for shoulder in (-90,-60,60,90):
                         end=heading+math.radians(shoulder)
@@ -358,7 +509,7 @@ class JointPlanner:
                 try:
                     route=self.path(point,destination);drift=point;drift_path=[point]
                     for q in dense_path(route,40)[1:]:
-                        if math.dist(point,q)>min(self.search.get('maximumObservationDriftMm',1000),(self.m[ch['to']]-self.m[ch['from']])/self.fps*600) or not inside(q,room['poly']):break
+                        if math.dist(point,q)>min(self.search.get('maximumObservationDriftMm',1000),self.observation_frames(ch)/self.fps*600) or not inside(q,room['poly']):break
                         drift=q;drift_path.append(q)
                     if math.dist(point,drift)>80:ends.append(drift);view_paths[tuple(drift)]=drift_path
                 except ValueError:pass
@@ -409,9 +560,10 @@ class JointPlanner:
         if not previous or previous['to']!=current['from']:return item
         prior=choices[previous['name']];point=prior['endPoint'];yaw=prior['yaw']+prior['pan']
         end_yaw=item['yaw']+item['pan']
-        if math.dist(point,item['point'])<.1 and abs(delta(yaw,item['yaw']))<1e-7:return item
+        same_point=math.dist(point,item['point'])<.1
+        if same_point and abs(delta(yaw,item['yaw']))<1e-7 and (not self.new_plan or abs(prior.get('pitch',0)-item.get('pitchFrom',item.get('pitch',0)))<1e-7):return item
         v={**item,'point':point[:],'yaw':yaw,'pan':delta(yaw,end_yaw),
-           'viewPath':self.path(point,item['endPoint']),'source':'joint_boundary',
+           'viewPath':item['viewPath'] if self.new_plan and math.dist(point,item['point'])<1e-6 and item.get('viewPath') else self.path(point,item['endPoint']),'source':'joint_boundary',
            'pitchFrom':prior.get('pitch',0)}
         v['localCost']=self.local_cost(current,v)
         return v if v['localCost'] is not None else None
@@ -424,13 +576,13 @@ class JointPlanner:
             item=choices[ch['name']]
             if not previous or previous['to']!=ch['from']:
                 distance=length(self.incoming_path(source['pointMm'],item['point'],ch))/1000
-                seconds+=max(distance/self.limits['maximumSpeedMps'],abs(math.degrees(delta(source['yawRadians'],item['yaw'])))/self.limits['maxYawDegreesPerSecond'],abs(math.degrees(item.get('pitch',0)-source['pitchRadians']))/self.limits['maxPitchDegreesPerSecond'])
+                seconds+=max(distance/self.limits['maximumSpeedMps'],abs(math.degrees(delta(source['yawRadians'],item['yaw'])))/self.limits['maxYawDegreesPerSecond'],abs(math.degrees(item.get('pitchFrom',item.get('pitch',0))-source['pitchRadians']))/self.limits['maxPitchDegreesPerSecond'])
             source={'pointMm':item['endPoint'],'yawRadians':item['yaw']+item['pan'],'pitchRadians':item.get('pitch',0)};previous=ch
         # This is a lower-bound filter, not a compulsory extra closing turn.
         # Door framing is priced separately when that closing candidate is built.
         end=closing if closing is not None else self.t['frames'][-1]
         seconds+=max(length(self.path(source['pointMm'],end['pointMm']))/1000/self.limits['maximumSpeedMps'],abs(math.degrees(delta(source['yawRadians'],end['yawRadians'])))/self.limits['maxYawDegreesPerSecond'])
-        viewing=sum(locks.get('viewingFrames',{}).get(ch['name'],self.m[ch['to']]-self.m[ch['from']]) for _,ch in self.obs)
+        viewing=sum(self.observation_frames(ch,choices.get(ch['name'])) for _,ch in self.obs)
         available=locks['totalFrames']-1-viewing
         required=math.ceil(seconds*self.fps-1e-8)
         if required>available:
@@ -454,7 +606,7 @@ class JointPlanner:
                     if previous and previous.get('roomId')==ch.get('roomId'):
                         old=choices[previous['name']];sign=1 if old['pan']>0 else -1
                         if item['pan']*sign<0 or delta(syaw,item['yaw'])*sign< -math.radians(1):continue
-                    effort=max(d/1000/self.limits['maximumSpeedMps'],abs(math.degrees(delta(syaw,item['yaw'])))/self.limits['maxYawDegreesPerSecond'],abs(math.degrees(item.get('pitch',0)-(choices[previous['name']].get('pitch',0) if previous else self.t['frames'][0]['pitchRadians'])))/self.limits['maxPitchDegreesPerSecond'])
+                    effort=max(d/1000/self.limits['maximumSpeedMps'],abs(math.degrees(delta(syaw,item['yaw'])))/self.limits['maxYawDegreesPerSecond'],abs(math.degrees(item.get('pitchFrom',item.get('pitch',0))-(choices[previous['name']].get('pitch',0) if previous else self.t['frames'][0]['pitchRadians'])))/self.limits['maxPitchDegreesPerSecond'])
                     # Viewing quality dominates ties; safe travel/turn work couples rooms.
                     proposed={**choices,ch['name']:item}
                     try:fits=self.budget_feasible(proposed)
@@ -502,19 +654,28 @@ class JointPlanner:
                 windows[ch['from']]=fs
                 continue
             choice=choices[ch['name']];a,z=self.m[ch['from']],self.m[ch['to']];fs=copy.deepcopy(self.t['frames'][a:z+1]);yaw=choice['yaw'];pan=choice['pan']
+            n=self.observation_frames(ch,choice)
+            if n!=len(fs)-1:fs=resample_segment(fs,n)
+            path=self.observation_path(ch,choice)
+            motion=self.position_profile(path,chapter_limits(self.limits,ch)) if self.new_plan else None
+            if motion and motion['seconds']>n/self.fps+1e-8:raise ValueError('Observation movement cannot brake within its viewing window: '+ch['name'])
+            if self.new_plan and ch.get('movingView') and self.observation_motion_report(ch,choice,n)['issues']:
+                raise ValueError('Moving observation exceeds sampled trajectory limits at its fixed frame count: '+ch['name'])
             for j,f in enumerate(fs):
-                u=j/(len(fs)-1);f['pointMm']=at_distance(choice.get('viewPath',[choice['point'],choice['endPoint']]),length(choice.get('viewPath',[choice['point'],choice['endPoint']]))*u);f['yawRadians']=yaw+pan*u;f['pitchRadians']=choice.get('pitchFrom',choice.get('pitch',f['pitchRadians']))*(1-u)+choice.get('pitch',f['pitchRadians'])*u
+                u=j/(len(fs)-1);f['pointMm']=speed_sample(motion,motion['seconds']*u) if motion else at_distance(path,length(path)*u);f['yawRadians']=yaw+pan*u;f['pitchRadians']=choice.get('pitchFrom',choice.get('pitch',f['pitchRadians']))*(1-u)+choice.get('pitch',f['pitchRadians'])*u
+            if self.new_plan:
+                fs[0]['pointMm']=choice['point'][:];fs[-1]['pointMm']=choice['endPoint'][:] if ch.get('movingView') or math.dist(choice['point'],choice['endPoint'])>=.1 else choice['point'][:]
             windows[ch['from']]=fs
         output=[copy.deepcopy(self.entry)];newmarks={chapters[0]['from']:0}
         for ch in chapters:
             if ch['from'] in windows:
                 choice=choices[ch['name']]
-                fs=copy.deepcopy(self.t['frames'][self.m[ch['from']]:self.m[ch['to']]+1]) if choice['source']=='seed' and not (frozen_windows and ch['from'] in frozen_windows) else copy.deepcopy(windows[ch['from']])
+                fs=copy.deepcopy(self.t['frames'][self.m[ch['from']]:self.m[ch['to']]+1]) if choice['source']=='seed' and not self.new_plan and not (frozen_windows and ch['from'] in frozen_windows) else copy.deepcopy(windows[ch['from']])
             else:
                 source=output[-1];dest=windows[ch['to']][0] if ch['to'] in windows else (closing if ch is chapters[-1] else self.t['frames'][self.m[ch['to']]])
                 old=self.t['frames'][self.m[ch['from']]:self.m[ch['to']]+1]
                 unchanged=math.dist(source['pointMm'],old[0]['pointMm'])<.1 and math.dist(dest['pointMm'],old[-1]['pointMm'])<.1 and abs(delta(source['yawRadians'],old[0]['yawRadians']))<1e-7 and abs(delta(dest['yawRadians'],old[-1]['yawRadians']))<1e-7 and abs(source['pitchRadians']-old[0]['pitchRadians'])<1e-7 and abs(dest['pitchRadians']-old[-1]['pitchRadians'])<1e-7
-                if unchanged and not ch.get('pathWaypoints') and not ch.get('navigationPolicy') and ch['name'] not in nav_policy.get('forceChapters',[]):
+                if not self.new_plan and unchanged and not ch.get('pathWaypoints') and not ch.get('navigationPolicy') and ch['name'] not in nav_policy.get('forceChapters',[]):
                     from tour_rules import trajectory
                     if not trajectory({'frames':old,'fps':self.fps},self.c)['issues']:
                         fs=copy.deepcopy(old)
@@ -528,6 +689,12 @@ class JointPlanner:
                 if same_positions and not ch.get('pathWaypoints') and not trajectory({'fps':self.fps,'frames':old},self.c)['issues'] and all(self.p.line_free(a,b) for a,b in zip(old_path,old_path[1:])):
                     path=old_path # A framing edit does not require discarding a verified spatial path.
                 else:path=self.connection_path(source['pointMm'],dest['pointMm'],ch)
+                if self.new_plan:
+                    fs=self.fresh_connection(source,dest,path,ch,nav_policy)
+                    shift=output[-1]['yawRadians']+delta(output[-1]['yawRadians'],fs[0]['yawRadians'])-fs[0]['yawRadians']
+                    for f in fs:f['yawRadians']+=shift
+                    output.extend(fs[1:]);newmarks[ch['to']]=len(output)-1
+                    continue
                 dense=dense_path(path,20);distances=[0]
                 for a,b in zip(dense,dense[1:]):distances.append(distances[-1]+math.dist(a,b))
                 if distances[-1]<1:
@@ -569,8 +736,11 @@ class JointPlanner:
         for ch in c['chapters']:
             if ch['phase']=='observe':
                 a,z=newmarks[ch['from']],newmarks[ch['to']];ch['singleSweepDegrees']=math.degrees(output[z]['yawRadians']-output[a]['yawRadians'])
-        t=apply_timing_locks(t,c)
-        t=smooth_position_seams(t,c,self.p)
+        t=apply_timing_locks(t,c,preserve_connection_clock=self.new_plan)
+        if self.new_plan:
+            t.pop('positionProjection',None)
+            t=self.repair_fresh_positions(t,c)
+        else:t=smooth_position_seams(t,c,self.p)
         return t,c
 
 def rank(report,tour):
@@ -617,6 +787,8 @@ def run(job,out):
     out=Path(out).resolve()
     if out.exists():raise ValueError('Fresh pipeline output required')
     if job.get('schema')!='homeowner-production-job/1':raise ValueError('Explicit production job schema required')
+    from tour_stage_chain import require_camera_entry
+    spatial=require_camera_entry(job)
     b=read(job['bundle']);search={'beamWidth':3,'perRoomCandidates':6,'maximumRounds':2,'maximumFullEvaluations':40,'maximumPlanningSeconds':300,'neighbourhoodMm':400,'strictRepairRounds':True,'maximumDoorwayCandidates':3,**job.get('search',{})}
     if not all(not isinstance(search[k],bool) and isinstance(search[k],int) and 1<=search[k]<=32 for k in ('beamWidth','perRoomCandidates','maximumRounds')):raise ValueError('Bounded positive search counts required')
     for key,minimum,maximum in [('maximumFullEvaluations',1,512),('maximumCandidateMeshEvaluations',1,128),('maximumDoorwayCandidates',0,3)]:
@@ -627,7 +799,15 @@ def run(job,out):
         t=read(job['seedTour']);c=read(job['seedConfig'])
     else:
         from design_homeowner_tour import design
+        if spatial:
+            from tour_stage_chain import check_brief_alignment
+            drift=check_brief_alignment(read(job['brief']),spatial['value'])
+            if drift:raise ValueError('Camera brief does not follow the approved route: '+'; '.join(x['code']+' '+json.dumps({k:v for k,v in x.items() if k!='code'},ensure_ascii=False) for x in drift))
         t,c,_=design(b,read(job['brief']))
+    mode=job.get('planningMode') or ('revision' if job.get('seedTour') else 'new')
+    if mode not in ('new','revision'):raise ValueError('planningMode must be new or revision')
+    if mode=='new' and job.get('revisionScope'):raise ValueError('New planning cannot use a frozen revision scope')
+    search['_planningMode']=mode
     if t['schemeSha256']!=b['schemeSha256']:raise ValueError('Frozen scheme identity mismatch')
     if not c.get('tourContract'):raise ValueError('Current contract required; no automatic legacy approval')
     scene=read(Path(job['runtime'])/'scene.json')
@@ -635,8 +815,10 @@ def run(job,out):
     frozen_tour=copy.deepcopy(t);frozen_config=copy.deepcopy(c)
     scope=revision_scope(t,c,job.get('revisionScope'))
     out.mkdir(parents=True);dump(out/'job.json',job);started=time.monotonic()
-    search['_planningDeadline']=started+search['maximumPlanningSeconds']
-    workflow={'schema':'homeowner-production-workflow/1','stage':'input_locked','frozenSchemeSha256':b['schemeSha256'],'events':[],'routeApproval':'pending','humanAcceptance':'pending','video':'not_requested'}
+    # The final mesh audit is mandatory evidence; search may not spend its time.
+    search['_finalDeadline']=started+search['maximumPlanningSeconds']
+    search['_planningDeadline']=search['_finalDeadline']-min(240,search['maximumPlanningSeconds']*.25)
+    workflow={'schema':'homeowner-production-workflow/1','planningMode':mode,'stage':'input_locked','frozenSchemeSha256':b['schemeSha256'],'events':[],'spatialRouteApproval':'approved' if spatial else 'missing','routeApproval':'pending','humanAcceptance':'pending','video':'not_requested'}
     def stage(name,**details):
         workflow.update(stage=name,**details);workflow['events'].append({'stage':name,'elapsedSeconds':round(time.monotonic()-started,3)});dump(out/'workflow-state.json',workflow)
     stage('candidate_search')
@@ -671,7 +853,7 @@ def run(job,out):
             known=list(dict.fromkeys(known));feedback+=known
     attempts=[];best=(t,engine.c,base);attempt=0;frontier=[];mesh_evaluations=0;native_budget_exhausted=False;selected_origin='frozen_seed'
     mesh_cap=search.get('maximumCandidateMeshEvaluations',8)
-    phase_mesh_limit=min(mesh_cap,2)
+    phase_mesh_limit=min(mesh_cap,3)
     def mesh_candidate(tour,config,label):
         nonlocal mesh_evaluations
         if not job.get('meshPreflight',True):return None
@@ -694,6 +876,7 @@ def run(job,out):
         except subprocess.TimeoutExpired:audit=None
         report=attach_screen_evidence(report,audit,known,job.get('meshPreflight',True))
         report=protect_satisfied_constraints(report,baseline_contract)
+        attach_spatial_evidence(report,spatial,tour)
         score=rank(report,tour);attempt+=1
         attempts.append({'id':attempt,'origin':origin,'seconds':tour['seconds'],'rank':score,'issues':report['issues'],'choices':choices,'checks':report['checks'],'collisionSamples':[tour['frames'][i] for i in report['checks']['geometry']['collisionFrames'][:8]]})
         print(json.dumps({'attempt':attempt,'origin':origin,'seconds':round(tour['seconds'],3),'codes':[i['code'] for i in report['issues']]},ensure_ascii=False),flush=True)
@@ -709,10 +892,13 @@ def run(job,out):
     try:baseline_audit=mesh_candidate(t,engine.c,'seed')
     except subprocess.TimeoutExpired:baseline_audit=None
     base=attach_screen_evidence(base,baseline_audit,known,job.get('meshPreflight',True))
+    attach_spatial_evidence(base,spatial,t)
+    # Compare candidates with the seed as audited, not the seed before its screen evidence.
+    baseline_contract=copy.deepcopy(base)
     best=(t,engine.c,base)
     attempts.append({'id':0,'origin':'frozen_seed','seconds':t['seconds'],'rank':rank(base,t),'issues':base['issues'],'checks':base['checks']})
     if scope is None:
-        prepared=smooth_position_seams(t,engine.c,engine.p)
+        prepared=copy.deepcopy(t) if engine.new_plan else smooth_position_seams(t,engine.c,engine.p)
         for sec in (.12,.2):
             if attempt>=search['maximumFullEvaluations'] or time.monotonic()>search['_planningDeadline']:break
             try:consider(finalize_gaze(prepared,engine.c,sec),engine.c,'bounded_final_gaze_'+str(sec))
@@ -773,7 +959,7 @@ def run(job,out):
                 proposals.append(('local_'+ch['name'],{**baseline_choices,ch['name']:choice}))
         local_evaluations={}
         for proposal_kind,choices,closing_mode in [(kind,values,mode) for kind,values in proposals for mode in ('seed','door')]:
-            if attempt>=search['maximumFullEvaluations'] or time.monotonic()-started>search['maximumPlanningSeconds']:break
+            if attempt>=search['maximumFullEvaluations'] or time.monotonic()>search['_planningDeadline']:break
             if proposal_kind.startswith('local_') and local_evaluations.get(proposal_kind,0)>=search.get('localAlternatives',2):continue
             nav={'avoidBroadWallViews':True,'broadWallPenalty':80,'forwardWeight':6,'excessTurnPerStepWeight':30,'interpolation':'smoothstep',**search.get('navigationPolicy',{}),'closingView':closing_mode}
             if proposal_kind=='connection_only':nav['forceChapters']=critical
@@ -791,7 +977,7 @@ def run(job,out):
             dump(out/'exploration-frontier.json',{'diagnosticOnly':True,'seconds':working[0]['seconds'],'issues':working[2]['issues']})
             explore=out/'exploration-checkpoint';explore.mkdir(exist_ok=True);dump(explore/'tour.json',working[0]);dump(explore/'camera-config.json',working[1])
         frontier.clear();engine=JointPlanner(b,working[0],working[1],search)
-        if attempt>=search['maximumFullEvaluations'] or time.monotonic()-started>search['maximumPlanningSeconds']:break
+        if attempt>=search['maximumFullEvaluations'] or time.monotonic()>search['_planningDeadline']:break
     # Fine framing repair for near-threshold coverage. Keep all positions and
     # viewing durations; use soft transitions rather than whole-camera rotation.
     fine_source=working
@@ -799,7 +985,7 @@ def run(job,out):
     fringe=[] if scope is not None or search.get('strictRepairRounds') else [r['roomId'] for r in cp.get('rooms',[]) if 0<cp.get('minimumPercent',0)-r['horizontalAreaPercent']<=6]
     for room in fringe:
         for degrees in (-2,2,-4,4,-6,6):
-            if attempt>=search['maximumFullEvaluations'] or time.monotonic()-started>search['maximumPlanningSeconds']:break
+            if attempt>=search['maximumFullEvaluations'] or time.monotonic()>search['_planningDeadline']:break
             proposal=copy.deepcopy(fine_source[0]);pc=fine_source[1];marks=markers(proposal);radius=max(1,round(proposal['fps']*.35))
             for ch in pc['chapters']:
                 if ch['phase']!='observe' or ch.get('roomId')!=room:continue
@@ -814,7 +1000,7 @@ def run(job,out):
         engine=JointPlanner(b,best[0],best[1],search);fixed={ch['name']:engine.baseline(ch) for _,ch in engine.obs}
         forced=[ch['name'] for ch in best[1]['chapters'] if ch['phase']=='transit']
         for forward,turn in ((1,100),(12,30),(6,10)):
-            if attempt>=search['maximumFullEvaluations'] or time.monotonic()-started>search['maximumPlanningSeconds']:break
+            if attempt>=search['maximumFullEvaluations'] or time.monotonic()>search['_planningDeadline']:break
             try:
                 proposal,pc=engine.rebuild(fixed,{'avoidBroadWallViews':True,'broadWallPenalty':80,'forwardWeight':forward,'excessTurnPerStepWeight':turn,'interpolation':'smoothstep','forceChapters':forced})
                 consider(finalize_gaze(proposal,pc,.2),pc,'whole_route_connection_policy_'+str(forward)+'_'+str(turn),fixed)
@@ -830,7 +1016,7 @@ def run(job,out):
         node=shutil.which('node')
         if node:
             command=[node,str(Path(__file__).with_name('tour_mesh_preflight.mjs')),'--runtime',job['runtime'],'--tour',str(out/'tour.json'),'--config',str(out/'camera-config.json'),'--out',str(out/'mesh-subject-audit.json')]
-            try:result=subprocess.run(command,capture_output=True,text=True,timeout=max(1,search['_planningDeadline']-time.monotonic()))
+            try:result=subprocess.run(command,capture_output=True,text=True,timeout=max(1,search['_finalDeadline']-time.monotonic()))
             except subprocess.TimeoutExpired:result=None;mesh_status='timeout';dump(out/'mesh-timeout.json',{'status':'action_required','reason':'Bounded planning deadline exhausted'})
             if result is not None:(out/'mesh-preflight.log').write_text(result.stdout+result.stderr)
             if result is not None and result.returncode==0:
@@ -848,8 +1034,10 @@ def run(job,out):
     final_scope=scope_check(frozen_tour,t,c,scope);report.setdefault('checks',{})['revisionScope']=final_scope;report['issues']+=final_scope['issues']
     if report['issues']:report['status']='needs_revision'
     report=protect_satisfied_constraints(report,baseline_contract)
+    attach_spatial_evidence(report,spatial,t)
+    spatial_issues=report.get('checks',{}).get('spatialRoute',{}).get('issues',[])
     dump(out/'contract-report.json',report)
-    summary=read(out/'search-report.json');summary.update(status=report['status'],remainingIssues=report['issues'],candidateMeshEvaluations=mesh_evaluations,finalMeshStatus=mesh_status)
+    summary=read(out/'search-report.json');summary.update(planningMode=mode,status=report['status'],remainingIssues=report['issues'],candidateMeshEvaluations=mesh_evaluations,finalMeshStatus=mesh_status)
     dump(out/'search-report.json',summary)
     from tour_rules import review_state
     dump(out/'self-check.json',{**review_state(report['status'],mesh_status),'actualPlayback':'not_performed','candidateMeshEvaluations':mesh_evaluations})
@@ -859,6 +1047,8 @@ def run(job,out):
     outcome={'status':'selected_revision' if changed else 'baseline_retained','selectedOrigin':selected_origin,'changedFrames':changed,'automaticVisualAcceptance':False}
     closeout['revisionOutcome']=outcome
     dump(out/'closeout-report.json',closeout)
+    from tour_camera_diagnostics import build as camera_diagnostics
+    dump(out/'camera-diagnostics.json',camera_diagnostics(b,t,c,engine.p,audit))
     summary=read(out/'search-report.json');summary['revisionOutcome']=outcome;dump(out/'search-report.json',summary)
     engineering=closeout['engineeringStatus']
     stage('engineering_verified' if engineering=='pass' else 'engineering_action_required',engineeringStatus=engineering,closeoutReport='closeout-report.json',humanAcceptance='pending',blockedStages=['video_capture'])
@@ -866,9 +1056,9 @@ def run(job,out):
         stage('search_checked_no_rehearsal',engineeringStatus=engineering,numericStatus=report['status'],meshVisibility=mesh_status,blockedStages=['video_capture'],rehearsalGenerated=False)
         return {'out':str(out),'status':'diagnostic_search_only','engineeringStatus':engineering,'seconds':t['seconds'],'remainingIssues':report['issues'],'rehearsalGenerated':False,'videoGenerated':False}
     from route_rehearsal import build
-    manifest=build(out/'tour.json',out/'camera-config.json',job['bundle'],job['plan'],job['planBounds'],out/'rehearsal',c['maximumSeconds'],job['runtime'],job.get('label','全屋参观 · 联合规划预演'))
+    manifest=build(out/'tour.json',out/'camera-config.json',job['bundle'],job['plan'],job['planBounds'],out/'rehearsal',c['maximumSeconds'],job['runtime'],job.get('label','全屋参观 · 镜头预演'),spatial)
     if mesh_status!='pass' or report['issues']:manifest['status']='needs_revision';dump(out/'rehearsal/rehearsal.json',manifest)
-    stage('rehearsal_pending' if manifest['status']=='pending_user_review' else 'repair_required',meshVisibility=mesh_status,dynamicPlayback='not_performed',blockedStages=['video_capture'],nextAllowedStage='explicit_route_review' if manifest['status']=='pending_user_review' else 'repair_and_recheck')
+    stage('rehearsal_pending' if manifest['status']=='pending_user_review' else 'repair_required',meshVisibility=mesh_status,dynamicPlayback='not_performed',blockedStages=['video_capture'],nextAllowedStage='explicit_route_review' if manifest['status']=='pending_user_review' else 'return_to_route_confirmation' if spatial_issues else 'repair_and_recheck')
     make_synchronized_preview(out,job,t,manifest)
     from tour_revision_review import build_revision_review
     baseline_dir=out/'revision-baseline';baseline_dir.mkdir();dump(baseline_dir/'tour.json',frozen_tour);dump(baseline_dir/'camera-config.json',frozen_config)

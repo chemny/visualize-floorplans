@@ -10,6 +10,8 @@ import h5
 class RouteRehearsalTests(unittest.TestCase):
  def setUp(self):
   self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.p=Path(self.tmp.name);p=self.p
+  # Later-stage gate tests; the chain itself is tested in test_tour_spatial_plan.
+  chain=patch('tour_stage_chain.require_rehearsal_chain');chain.start();self.addCleanup(chain.stop)
   self.t={'schemeSha256':'case','fps':2,'seconds':4,'frames':[{'pointMm':[500+i*30,500],'eyeMm':1600,'yawRadians':0,'pitchRadians':0,'horizontalFovDegrees':76} for i in range(8)],'visits':[{'name':'start','frame':0},{'name':'view','frame':3},{'name':'end','frame':7}]}
   self.c={'chapters':[{'name':'连接','from':'start','to':'view','phase':'transit'},{'name':'客厅','from':'view','to':'end','phase':'observe','subjects':['sofa']}]}
   self.b={'schemeSha256':'case','model':{'rooms':[{'id':'living','poly':[[0,0],[2000,0],[2000,2000],[0,2000]]}]},'state':{'walls':[],'furniture':[]}}
@@ -23,6 +25,12 @@ class RouteRehearsalTests(unittest.TestCase):
    common={'tourSha256':sha(p/'tour.json'),'configSha256':sha(p/'config.json'),'geometrySha256':sha(p/'geometry.bin'),'ruleFingerprint':fingerprint()}
    for key,value in {'screenAudit':{**common,'rulesetVersion':RULESET,'status':'pass','screenQuality':{'status':'pass'}},'visualReview':{**common,'result':'pass','observationMode':'continuous_playback','reviewedBy':'synthetic reviewer fixture','evidence':'Synthetic gate test only','checks':{k:True for k in ['transitionsNatural','noRepeatedIntroduction','noSustainedObstruction','noUncomfortableTurns']}}}.items():
     q=p/(key+'.json');dump(q,value);m['references'][key]={'path':str(q),'sha256':sha(q)}
+   bundle_ref={'path':str(p/'bundle.json'),'sha256':sha(p/'bundle.json')}
+   dump(p/'spatial-plan.json',{'schema':'homeowner-spatial-plan/1','status':'pending_user_confirmation','schemeSha256':'case','bundle':bundle_ref})
+   plan_ref={'path':str(p/'spatial-plan.json'),'sha256':sha(p/'spatial-plan.json')}
+   dump(p/'spatial-approved.json',{'schema':'homeowner-spatial-approval/1','status':'approved','approvalSource':'synthetic_test_fixture','confirmedBy':'synthetic fixture','evidence':'Synthetic test only','plan':plan_ref,'bundle':bundle_ref,'checks':{k:True for k in ('orderApproved','pathApproved','necessaryReturnsApproved')}})
+   dump(p/'spatial-conformance.json',{'schema':'homeowner-spatial-conformance/1','status':'pass','tourSha256':sha(p/'tour.json')})
+   for key,name in [('spatialPlan','spatial-plan.json'),('spatialReview','spatial-approved.json'),('spatialConformance','spatial-conformance.json')]:m['references'][key]={'path':str(p/name),'sha256':sha(p/name)}
    dump(p/'rehearsal/rehearsal.json',m);r=read(p/'rehearsal/route-review.pending.json');r['rehearsal']['sha256']=sha(p/'rehearsal/rehearsal.json');dump(p/'rehearsal/route-review.pending.json',r)
   return m
  def approve(self):
@@ -58,7 +66,7 @@ class RouteRehearsalTests(unittest.TestCase):
   self.configure_contract();dump(self.p/'config.json',self.c);self.generate();r=self.approve();import os,shutil
   node=os.environ.get('FLOOR_VIS_NODE') or shutil.which('node')
   if not node:self.skipTest('Existing node unavailable')
-  module=(Path(__file__).parent/'preview_gate.mjs').resolve().as_uri();script=f"import {{requireRoute}} from {json.dumps(module)};requireRoute(process.argv[1],process.argv[2],process.argv[3]);"
+  module=(Path(__file__).parent/'preview_gate.mjs').resolve().as_uri();script=f"import {{requireRoute,allowSyntheticSpatialFixturesForTests}} from {json.dumps(module)};allowSyntheticSpatialFixturesForTests();requireRoute(process.argv[1],process.argv[2],process.argv[3]);"
   result=subprocess.run([node,'--input-type=module','-e',script,str(r),str(self.p/'tour.json'),str(self.p)],capture_output=True,text=True);self.assertEqual(result.returncode,0,result.stderr)
   result=subprocess.run([node,str(Path(__file__).parent/'h5_browser.mjs'),'capture','--runtime',str(self.p),'--tour',str(self.p/'tour.json'),'--out',str(self.p/'capture'),'--full','--preview','--range','0:2'],capture_output=True,text=True);self.assertNotEqual(result.returncode,0);self.assertIn('--route-review',result.stderr);self.assertFalse((self.p/'capture').exists())
  def configure_contract(self):
@@ -76,7 +84,7 @@ class RouteRehearsalTests(unittest.TestCase):
   node=os.environ.get('FLOOR_VIS_NODE') or shutil.which('node')
   if not node:self.skipTest('Existing node unavailable')
   module=(Path(__file__).parent/'preview_gate.mjs').resolve().as_uri()
-  script=f"import {{requireRoute}} from {json.dumps(module)};requireRoute(process.argv[1],process.argv[2],process.argv[3]);"
+  script=f"import {{requireRoute,allowSyntheticSpatialFixturesForTests}} from {json.dumps(module)};allowSyntheticSpatialFixturesForTests();requireRoute(process.argv[1],process.argv[2],process.argv[3]);"
   return subprocess.run([node,'--input-type=module','-e',script,str(review),str(self.p/'tour.json'),str(self.p)],capture_output=True,text=True)
  def test_contract_passes_both_capture_gate_implementations(self):
   self.configure_contract();dump(self.p/'config.json',self.c);m=self.generate();r=self.approve()

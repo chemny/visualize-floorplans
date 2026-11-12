@@ -53,5 +53,7 @@
   "../../assets/h5/tour/route-panel.js",
   "tour_stage_gate.py",
   "../../assets/h5/tour/narration-job-template.json",
-  "../../assets/h5/tour/presentation-job-template.json"
+  "../../assets/h5/tour/presentation-job-template.json",
+  "tour_stop_smoothness.py",
+  "tour_small_room_depth.py"
 ]

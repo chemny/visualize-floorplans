@@ -2,14 +2,14 @@
 name: interior-design
 description: Start from one floor-plan image with optional furniture/style references, build editable offline H5 2D/3D renovation workbenches, coordinate interior concept images, and create deterministic homeowner camera preflights. Use when the user requests floor-plan confirmation, furniture and finish editing, scheme export, walkthrough planning and local handoff. Preserve structural evidence and versioned approvals. Concept design is not measured CAD or construction documentation; Seedance is a separate optional branch.
 metadata:
-  version: "0.2.11"
+  version: "0.2.14"
 ---
 
 # Interior Design · 家装助手
 
 全屋参观生成与修订遵循 `references/tour-planning-contract.md`。三轮复核须检查真实
 目标驱动、整房单向性、全部捕获入口和最终帧拍墙/突转；历史通过、数值通过与
-三维播放验收分别记录。缺少新契约的旧配置不能直接捕获；当前Blender仅支持静态出图。
+三维播放验收分别记录。缺少新契约的旧配置不能直接捕获；当前 Blender 支持同源静态出图、限长动态短样，以及证据齐备并明确授权后的完整静音审阅片；讲解仍须独立视频确认。
 当前执行版本为 `homeowner-tour-rules/2`。规则、实现与反例测试的对应关系见
 `references/tour-rule-implementation.md`；修改全屋参观引擎时读取该表，禁止只改文档或案例补丁。
 
@@ -35,6 +35,20 @@ Only genuine dependencies or consequential decisions justify a pause.
 These interaction rounds coordinate the technical stages below; optional video
 is not the third user decision round.
 
+## Shared tour rendering branches
+
+Use `references/tour-render-branches.md`: H5 is the default; Blender is an explicit optional branch. Both reuse the approved exact tour and the same four-stage pages and narration gate. Lighting for Blender is a case profile: see `references/blender-lighting.md`. Use `h5.py render-prepare` before branch work. Blender exact-route static preparation and bounded `h5.py blender-draft` capture are implemented. All Blender capture entries also require bound routeReview, routeScene and routeGeometry and recheck the displayed-route approval. After bound dynamic samples, whole-home lighting calibration and explicit full-review authorization, `h5.py blender-review-film` renders the complete silent review. The legacy unrestricted animation entry stays disabled. Never replan inside the Blender renderer or treat a static sample as animation acceptance. For the whole procedure from route to final film, follow `references/tour-production-playbook.md`.
+
+## Production execution and delivery
+
+For remote rendering, quality diagnostics, optional enlargement comparisons and final delivery checks,
+use `references/production-execution-and-delivery.md` (`homeowner-production-sop/1`). Native entries:
+`h5.py remote-production`, `video-quality`, `video-upscale`, `video-upscale-pages`, `delivery-check`.
+Remote rendering requires an explicit bound execution profile and endpoint authorization; it renders
+and encodes on the selected host, collecting final media/reports rather than every source frame.
+Enlargement is an optional short experiment inside video review, never an automatic quality upgrade
+or full-film authorization. Keep actual playback, local visual quality and user approval separate.
+
 ## Stage-bound asset cleanup
 
 At confirmed stage boundaries, video verification or accepted handoff, read
@@ -47,6 +61,11 @@ permanent deletion or automatic approval. Installing this feature does not
 authorize cleanup of existing cases.
 
 ## Bundled reference case
+
+When refreshing legacy cases or README media, use `references/reference-case-upgrade.md`
+and `h5.py case-upgrade-check`. Migrate an independent copy before new demos;
+bind current media to one case/revision and keep historical concepts separate.
+Do not inherit old route/video approvals or treat a successful build as usability acceptance.
 
 For a concrete capability preview, open `assets/reference-cases/jujian-champagne-pearl/index.html` when the user asks to see an example. Read its brief `README.md` for representation boundaries; do not load the mesh or all images unless needed. It contains supplied references, a current 0.2.0 workbench, selected concept images/drawings, scheme data and an H5 tour. This is a case-specific example, not a shared default apartment or fresh acceptance of every representation. Copy case input into a new project before editing; do not modify the bundled example. Existing image/video/mesh sources differ from the newest lighting/material demo. The page uses relative links and does not open automatically when the Skill is loaded.
 
@@ -68,18 +87,19 @@ contract and mesh checks reconstruct them independently. Require 0.5s readable
 core fixtures in the first room-viewing episode; later pass-throughs cannot fill
 omissions. One shot can show multiple functions. Never drop a hard-to-frame
 fixture to improve candidate scores; see the planning contract for scope.
-Production is strictly sequential: confirm route, generate and review silent video,
+Production is strictly sequential: confirm route, inspect live camera preview, generate and review the final silent (optionally decorated) video,
 then obtain explicit user acceptance of that exact video before narration/subtitles/music.
 Use `h5.py narration-prepare` before any TTS or subtitle work and
 `h5.py narration-compose` for composition; both enforce hash-bound
 `homeowner-video-approval/1`. Never chain video encoding directly into narration.
 Page packaging enforces the same acceptance. Review capture releases and samples
 never authorize narration; pending records must not be automatically approved.
-Use `references/tour-presentation-pages.md` for the shared three-page workflow, templates, media binding and interactions. Treat that document as the single presentation SOP and use its rule-to-implementation checklist. Regenerate through the shared CLI in a fresh directory and verify actual generated interactions; test counts alone do not certify appearance. Do not recreate case-local page shells. Keep the three stage tabs at the top; embed only the pure route-map component in auxiliary 3D previews, never a full stage page.
-For a new tour or a revision, read `references/unified-tour-production.md` and use
-`h5.py plan-tour --job --out` for the bounded joint-candidate/repair workflow and
-three-stage presentation in `references/tour-presentation-pages.md`: route-only first, then video review, then narrated playback. Actual 3D checks remain a separate camera preview. This entry never captures video or grants approval.
-The lower-level `h5.py design-tour --bundle --brief --out` remains available to compare room
+Use `references/tour-presentation-pages.md` for the shared four-page workflow, templates, media binding and interactions. Treat that document as the single presentation SOP and use its rule-to-implementation checklist. Regenerate through the shared CLI in a fresh directory and verify actual generated interactions; test counts alone do not certify appearance. Do not recreate case-local page shells. Keep the four stage tabs at the top; embed only the pure route-map component in auxiliary 3D previews, never a full stage page.
+For a new tour or a revision, read `references/unified-tour-production.md`. First run
+`h5.py plan-route --job --out` and show its `route.html`; it plans rooms, openings, order and necessary returns, with no cameras or frames. Only after the user explicitly confirms that exact route, record `homeowner-spatial-approval/1` and pass it to
+`h5.py plan-tour --job --out`, the bounded camera candidate/repair workflow that stays inside the approved route. Never write that approval for the user. `h5.py tour-draft` gives a seconds-long camera draft for iterating, `h5.py optimize-stations` picks stations by mesh audit, and `h5.py validate-corpus` replays the front half of the chain on the recorded cases and flags regressions. `h5.py brief-from-route` writes the camera brief and an assumptions list from the approved route. Camera options (minimal turning, small-room back-out, pitch and eye height) and what was learned tuning them are in `references/tour-camera-options-and-lessons.md`; they are off by default and were tuned on one plan only. Stages follow the
+four-stage presentation in `references/tour-presentation-pages.md`: route, live camera preview, decorated silent video review, then narrated playback; `h5.py tour-stage-status` reports them from actual files. A full intermediate 3D MP4 is optional, not required. Apply `references/decorated-tour-workflow.md` for time-bound image guides and remote rendering; native image generation is an agent tool step, not a CLI claim. This entry never captures video or grants approval.
+The lower-level `h5.py design-tour --bundle --brief --out --spatial-plan --spatial-review` also needs the approved route; it can compare room
 order, select doorway/shallow observation points and emit semantic gaze. Do not
 write case-local timed path-chasing camera generators or compulsory viewing moves.
 Use `references/tour-native-revision.md` for native doorway composition repairs,
@@ -148,6 +168,11 @@ choices, and verify save/reload independently from visual samples.
 Wall-surface patterns, existing wall panels and artwork follow
 `references/wall-decoration-linkage.md`; use the shared style/room/face policy,
 respect fixed choices and preserve architecture and decoration placement.
+
+Furniture bodies and neutral service rooms follow `references/furniture-style-linkage.md`.
+Respect fixed shapes and colors independently, preserve placement/envelopes and actual
+operation models, and check generated geometry, plan parity and save/reload.
+Desk-to-entry spacing is explicitly declared per case; do not treat absence as approval.
 
 ## Workbench maintenance and regeneration
 

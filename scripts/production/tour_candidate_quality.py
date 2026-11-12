@@ -7,7 +7,7 @@ def protect_satisfied_constraints(report, baseline):
     """Do not exchange a previously satisfied hard constraint for fewer flags."""
     protected={'body_path_collision','scheme_mismatch','motion_limit',
         'camera_angular_acceleration','room_visit_over_budget','total_over_budget',
-        'room_coverage_below_case_minimum','locked_total_duration_changed',
+        'room_coverage_below_case_minimum','excessive_transit_turn','transit_turn_beyond_path','abrupt_stop','small_room_too_deep','sustained_backward_walking','locked_total_duration_changed',
         'locked_viewing_duration_changed','locked_fps_changed','missing_core_view_target','core_facility_unreadable'}
     key=lambda x:(x['code'],x.get('roomId'),x.get('subjectId'),x.get('name'),x.get('axis'),x.get('chapter'),x.get('field'))
     old={key(x) for x in baseline['issues'] if x['code'] in protected}

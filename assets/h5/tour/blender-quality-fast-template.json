@@ -1,0 +1,16 @@
+{
+  "schema": "blender-render-quality/1",
+  "adaptiveSampling": false,
+  "minimumSamples": 0,
+  "noiseThreshold": 0.015,
+  "retainDiagnosticPasses": false,
+  "useDenoising": true,
+  "denoiser": "OPTIX",
+  "denoisingInputPasses": "RGB_ALBEDO_NORMAL",
+  "motionBlur": false,
+  "seed": 42,
+  "causticsReflective": false,
+  "causticsRefractive": false,
+  "persistentData": true,
+  "pngCompression": 3
+}

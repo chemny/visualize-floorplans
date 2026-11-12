@@ -1,10 +1,13 @@
 {
   "schema": "homeowner-production-job/1",
   "_instructions": "Fill paths for one frozen current scheme. Supply either brief, or both seedTour and seedConfig. Paths and budgets belong to the case. Never invent approval. Planning produces interactive rehearsal only, never video.",
+  "spatialPlan": null,
+  "spatialReview": null,
   "bundle": null,
   "brief": null,
   "seedTour": null,
   "seedConfig": null,
+  "planningMode": null,
   "runtime": null,
   "plan": null,
   "planBounds": null,

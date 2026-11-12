@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.2.14 — 发布候选
+
+- 新增 `compare_render_quality.py`（同帧相似度/峰值信噪比与放大对比图）和 `blender-quality-fast-template.json`（32 采样显卡降噪的质量档），带测试。
+- 新增 `references/tour-production-playbook.md`（四阶段流程、门槛、Blender 与远程渲染的做法和坑）；重写 `tour-camera-options-and-lessons.md`（按主题整理、状态列、1 号定稿设置、遗留）；`validate-corpus` 对输入缺失或方案哈希不符的案例标为跳过而不是失败或用错版本，清单支持 `entranceOpeningId`；远程快照回归断言。
+- Blender 质量配置新增 `persistentData`、`pngCompression`；新增 `references/blender-render-speed.md`：每帧耗时构成（光追约 3.1 秒、CPU 降噪约 1.5 秒）与对比实验，32 采样加显卡降噪每帧 1.65 秒（原 4.8 秒），仅在 1 号户型验证。整片校验改为按文件比较路径（Windows 路径风格）；远程快照补上灯光检查资源。
+- Blender 灯光：新增 `blender_lighting_profile.py`（校验灯光配置键、按灯具编号 > 类型 > 全局取功率、亮度参考带）和 `references/blender-lighting.md`；`import_blender` 支持 `fixtureWattsByType`、`fixtureWattsById`、`cameraBackgroundColor`。远程快照补上 `renovation-components-v12.js`，否则远程灯光检查导入失败。
+- 预演生成时把 `tourSha256`、`configSha256`、`bundleSha256`、`schemeSha256` 写进数值报告，评审片授权（`--review-release`）核对这些绑定；此前只有测试夹具会手写，真实流水线产出过不了授权。半帧内的停留差视为取整，不再报 `viewing_time_compressed`；引擎内写死的连接占比 55% 同步改为 80%。
+- 持续倒走上限由 0.5 秒改为 1.0 秒（用户于 2026-11-02 决定；依据仅 1 号户型实测 0.58、0.83 秒）。
+- 连接占比默认上限由 55% 改为 80%：三个真实户型的整屋参观实测 74% 到 76%，原值在整屋参观里普遍不可达；用户于 2026-11-02 决定调整。案例仍可在 `choreographyPolicy` 中写得更严，高于 80% 须写 `choreography_limit_override` 例外。
+- `brief-from-route` 现在会把小空间（单门、6 平方米以内、非入户首个房间）的站位移到门内 400 毫米，使 `small_room_too_deep` 在三个户型上都不再触发。
+- 镜头诊断新增 `roomWobble`（房间内左右回摆）、`wallFacingRuns`（近墙连续段）、`timeBreakdown`；选项 `sweepConsistencyWeight`、`turnInsideSmallRoom`；brief 支持 `motionReviewLimits`（本案转头速度上限，须有 `motion_limit_override` 例外）。均默认关闭，仅在 1 号户型上验证。
+- 节奏与小空间：默认巡航 1.1/窄处 0.95 米/秒；新增终段加速度限制 `tour_workflow.limit_acceleration`（转头限速、窄处限速造成的速度台阶一并抹平，消除 `path_tangent_discontinuity`）；新增 `tour_small_room_depth.py` 与 brief 选项 `navigationPolicy.smallRoomShallowMm`（6 平方米以内单门小空间不进门内超过设定深度，入户首个房间除外，违反记 `small_room_too_deep`）；预览页诊断预演不再标“待审阅”。
+- 速度与贴墙：路径舒适净空偏好（不绕路、不降低硬安全距离）、分档巡航、缓停缓起、`abrupt_stop` 检查；全部默认关闭，本案实测总时长 72 → 约 93 秒。
+- 连接段转头新增相对上限：镜头转头不得比路线自身转弯多出 90° 以上（`transit_turn_beyond_path`），绝对 180° 不变；诊断与回归基线同步。
+- 新增 `h5.py tour-draft`（秒级镜头草稿）、`optimize-stations`（站位按网格画面选并复核撤销）、`validate-corpus`（案例一键跑完整前半链并与基线比较）、`record-approval --kind camera|video`（镜头预演、整片视频确认记录，拒绝代理名称与未完成的预演）。修复 `test_tour_rules` 里早于“加大净空重试”的过期测试桩。
+- 新增 `h5.py brief-from-route`：按已批准路线生成镜头 brief 与假设清单（总时长、覆盖百分比、视高原因必须由案例给出）；子房间站位超过两个时归入相邻房间；扫视装不下全部主体时保留主体并报告。
+- 新增 `h5.py record-route-approval`（只接受用户姓名与原话）、镜头 brief 模板、开跑前的 brief 与路线对齐检查、`camera-diagnostics.json` 按章节诊断。
+- 镜头阶段新增默认关闭的选项：最少转头连接规划、联合扫视选择、小房间回退（12平米以内、单出口、1.2米/2.5秒）、按主体的俯仰与可降低的视高；修正转头多转一整圈、候选对照版不对等、画面检查预算不足。只在一个户型上调试过，详见 `references/tour-camera-options-and-lessons.md`。
+- 参观制作拆为独立四阶段：新增 `h5.py plan-route`、`tour-stage-status`；镜头、捕获入口须消费用户路线确认。旧预演和旧确认无路线链，不能捕获；门槛源码变化也使旧规则指纹失效。
+
+- 平面桌椅遮挡按座面与台面层次绘制，标签沿用相同顺序；不修改家具高度或三维几何。加入原生SVG像素、实际选中与旋转合成户型回归，避免收在桌下的座面显示到桌面上。
+
+- 增加历史案例副本迁移与同源展示素材检查入口 `case-upgrade-check`；旧概念图/视频单列来源，不继承验收。补齐明确外围饰面带的独立保留和缺口区域报告，统一实际墙端/门洞地面检查；门把手按实际高度排除点位误报，浏览器地面与风格回归适配独立连接带和不同房间编号。
+
+- 固定四步参观流程，默认H5与可选Blender共用路线确认及具体视频批准；Blender短样、整片、远程执行入口均复查同一份路线证据。
+- 补齐远程设备、冻结输入、恢复、远端编码与回传；未改JSON保持原字节，中文报告使用UTF-8。
+- 补齐局部时序诊断、显式采样降噪配置、可选无扩散放大短样及最终音画/页面绑定检查。
+- 区分普通、Blender API及浏览器回归，移除本机路径依赖；按功能检测可选运行环境，不自动安装。
+- 整理安装链接、双渲染使用说明及版本边界。当前用户场景、路线和媒体不迁移、不改写。
+
 ## 0.2.11 — 本地未发布
 
 - 阶段收尾：完整音轨/字幕/参数追溯、统一全部模块回归收集、独立子系统版本说明与本地固化边界；保留案例用户验收待审。

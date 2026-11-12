@@ -11,8 +11,35 @@ from tour_workflow import markers
 SCHEMA = 'homeowner-forward-motion/1'
 PREFERRED_DEGREES = 60
 BACKWARD_DEGREES = 90
-MAXIMUM_BACKWARD_SECONDS = .5
+MAXIMUM_BACKWARD_SECONDS = 1.0  # was .5; user decision 2026-11-02 after plan 1 measured .58 and .83 s
 MINIMUM_WALKING_SPEED_MPS = .2
+# Case-enabled exception (config.smallRoomBackOut): leaving a small single-exit room by
+# stepping back while still facing it. Product limits, not a standard; a config can only tighten them.
+SMALL_ROOM_AREA_M2 = 12.
+BACK_OUT_METERS = 1.2
+BACK_OUT_SECONDS = 2.5
+
+
+def polygon_area_m2(poly):
+    return abs(sum(a[0] * b[1] - b[0] * a[1] for a, b in zip(poly, poly[1:] + poly[:1]))) / 2e6
+
+
+def verify_policy(bundle, config):
+    """The exception only stands for rooms that really are small in the confirmed scheme."""
+    policy = config.get('smallRoomBackOut')
+    if not policy:
+        return {'status': 'not_requested', 'issues': []}
+    rooms = {r['id']: r for r in bundle['model']['rooms']}
+    issues = []
+    for row in policy.get('rooms', []):
+        room = rooms.get(row.get('roomId'))
+        area = polygon_area_m2(room['poly']) if room else None
+        if room is None or abs(area - row.get('areaM2', -1)) > .2:
+            issues.append({'code': 'small_room_back_out_invalid', 'roomId': row.get('roomId'), 'message': 'Declared area does not match the confirmed scheme'})
+        elif area > SMALL_ROOM_AREA_M2:
+            issues.append({'code': 'small_room_back_out_invalid', 'roomId': row['roomId'], 'message': 'Room is larger than %g m2' % SMALL_ROOM_AREA_M2})
+    return {'status': 'pass' if not issues else 'needs_revision', 'issues': issues, 'limits': {
+        'maximumAreaM2': SMALL_ROOM_AREA_M2, 'maximumMeters': BACK_OUT_METERS, 'maximumSeconds': BACK_OUT_SECONDS}}
 
 
 def inspect(tour, config):
@@ -22,6 +49,11 @@ def inspect(tour, config):
     marks = markers(tour)
     chapters = [(marks[ch['from']], marks[ch['to']], ch['name'])
                 for ch in config.get('chapters', [])]
+    policy = config.get('smallRoomBackOut') or {}
+    allowed_rows = {row.get('chapter'): row for row in policy.get('rooms', [])}
+    meters = min(policy.get('maximumMeters', BACK_OUT_METERS), BACK_OUT_METERS)
+    seconds_limit = min(policy.get('maximumSeconds', BACK_OUT_SECONDS), BACK_OUT_SECONDS)
+    starts = {name: start for start, end, name in chapters}
     spans, active = [], None
     walking = preferred = 0
     maximum = 0.
@@ -49,8 +81,18 @@ def inspect(tour, config):
             active['seconds'] = (active['endFrame'] - active['startFrame']) / fps
             spans.append(active)
             active = None
+    def back_out(span):
+        names = span['chapters']
+        row = allowed_rows.get(names[0]) if len(names) == 1 else None
+        if not row or row.get('areaM2', 1e9) > SMALL_ROOM_AREA_M2 or span['startFrame'] > starts[names[0]] + round(fps * .75):
+            return False
+        travelled = sum(math.dist(frames[i]['pointMm'], frames[i + 1]['pointMm']) for i in range(span['startFrame'], span['endFrame'])) / 1000
+        return travelled <= meters + 1e-6 and span['seconds'] <= seconds_limit + 1e-9
+    for span in spans:
+        if span['seconds'] > MAXIMUM_BACKWARD_SECONDS + 1e-9 and back_out(span):
+            span['allowance'] = 'small_room_back_out'
     issues = [{'code': 'sustained_backward_walking', 'chapter': s['chapters'][0] if s['chapters'] else '',
-               **s} for s in spans if s['seconds'] > MAXIMUM_BACKWARD_SECONDS + 1e-9]
+               **s} for s in spans if s['seconds'] > MAXIMUM_BACKWARD_SECONDS + 1e-9 and not s.get('allowance')]
     return {'schema': SCHEMA, 'status': 'needs_revision' if issues else 'pass',
             'thresholds': {'preferredMaximumDegrees': PREFERRED_DEGREES,
                            'backwardAngleDegrees': BACKWARD_DEGREES,
