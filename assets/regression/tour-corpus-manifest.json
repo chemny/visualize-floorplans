@@ -41,7 +41,7 @@
     },
     {
       "id": "french-3br2ba",
-      "bundle": "/Users/neo/Codex/inbox/tour-current-french-20261028/export/production-bundle.json",
+      "bundle": "/Users/neo/Codex/inbox/tour-recovered-20261114/french-current/production-bundle.json",
       "caseFile": "/Users/neo/Codex/inbox/layout-candidate-review-20261024/french-style-native-20261028/case.json",
       "maximumSeconds": 100,
       "coverageMinimumPercent": 80,
