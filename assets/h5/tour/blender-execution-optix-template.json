@@ -1,0 +1,7 @@
+{
+  "schema": "blender-execution-profile/1",
+  "backend": "OPTIX",
+  "allowCpuFallback": false,
+  "graphicsBackend": "vulkan",
+  "requirePackedImages": true
+}

@@ -10,9 +10,18 @@ Furniture layouts and style references are optional. The Agent reads visible dim
 
 ## Preview
 
-![Capability illustration: a floor plan, editable 2D/3D workbench and interior concepts](assets/interior-design-hero-en.png)
+![Capability illustration: a floor plan, editable 2D/3D workbench and interior concepts](assets/interior-design-hero-simple-en.png)
 
 Illustration of the workflow; AI interior concepts and the editable 3D preview are separate outputs.
+
+### Workbench recordings
+
+| 2D drawings and furniture editing · 15 seconds | 3D views and lighting · 15 seconds |
+| --- | --- |
+| [![2D workbench recording](assets/demos/jujian-workbench/2d-operations.jpg)](assets/demos/jujian-workbench/2d-operations.mp4) | [![3D workbench recording](assets/demos/jujian-workbench/3d-operations.jpg)](assets/demos/jujian-workbench/3d-operations.mp4) |
+| Switch between floor plan, furniture and finish drawings; rotate and move furniture, open dimensions and undo. | Drag the bird's-eye view, switch day/night, focus a room, return and switch to the top view. |
+
+Click a thumbnail to view the recording. Both clips show actual workbench interactions.
 
 [Explore the bundled Champagne Pearl case](assets/reference-cases/jujian-champagne-pearl/index.html): supplied references, 13 concept images, an editable workbench, drawings and a 56-second tour. Ask the Agent to open the installed local case; GitHub does not execute HTML file pages. Its retained images and tour differ from the current example workbench in lighting and materials; see the [case notes](assets/reference-cases/jujian-champagne-pearl/README.md).
 
@@ -30,14 +39,14 @@ Illustration of the workflow; AI interior concepts and the editable 3D preview a
 | Save and confirm | Save directly to a local project service and confirm a stage; portable HTML supports independent saving and export. |
 | Coordinated interior concepts | Generate room and whole-home views using the confirmed layout and style, then review differences. |
 | Stage cleanup | Review obsolete media, protect referenced assets, then back up and quarantine an explicitly approved batch; no background deletion. |
-| Local delivery | Package the workbench, drawings, scheme data and approved images with an index and file checksums. |
-| Optional camera preflight | Plan and capture a continuous H5 tour when requested; video generation is a separate optional branch. |
+| Local delivery | Provide the workbench, drawings, scheme data and approved images with an index; no release archive is generated automatically. |
+| Optional camera preflight | Review the route and camera, render with H5 by default or optional Blender, then add narration after approval of the exact video. |
 
 This is concept design, not measured CAD, structural assessment or construction documentation. Unknown wall types require verification before demolition proposals. Video and Blender are optional; renovation pricing is excluded.
 
 ## Installation
 
-Current local Skill version: **0.2.11** (not published).
+Skill version: **0.2.14**.
 
 Native tour revisions now include bounded doorway composition candidates and validation, explicit
 frame/observation freezing, synchronized before/after review and an engineering
@@ -52,16 +61,19 @@ The Agent prepares the core environment first; image and video integrations can 
 | --- | --- |
 | Agent client | Tested with Codex; designed for Claude Code and OpenClaw, which have not been tested. |
 | Core runtime | Python 3.11 or newer; a modern browser for the workbench. |
-| Operating system | Tested on macOS. Windows path and invocation compatibility is reviewed, but Windows execution has not been tested. |
+| Operating system | macOS workbench/media workflow; Windows can host remote Blender rendering. Other client workflows require environment-specific checks. |
 | Interior images | An available, authorized image-generation/editing tool that accepts reference images. |
-| Browser capture / video | Optional Node.js, browser automation and Chromium; FFmpeg for encoding. |
+| Standard video | Existing Node.js, Playwright, Chrome/Chromium and FFmpeg/ffprobe. |
+| Blender video | Blender5.2-compatible APIs on the render host; local or existing SSH-connected Windows host. |
+| Narration/music | Available local or external voice tools and authorized voice/music assets. |
+| Local flicker / H3 enlargement | Optional OpenCV or existing ComfyUI nodes/models; not base dependencies. |
 
 ### Quick Installation
 
 Send this request to your Agent:
 
 ```text
-Install this Skill: https://github.com/chemny/interior-design
+Install this Skill: https://github.com/chemny/visualize-floorplans
 Check the core environment and prepare anything missing, then install and verify discovery and readiness. Set up optional features when I need them.
 ```
 
@@ -110,6 +122,19 @@ Route and camera direction are planned separately, with shallow visits to small 
 
 H5 capture requires the optional browser tools; generative final video needs a separately available provider and its own review.
 
+## Tour production
+
+1. **Route and camera**: review the complete entry-to-exit path, facing and room timing on the plan.
+2. **Camera preview**: inspect live same-source 3D composition, transitions, occlusion and pace.
+3. **Video review**: render and approve the exact silent video.
+4. **Narrated film**: align speech, concise subtitles and music to that approved picture, then compose.
+
+H5 is the default and needs no Blender. Optional Blender rendering improves materials, daylight and shadows; validate static samples and difficult dynamic clips before the full film. Viewers need only a browser. Remote rendering also encodes on the remote host and collects video/reports rather than all frames.
+
+Enlargement is an optional short comparison inside video review, not an automatic detail upgrade or full-film operation. Generative decoration processing is separately selected and reviewed for structural drift. Narration follows actual shots; music uses one constant gain. Web subtitles are separate from selectable MP4 subtitles/SRT and are not claimed as burned-in.
+
+See [render branches](references/tour-render-branches.md), [four-stage pages](references/tour-presentation-pages.md) and [execution/delivery](references/production-execution-and-delivery.md).
+
 ## How It Works
 
 Three concentrated decision rounds: **plan and essential needs → furniture layout → visual style and output scope**. The Agent completes checks and refinements within each round, batches consequential questions with recommendations, and presents final outputs for acceptance.
@@ -152,6 +177,4 @@ Original code and documentation use [MIT](LICENSE). Adapted floorplan workbench 
 
 ## About Me
 
-Maintained by [chemny](https://github.com/chemny). Questions and feedback can be raised in the [repository issues](https://github.com/chemny/interior-design/issues).
-
-Local closeout: [version boundaries and verification](references/local-version-closeout.md). Skill 0.2.11 includes workbench subsystem 0.2.7; build hashes establish exact identity.
+Maintained by [chemny](https://github.com/chemny). Questions and feedback can be raised in the [repository issues](https://github.com/chemny/visualize-floorplans/issues).

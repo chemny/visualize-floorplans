@@ -18,3 +18,7 @@ assets/furniture-layout-reference/furniture-layout-linework-v9.svg
 
 # Local unused cover draft; localized approved covers are published.
 assets/visualize-floorplans-hero.png
+
+# Ephemeral CI development tools/evidence; not distributed.
+.ci-tools/
+.ci-evidence/

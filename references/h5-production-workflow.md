@@ -7,7 +7,7 @@ consistency, subject time-window checks and accepted-delivery gates. A raw
 preflight can complete with reported visual failures; formal delivery cannot.
 
 For shared drawing visibility, installation and lighting checks, homeowner
-camera planning, and accepted-package closeout, read
+camera planning, and delivery closeout, read
 `h5-acceptance-and-handoff.md`. A verified deterministic H5 replay and an
 unverified generative final are separate stages.
 
@@ -82,7 +82,8 @@ Example argument shape (substitute real paths; invoke tools directly):
 
 ```
 python scripts/production/plan_route.py --bundle production-bundle.json --config tour-config.json --output tour.json
-blender --background --python scripts/production/import_blender.py -- --bundle production-bundle.json --route tour.json --out renders --stills --animation
+python scripts/production/h5.py render-prepare --job render-job.json --out prepared-render
+python scripts/production/h5.py blender-draft --job draft-job.json --out draft --blender EXISTING_BLENDER --ffmpeg EXISTING_FFMPEG
 ```
 
 The config contains explicit `stops` (`name`, `point` in mm), duration/fps, body
@@ -103,7 +104,7 @@ provide `--quality-review` with a current accepted source stage and, for animati
 `scripts/production/run_production.py` runs H5 by default with existing
 runtimes; `--engine blender` explicitly selects the optional Blender branch. It refuses a nonempty output directory, stale confirmations and price
 fields. Pass `--bundle`, `--config`, optional `--views`, `--out`, and `--animation`.
-For H5, also pass the existing Node, Playwright module and Chromium paths.
+The legacy Blender runner supports static preparation only; its --animation remains rejected. Use h5.py blender-review-film for an explicitly authorized full silent Blender film after sample validation. For H5, pass the existing Node, Playwright module and Chromium paths.
 An already reviewed tour can be supplied through `h5.py run --tour`.
 Override executable locations with `--blender`, `--ffmpeg`, `--ffprobe` when
 needed. It checks the encoded video frame count and duration with ffprobe.
@@ -114,6 +115,38 @@ The optional views file contains `{name, point:[x,y], target:[x,y]}` records in
 millimetres. Route stop records can include `roomId` and `lookAt:[x,y]` to direct
 camera gaze at actual room furniture while movement continues. Solid walls
 occlude those gaze targets. `maxYawDegreesPerSecond` limits head turns and
-`exitLookAt` keeps the final view on the home while leaving. `roomSpeedWeights`
+legacy `exitLookAt` settings cannot override normal forward walking toward the exit. `roomSpeedWeights`
 can allocate more time to compact rooms; blend the transitions and keep positive
 movement rather than inserting stationary holds.
+
+### Blender static same-source import
+
+Use `scripts/production/import_blender.py` for actual exported vertices, normals,
+indexed UV loops and material groups. A single-material Three.js mesh ignores
+face material groups; do not turn BoxGeometry face indices into invalid slots.
+Preserve image colour space per channel, UV repeat/centre/rotation/offset, flipY
+and axis wrapping. Bake Three world transforms into Blender `(X,-Z,Y)` without
+moving furniture; retain split normals rather than smoothing every furniture part.
+Mirrored transforms reverse triangle winding. Preserve source door/sliding-panel
+visibility; no implicit opening or hidden leaf for camera access.
+
+`--runtime` may read the corrected prepared geometry stream alongside `--bundle`;
+model, state and scheme hashes must agree. Missing legacy textures require their
+own recorded canonical-asset repair; Blender must not silently invent them.
+`--route --frame N` selects exactly one source camera frame. Match eye position,
+yaw/pitch, horizontal FOV, aspect and projection shift, and check the actual Blender
+projection matrix. Stills do not authorize animation or video capture.
+
+For a reviewed concept sample whose export approvals are absent, the caller must
+explicitly use `--review-only`; retain those statuses and renderAccepted=false.
+This does not grant formal handoff or animation approval. `--animation` remains
+rejected. `--engine cycles --samples N --stills` is static-only; case-specific
+lighting and finish overrides belong in `--render-profile` JSON. Window area
+sources may need camera/glossy/transmission visibility excluded to prevent the
+lighting card appearing through glass. Record these presentation approximations.
+
+Run `Blender --background --factory-startup --python scripts/test_blender_source_import.py`
+using the installed executable. Factory startup avoids launching unrelated user
+add-ons. Tests cover indexed UVs, custom normals, mirror winding, single-material
+face groups, source door visibility, texture channels/transforms and nonzero
+camera shift. Visually inspect the final static image as well as numeric audits.

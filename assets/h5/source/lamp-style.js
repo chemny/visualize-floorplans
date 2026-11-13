@@ -8,7 +8,7 @@ export function roomLampRole(room={},name=''){
  if(/客厅|餐厅|客餐|卧|儿童|书房|客书|living|dining|bed|study|office|child/.test(value))return 'decorative';
  return 'utility';
 }
-export function ensureLampStyle(f,{style,role='utility',ceiling=2800}={}){
+export function ensureLampStyle(f,{style,role='utility',compact=false,ceiling=2800}={}){
  if(!styleLampEligible(f))return f;
  if(f.lampStyleMode!==undefined&&!['follow','fixed'].includes(f.lampStyleMode))throw Error('灯具联动设置无效');
  if(f.lampShape!==undefined&&!LAMP_SHAPES[f.lampShape])throw Error('灯具款式无效');
@@ -21,6 +21,7 @@ export function ensureLampStyle(f,{style,role='utility',ceiling=2800}={}){
   shape='flat';
  }
  if(ceiling-LAMP_SHAPES[shape].drop<2100)throw Error('层高不足，需核对灯具安装高度');
+ if(compact&&f.lampStyleMode!=='fixed'){f.w=Math.min(f.w,280);f.d=Math.min(f.d,280);}
  f.lampLightOffset??=Number(f.h)||100;
  if(!Number.isFinite(f.lampLightOffset)||f.lampLightOffset<0||f.lampLightOffset>1000)throw Error('灯具光源位置无效');
  f.lampShape=shape;f.lampShapeRevision=1;f.h=LAMP_SHAPES[shape].drop;f.mount='ceiling';f.elevation=ceiling-f.h;

@@ -1,0 +1,20 @@
+{
+  "schema": "homeowner-remote-production-job/1",
+  "kind": "blender",
+  "job": {
+    "path": "./capture-job.json",
+    "sha256": "REPLACE"
+  },
+  "authorization": {
+    "path": "./remote-authorized.json",
+    "sha256": "REPLACE"
+  },
+  "endpoint": {
+    "sshTarget": "REPLACE_EXISTING_SSH_ALIAS",
+    "root": "D:/Render/REPLACE_UNIQUE_JOB",
+    "python": "C:/REPLACE/python.exe",
+    "blender": "C:/REPLACE/blender.exe",
+    "ffmpeg": "C:/REPLACE/ffmpeg.exe",
+    "ffprobe": "C:/REPLACE/ffprobe.exe"
+  }
+}

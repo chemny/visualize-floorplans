@@ -73,3 +73,9 @@ python3 -m unittest discover -s scripts -p test_component_capabilities.py
 检查器拒绝注册项遗漏、未知/缺失行为、固定子部件契约缺失、别名继承错配、
 证据路径失效和虚报可动机制。类型级数值测试与跨户型浏览器回归仍需分别运行；
 不能从组件索引通过推定当前案例布局、实际产品、施工或用户视觉验收通过。
+
+## 家具风格与服务空间
+
+`furniture-style-linkage.md` 列出可换家具体及九种造型族。样式、尺寸、颜色固定和真实操作能力分别记录；外形变化不代表柜门等动作已经实现。共享模块 `furniture-style.js` 与 `room-style-policy.js` 配合 `test_furniture_styles.mjs`、`test_furniture_style_browser.mjs` 检查真实几何和生成页面。
+
+书桌避门使用案例显式 `deskPlacementPolicy.minimumOpeningDistanceMm`，构建输出 `.desks.json`；`production/test_desk_placement.py` 覆盖近门反例、相邻房门、旋转家具和缺少规则。它只检查桌体到本房入口的保守平面距离，坐下、拉椅、柜门和路径仍须 `layout_use_review` 等另验。儿童房是否设书桌属于家庭需求，不能从某个案例推广成默认删除。

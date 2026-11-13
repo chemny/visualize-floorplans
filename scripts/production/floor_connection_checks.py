@@ -2,29 +2,10 @@
 from lighting_checks import inside
 
 def solid_wall_rects(walls):
-    rects=[]
-    for w in walls:
-        if w.get('demolished'):continue
-        x0,x1=sorted([w['a'][0],w['b'][0]]);y0,y1=sorted([w['a'][1],w['b'][1]]);t=w['t']/2
-        # Floor finishes may bridge a real door/passage. Deduct only the
-        # opening span; a closed leaf does not turn that span into solid wall.
-        horizontal=abs(w['b'][1]-w['a'][1])<1e-6
-        axis=0 if horizontal else 1
-        length=abs(w['b'][axis]-w['a'][axis])
-        direction=1 if w['b'][axis]>w['a'][axis] else -1
-        at=0
-        spans=[]
-        for o in sorted(w.get('opens',[]),key=lambda o:o['at']):
-            if o['kind'] not in ('door','sliding','open_passage'):continue
-            if o['at']>at:spans.append((at,o['at']))
-            at=max(at,o['at']+o['width'])
-        if at<length:spans.append((at,length))
-        for start,end in spans:
-            a=w['a'][axis]+direction*(start-(t if start==0 else 0))
-            b=w['a'][axis]+direction*(end+(t if end==length else 0))
-            lo,hi=sorted((a,b))
-            rects.append((lo,y0-t,hi,y1+t) if horizontal else (x0-t,lo,x1+t,hi))
-    return rects
+    # Share actual wall-end joins, openings and sill behavior with normalization.
+    # Independent square end caps can invent a few mm of solid at a junction.
+    from floor_boundaries import wall_rects
+    return wall_rects(walls)
 
 def check_floor_connections(model, walls):
     patches=model.get('floorConnections',[])

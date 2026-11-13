@@ -1,9 +1,10 @@
+import {styleFurnitureBody} from './furniture-style.js';
 import {finishMaterial} from './material-finish.js';
 import {tabletopDecor} from './tabletop-decor.js';
 import * as T from 'three';
 import {refinedFurniture,material,rigid,soft,pillow,lineMesh,roundedLoop,finishGroup,projectedUV,addMesh} from './soft-furniture-v10.js';
 export const FULL_REVISION='whole-home-detail-v11.1';
-export const FULL_TYPES=['bed','sofa','sofabed','armchair','chair','wardrobe','bookshelf','nightstand','desk','dresser','table','tvstand','coffee','rug','counter','vanity','ksink','stove','fridge','toilet','shower','plant','wallcab','fridgecab','endpanel','hood','pendant','downlight','tv'];
+export const FULL_TYPES=['bed','sofa','sofabed','armchair','chair','wardrobe','bookshelf','nightstand','desk','dresser','table','tvstand','coffee','rug','counter','vanity','ksink','stove','fridge','toilet','shower','plant','wallcab','fridgecab','endpanel','hood','pendant','downlight','tv','barstool'];
 const limit=(v,a,b)=>Math.max(a,Math.min(b,v));
 function cylinder(g,r,h,pos,m,name,rTop=r){return addMesh(g,new T.CylinderGeometry(rTop,r,h,32,1),m,name,pos);}
 function rod(g,a,b,r,m,name,rTop=r){const A=new T.Vector3(...a),B=new T.Vector3(...b),o=addMesh(g,new T.CylinderGeometry(rTop,r,A.distanceTo(B),12),m,name);o.position.copy(A).add(B).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),B.sub(A).normalize());return o;}
@@ -171,7 +172,9 @@ export function wholeHomeFurniture(f,base){
  if(f.type==='fridge'){m.body=material(f.color,'metal','appliance-metal',f.finishSpec);m.body.roughness=.42;m.body.metalness=.78;m.body.userData.finishRole='appliance-metal';}
  m.stone.roughness=f.finishSpec?.stoneRoughness??.40;
  m.ceramic.userData.finishRole='ceramic';m.glass.userData.finishRole='glass';
- if(['bed','sofa','sofabed','armchair'].includes(f.type)){g=refinedFurniture(f);g.userData.bodyForDimensions=true;}
+ const styled=styleFurnitureBody(f,m);
+ if(styled)g=styled;
+ else if(['bed','sofa','sofabed','armchair'].includes(f.type)){g=refinedFurniture(f);g.userData.bodyForDimensions=true;}
  else if(f.type==='chair')curvedChair(g,f,m);
  else if(['wardrobe','bookshelf','nightstand','wallcab','fridgecab'].includes(f.type))cupboard(g,f,m);
  else if(['table','desk','dresser'].includes(f.type))table(g,f,m);

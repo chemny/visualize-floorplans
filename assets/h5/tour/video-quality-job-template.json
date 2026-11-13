@@ -1,0 +1,19 @@
+{
+  "schema": "homeowner-video-quality-job/1",
+  "video": {
+    "path": "./review.mp4",
+    "sha256": "REPLACE"
+  },
+  "regions": [
+    {
+      "name": "REPLACE_ACTUAL_FURNITURE_REGION",
+      "bounds": [
+        0.1,
+        0.2,
+        0.5,
+        0.8
+      ]
+    }
+  ],
+  "threshold": 0.06
+}

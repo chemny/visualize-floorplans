@@ -77,6 +77,9 @@ review. The blank template intentionally fails build: it cannot fabricate walls.
 - `initialState.rooms`: matching room IDs with `{name,mat}`. Floor material keys
   are `wood`, `walnut`, `tile800`, `tile600`, `marble`, `antislip`, `terrazzo`,
   `carpet`. Room names and materials are editable.
+  For reviewed legacy peripheral finish strips, `floorBoundaryPolicy.retainConnections`
+  names existing patches with `id,maximumWidthMm,reason`; those remain independently
+  validated finish regions, not extra usable rooms. See `reference-case-upgrade.md`.
 - `initialState.walls`: each `{id,a:[x,y],b:[x,y],t,height,bearing,demolished,
   opens:[]}`. Current H5 geometry supports orthogonal walls. Do not advertise
   diagonal-wall support. Protect documented structural walls; black marks alone

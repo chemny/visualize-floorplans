@@ -19,7 +19,7 @@ def target_anchor(bundle,subject):
     if obj is None:raise ValueError('Unknown ordered viewing target: '+str(subject))
     if not all(isinstance(obj.get(k),(int,float)) and math.isfinite(obj[k]) for k in ('cx','cy')):
         raise ValueError('Ordered viewing target lacks finite position: '+str(subject))
-    return [obj['cx'],obj['cy'],obj.get('h',1000)/2]
+    return [obj['cx'],obj['cy'],obj.get('elevation',0)+obj.get('h',1000)/2]
 
 def target_samples(bundle,subject):
     centre=target_anchor(bundle,subject)
@@ -71,6 +71,13 @@ def inspect(bundle,tour,config,planner):
     if any(isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or v<=0 for v in policy.values()):
         raise ValueError('Camera evidence thresholds must be finite and positive')
     fs=tour['frames'];fps=tour['fps'];m=markers(tour);issues=[];rows=[];rooms={}
+    from tour_core_targets import declared_introductions,introduction_episodes
+    episode_keys={}
+    if declared_introductions(config):
+        for room,episodes in introduction_episodes(config).items():
+            for index,episode in enumerate(episodes):
+                for ch in episode:
+                    if ch.get('roomId')==room:episode_keys[ch['name']]=(room,index)
     relaxed=[k for k,v in policy.items() if k in DEFAULTS and ((v<DEFAULTS[k]) if k=='minimumTargetVisibleSeconds' else (v>DEFAULTS[k]))]
     from tour_rules import exception
     if relaxed and not exception(config,'camera_evidence_limit_override'):
@@ -79,7 +86,10 @@ def inspect(bundle,tour,config,planner):
     for ch in config['chapters']:
         if ch.get('phase')!='observe' or ch.get('from') not in m or ch.get('to') not in m:continue
         a,z=m[ch['from']],m[ch['to']];room=ch.get('roomId');changes=[math.degrees(g['yawRadians']-f['yawRadians']) for f,g in zip(fs[a:z],fs[a+1:z+1])]
-        entry=rooms.setdefault(room if room is not None else '__undeclared__:'+ch['name'],{'positiveDegrees':0,'negativeDegrees':0,'windows':[],'lastYaw':None})
+        episode=episode_keys.get(ch['name'])
+        key=(str(room)+'#'+str(episode[1])) if episode else (room if room is not None else '__undeclared__:'+ch['name'])
+        entry=rooms.setdefault(key,{'positiveDegrees':0,'negativeDegrees':0,'windows':[],'lastYaw':None})
+        if episode:entry.update(roomId=room,episodeIndex=episode[1])
         if entry['lastYaw'] is not None:changes.append(math.degrees(fs[a]['yawRadians']-entry['lastYaw']))
         entry['lastYaw']=fs[z]['yawRadians'];entry['windows'].append(ch['name'])
         entry['positiveDegrees']+=sum(max(0,v) for v in changes);entry['negativeDegrees']+=sum(max(0,-v) for v in changes)
@@ -113,7 +123,7 @@ def inspect(bundle,tour,config,planner):
     for room,row in rooms.items():
         row.pop('lastYaw')
         if not str(room).startswith('__undeclared__:') and min(row['positiveDegrees'],row['negativeDegrees'])>1:
-            issues.append({'code':'room_wide_sweep_reversal','roomId':room,**row})
+            issues.append({'code':'room_wide_sweep_reversal','roomId':row.get('roomId',room),**row})
     # Sample the full timeline, including exit/transit; not just chosen refinements.
     stride=max(1,round(fps/8));run=longest=total=0;wall_spans=[];run_start=None
     for i in range(0,len(fs),stride):

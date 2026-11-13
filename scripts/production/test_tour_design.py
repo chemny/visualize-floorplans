@@ -4,6 +4,26 @@ from tour_choreography import inspect
 from tour_workflow import intent_check
 
 class DesignTests(unittest.TestCase):
+ def test_adjacent_dry_area_to_wet_room_is_transit_not_a_false_inside_room_view(self):
+  bundle={'schemeSha256':'dry-wet','model':{'footprint':[[0,0],[6000,0],[6000,4000],[0,4000]],'rooms':[{'id':'dry','poly':[[0,0],[3000,0],[3000,4000],[0,4000]]},{'id':'wet','poly':[[3000,0],[6000,0],[6000,4000],[3000,4000]]}]},'state':{'walls':[],'furniture':[{'id':'wash','type':'vanity','cx':2000,'cy':2000,'w':400,'d':400,'rot':0},{'id':'toilet','type':'toilet','cx':5000,'cy':2000,'w':400,'d':400,'rot':0}]}}
+  common={'roomId':'wet','episodeId':'bath','tourRole':'service','viewPurpose':'One dry and wet bathroom introduction','viewSeconds':2,'observationPanDegrees':10,'candidatePointsOnly':True}
+  brief={'schema':'homeowner-design-brief/1','tourMode':'indoor_segment','startPoint':[500,2000],'maximumSeconds':60,'coveragePolicy':{'enabled':False},'rooms':[{**common,'observationId':'dry-view','name':'Dry','observationRegionId':'dry','coveredRoomIds':['dry'],'adjacentViewReason':'Actual external wash area','subjectId':'wash','targetMm':[2000,2000,600],'candidatePoints':[[1000,2000]]},{**common,'observationId':'wet-view','name':'Wet','secondPointReason':'A real physical boundary separates dry and wet areas','subjectId':'toilet','targetMm':[5000,2000,600],'candidatePoints':[[4000,2000]]}],'groups':[['dry-view','wet-view']]}
+  _,config,_=design(bundle,brief)
+  bridge=next(ch for ch in config['chapters'] if ch['name']=='Dry → Wet')
+  self.assertEqual(bridge['phase'],'transit');self.assertNotIn('movingView',bridge)
+  both=copy.deepcopy(brief);both['rooms'][1].update(observationRegionId='dry',adjacentViewReason='Both positions are in the real external area',candidatePoints=[[1200,2500]])
+  _,config,_=design(bundle,both);bridge=next(ch for ch in config['chapters'] if ch['name']=='Dry → Wet')
+  self.assertTrue(bridge['movingView']);self.assertEqual(bridge['observationRegionId'],'dry')
+ def test_brief_preserves_unordered_subjects_and_explicit_reference_coverage(self):
+  bundle={'schemeSha256':'declared-functions','model':{'footprint':[[0,0],[6000,0],[6000,4000],[0,4000]],'rooms':[{'id':'room','poly':[[0,0],[6000,0],[6000,4000],[0,4000]]}]},'state':{'walls':[],'furniture':[{'id':'bed','type':'bed','cx':4000,'cy':2000,'w':500,'d':500,'rot':0},{'id':'storage','type':'wardrobe','cx':4000,'cy':2600,'w':500,'d':300,'rot':0}]}}
+  reference={'mode':'reference_not_visual_acceptance','roomTargets':{'room':75},'reviewTolerancePercentagePoints':5}
+  brief={'schema':'homeowner-design-brief/1','tourMode':'indoor_segment','startPoint':[1000,2000],'maximumSeconds':60,'coveragePolicy':{'enabled':True,'minimumPercent':1},'coverageReferencePolicy':reference,'rooms':[{'roomId':'room','name':'Room','subjectId':'bed','subjects':['storage'],'orderedViewTargets':['bed'],'targetMm':[4000,2000,800],'candidatePoints':[[2200,2000]],'candidatePointsOnly':True,'viewPurpose':'Read sleep and storage in one composition','tourRole':'primary','viewSeconds':2}]}
+  _,config,_=design(bundle,brief)
+  view=next(ch for ch in config['chapters'] if ch['phase']=='observe')
+  self.assertEqual(view['subjects'],['bed','storage']);self.assertEqual(view['orderedViewTargets'],['bed'])
+  self.assertEqual(config['coverageReferencePolicy'],reference)
+  brief['rooms'][0]['subjects']=['invented']
+  with self.assertRaisesRegex(ValueError,'Unknown'):design(bundle,brief)
  def test_explicit_adjacent_region_and_required_framing(self):
   class Free:
    walls=[]

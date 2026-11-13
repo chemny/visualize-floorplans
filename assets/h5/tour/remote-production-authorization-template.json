@@ -1,0 +1,12 @@
+{
+  "scope": "remote_production",
+  "status": "pending",
+  "approvalSource": "explicit_user_confirmation",
+  "evidence": "",
+  "kind": "blender",
+  "job": {
+    "path": "./capture-job.json",
+    "sha256": "REPLACE"
+  },
+  "endpoint": {}
+}

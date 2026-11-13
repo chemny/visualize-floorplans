@@ -12,6 +12,8 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out',required=True,help='New empty evidence directory')
     parser.add_argument('--test-node-modules',help='Existing node_modules containing three/esbuild for CPU geometry checks; never installs')
+    parser.add_argument('--blender',help='Explicit existing Blender for the three isolated API checks')
+    parser.add_argument('--with-media-browser',action='store_true',help='Real synthetic narration and four-stage browser integration')
     parser.add_argument('--node',help='Existing Node executable; required for subject checks')
     parser.add_argument('--with-browser',action='store_true',help='Run actual generated-artifact browser acceptance; no installs')
     parser.add_argument('--browser-case',help='Case JSON for isolated browser acceptance')
@@ -40,11 +42,17 @@ def main():
         for option,value in [('--node',node),('--browser',args.browser),('--playwright-module',args.playwright_module)]:
             if value:matrix_command.extend([option,value])
         commands.append(('cross-layout-browser-acceptance',matrix_command))
+    if args.blender:
+        for file in ('test_blender_source_import.py','test_blender_room_presentation.py','test_blender_render_quality.py'):
+            commands.append(('blender-'+file.removeprefix('test_').removesuffix('.py'),[args.blender,'--background','--factory-startup','--python-exit-code','1','--python',str(root/'scripts'/file)]))
+    if args.with_media_browser:
+        if not all((node,args.browser,args.playwright_module,shutil.which('ffmpeg'),shutil.which('ffprobe'))):parser.error('--with-media-browser requires existing Node, browser, Playwright, FFmpeg/ffprobe')
+        commands.append(('media-browser',[sys.executable,str(root/'scripts/production/test_production_browser.py'),str(out/'media-browser'),node,args.browser,args.playwright_module,shutil.which('ffmpeg'),shutil.which('ffprobe')]))
     results=[]
     for name,command in commands:
         run=subprocess.run(command,cwd=root,env=env,capture_output=True,text=True,encoding='utf-8',errors='replace')
         (out/(name+'.txt')).write_text(run.stdout+run.stderr,encoding='utf-8');results.append({'name':name,'exitCode':run.returncode,'evidence':name+'.txt'})
     if not node:results.append({'name':'subject-regression','exitCode':None,'reason':'Existing Node executable missing; no automatic install'})
-    report={'testNodeModules':env.get('INTERIOR_TEST_NODE_MODULES'),'javascriptModuleTests':[str(p.relative_to(root)) for p in javascript_module_tests(root)] if node else [],'platform':sys.platform,'python':sys.version.split()[0],'node':node,'checks':results,'status':'pass' if all(r['exitCode']==0 for r in results) else 'fail','scope':'Installed source/module regression; generated-artifact browser interactions only when explicitly requested; not visual/device/video or human acceptance','installsPerformed':False,'externalNetworkCalls':False,'loopbackHttp':args.with_browser or args.with_cross_layout,'browserAcceptance':{'requested':args.with_browser,'report':'browser/result.json' if args.with_browser else None,'status':'see browser/result.json' if args.with_browser else 'not_requested'},'crossLayoutAcceptance':{'requested':args.with_cross_layout,'report':'cross-layout/result.json' if args.with_cross_layout else None,'status':'see cross-layout/result.json' if args.with_cross_layout else 'not_requested'}}
+    report={'testNodeModules':env.get('INTERIOR_TEST_NODE_MODULES'),'javascriptModuleTests':[str(p.relative_to(root)) for p in javascript_module_tests(root)] if node else [],'platform':sys.platform,'python':sys.version.split()[0],'node':node,'checks':results,'status':'pass' if all(r['exitCode']==0 for r in results) else 'fail','scope':'Installed source/module regression; generated-artifact browser interactions only when explicitly requested; not visual/device/video or human acceptance','installsPerformed':False,'externalNetworkCalls':False,'blenderApiRequested':bool(args.blender),'mediaBrowserRequested':args.with_media_browser,'loopbackHttp':args.with_browser or args.with_cross_layout or args.with_media_browser,'browserAcceptance':{'requested':args.with_browser,'report':'browser/result.json' if args.with_browser else None,'status':'see browser/result.json' if args.with_browser else 'not_requested'},'crossLayoutAcceptance':{'requested':args.with_cross_layout,'report':'cross-layout/result.json' if args.with_cross_layout else None,'status':'see cross-layout/result.json' if args.with_cross_layout else 'not_requested'}}
     (out/'result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8');print(json.dumps(report,ensure_ascii=True));return 0 if report['status']=='pass' else 1
 if __name__=='__main__':raise SystemExit(main())

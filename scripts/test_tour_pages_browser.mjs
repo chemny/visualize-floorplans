@@ -22,10 +22,10 @@ export async function checkMediaPage(tab,{chapterLabel,expectedFrame,expectedPoi
  return{...state,mapListSwitch:true,narrationControls:narrated?'checked':'not_applicable'};
 }
 
-/** Structural UI check shared by all three review stages. */
+/** Structural UI check shared by all four review stages. */
 export async function checkPresentationShell(tab){
  const state=await tab.playwright.evaluate(()=>({navs:document.querySelectorAll('nav.steps').length,items:[...document.querySelectorAll('nav.steps>a')].map(a=>({label:a.textContent,top:a.getBoundingClientRect().top})),frames:document.querySelectorAll('iframe').length,videos:document.querySelectorAll('video').length}));
- assert.equal(state.navs,1);assert.equal(state.items.length,3);assert.equal(state.frames,0);assert.ok(state.videos<=1);assert.ok(state.items.every(x=>Math.abs(x.top-state.items[0].top)<2));return state;
+ assert.equal(state.navs,1);assert.equal(state.items.length,4);assert.ok([0,2].includes(state.frames));assert.ok(state.videos<=1);assert.ok(state.items.every(x=>Math.abs(x.top-state.items[0].top)<2));return state;
 }
 export async function checkAuxiliaryPreview(tab){
  const state=await tab.playwright.evaluate(()=>({navs:document.querySelectorAll('nav.steps').length,targets:[...document.querySelectorAll('iframe')].map(e=>e.getAttribute('src'))}));

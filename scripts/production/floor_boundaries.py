@@ -5,6 +5,10 @@ are reported rather than invented as room divisions.
 import copy,heapq,math
 from lighting_checks import inside
 
+class FloorBoundaryError(ValueError):
+ def __init__(self,message,report):
+  super().__init__(message);self.report={**report,'status':'failed','error':message}
+
 def wall_rects(walls):
  live=[w for w in walls if not w.get('demolished')];out=[]
  def pad(w,end):
@@ -71,12 +75,27 @@ def normalize_floor_boundaries(case):
  if policy.get('enabled') is False:return c,{**report,'status':'disabled'}
  tol=report['toleranceMm']
  if not isinstance(tol,(int,float)) or isinstance(tol,bool) or not 0<=tol<=200:raise ValueError('Floor boundary tolerance must be 0–200 mm')
+ # A reviewed finish-only strip may remain separate from a room polygon. It is
+ # still validated cell by cell; this does not waive gaps or create usable rooms.
+ retained={};patch_by_id={p['id']:p for p in patches}
+ for spec in policy.get('retainConnections',[]):
+  ident=spec.get('id');limit=spec.get('maximumWidthMm')
+  if ident not in patch_by_id or ident in retained or not isinstance(spec.get('reason'),str) or not spec['reason'].strip():raise ValueError('Retained finish connection needs a unique existing ID and review reason')
+  if isinstance(limit,bool) or not isinstance(limit,(int,float)) or not math.isfinite(limit) or not 0<limit<=200:raise ValueError('Retained finish connection width must be explicit and at most 200 mm')
+  p=patch_by_id[ident];width=min(max(v[i] for v in p['poly'])-min(v[i] for v in p['poly']) for i in (0,1))
+  if width>limit+.001:raise ValueError('Retained finish connection exceeds declared width: '+ident)
+  retained[ident]=p
+ report['retainedConnections']=[{'id':k,'areaMm2':abs(signed_area(p['poly'])),'materialRoomId':p['materialRoomId'],'scope':'finish only; not a usable room or path'} for k,p in retained.items()]
  polys=[model['footprint']]+[r['poly'] for r in rooms]+[p['poly'] for p in patches]
  if any(abs(a[0]-b[0])>.01 and abs(a[1]-b[1])>.01 for poly in polys for a,b in zip(poly,poly[1:]+poly[:1])):raise ValueError('Floor boundary normalization requires orthogonal polygons')
  rects=wall_rects(c['initialState']['walls']);xs=sorted({round(x,6) for p in polys for x,y in p}|{round(x,6) for r in rects for x in (r[0],r[2])});ys=sorted({round(y,6) for p in polys for x,y in p}|{round(y,6) for r in rects for y in (r[1],r[3])});nx=len(xs)-1;ny=len(ys)-1;owner={};free=set();gaps=set();roomids={r['id'] for r in rooms}
  for y in range(ny):
   for x in range(nx):
-   key=y*nx+x;p=((xs[x]+xs[x+1])/2,(ys[y]+ys[y+1])/2);area=(xs[x+1]-xs[x])*(ys[y+1]-ys[y]);hits={r['id'] for r in rooms if inside(p,r['poly'])};hits|={patch['materialRoomId'] for patch in patches if inside(p,patch['poly'])}
+   key=y*nx+x;p=((xs[x]+xs[x+1])/2,(ys[y]+ys[y+1])/2);area=(xs[x+1]-xs[x])*(ys[y+1]-ys[y]);roomhits={r['id'] for r in rooms if inside(p,r['poly'])};patchhits=[patch for patch in patches if inside(p,patch['poly'])];hits=roomhits|{patch['materialRoomId'] for patch in patchhits};kept=[patch for patch in patchhits if patch['id'] in retained]
+   if kept:
+    if len(kept)!=1 or roomhits or len(patchhits)!=1 or not inside(p,model['footprint']) or any(a<p[0]<b and d<p[1]<e for a,d,b,e in rects):raise ValueError('Retained finish connection overlaps a room/wall/patch or lies outside footprint: '+kept[0]['id'])
+    if not hits<=roomids:raise ValueError('Floor patch has unknown material owner')
+    continue
    if not hits<=roomids:raise ValueError('Floor patch has unknown material owner')
    if not inside(p,model['footprint']):
     if hits:report['outsideRemovedMm2']+=area
@@ -106,7 +125,9 @@ def normalize_floor_boundaries(case):
     yy,xx=divmod(other,nx);y,x=divmod(key,nx);step=xs[xx+1]-xs[xx] if xx!=x else ys[yy+1]-ys[yy];heapq.heappush(heap,(distance+step,rid,other))
  for key in gaps:
   y,x=divmod(key,nx);area=(xs[x+1]-xs[x])*(ys[y+1]-ys[y]);report['gapFilledMm2' if key in owner else 'unresolvedGapMm2']+=area
- if report['unresolvedGapMm2']>.01:raise ValueError('Unassigned floor exceeds small-gap repair range: '+str(report['unresolvedGapMm2'])+' mm²')
+ if report['unresolvedGapMm2']>.01:
+  report['unresolvedRegions']=[{'poly':p,'signedAreaMm2':signed_area(p)} for p in contours(gaps-owner.keys(),xs,ys,nx)]
+  raise FloorBoundaryError('Unassigned floor exceeds small-gap repair range: '+str(report['unresolvedGapMm2'])+' mm²',report)
  # A tiny detached overrun beside another room is not a new room island.
  report['reassignedFragments']=[]
  for rid in sorted(roomids):
@@ -136,4 +157,4 @@ def normalize_floor_boundaries(case):
   cells={key for key,rid in owner.items() if rid==room['id']};loops=contours(cells,xs,ys,nx)
   if len(loops)!=1 or signed_area(loops[0])<=0:raise ValueError('Room needs explicit multiple/hole-region review: '+room['id']+' '+str([(signed_area(p),p) for p in loops]))
   before=abs(signed_area(room['poly']));after=abs(signed_area(loops[0]));room['poly']=loops[0];report['rooms'].append({'id':room['id'],'beforeMm2':before,'afterMm2':after})
- model['floorConnections']=[];report['mergedConnectionCount']=len(patches);report['exactSharedEdges']=True;return c,report
+ model['floorConnections']=list(retained.values());report['mergedConnectionCount']=len(patches)-len(retained);report['exactSharedEdges']=True;return c,report

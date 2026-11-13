@@ -6,11 +6,11 @@ fetch(settings.routeData,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();ret
 for(const event of ['loadedmetadata','timeupdate','seeking','seeked','play','pause','ended'])video.addEventListener(event,()=>update());
 if('requestVideoFrameCallback'in video){const tick=(now,metadata)=>{update(metadata.mediaTime);video.requestVideoFrameCallback(tick)};video.requestVideoFrameCallback(tick)}
 document.querySelectorAll('[data-time]').forEach(b=>b.onclick=()=>{video.currentTime=data?seekTime(Number(b.dataset.time),data.fps,data.frames.length):Number(b.dataset.time);update()});initRoutePanel(document,()=>update());
-if(settings.stage===3){
+if(settings.stage===4){
  const tracks=Object.entries(settings.audio).map(([kind,url])=>{const a=new Audio(url);a.preload='auto';return{kind,a,toggle:document.getElementById(kind+'On')}}),captions=settings.captions||[],script=document.getElementById('script');
  for(const row of captions){const p=document.createElement('p'),time=document.createElement('time');time.textContent=stamp(row.start)+' ';p.append(time,document.createTextNode(row.text));script.append(p)}
  const subtitleCues=settings.subtitleCues||captions;let lastCue=null;
  paintCaptions=time=>{const row=subtitleCues.find(r=>time>=r.start&&time<r.end),key=document.getElementById('subsOn').checked&&row?row.start+'|'+row.text:'';if(key===lastCue)return;lastCue=key;const el=document.getElementById('subtitle');el.replaceChildren();if(key){const span=document.createElement('span');span.textContent=row.text;el.append(span)}};
- function sync(force=false){const time=video.currentTime,row=captions.find(r=>time>=r.start&&time<r.end),subtitle=document.getElementById('subtitle');paintCaptions(time);for(const{kind,a,toggle}of tracks){if(force||Math.abs(a.currentTime-time)>.25){try{a.currentTime=time}catch{}}a.playbackRate=video.playbackRate;a.volume=video.muted?0:video.volume*(kind==='music'?(row?.07:.17):1);if(toggle?.checked&&!video.paused&&!video.seeking&&!video.ended)a.play().catch(()=>{});else a.pause()}}
+ function sync(force=false){const time=video.currentTime;paintCaptions(time);for(const{kind,a,toggle}of tracks){if(force||Math.abs(a.currentTime-time)>.25){try{a.currentTime=time}catch{}}a.playbackRate=video.playbackRate;a.volume=video.muted?0:video.volume*(kind==='music'?(settings.musicGain??1):1);if(toggle?.checked&&!video.paused&&!video.seeking&&!video.ended)a.play().catch(()=>{});else a.pause()}}
  for(const event of ['play','pause','timeupdate','seeking','seeked','ratechange','ended','volumechange'])video.addEventListener(event,()=>sync(event==='seeked'));document.querySelectorAll('.toggles input').forEach(el=>el.onchange=()=>sync(true));
 }

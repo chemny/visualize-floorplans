@@ -1,0 +1,52 @@
+{
+  "schema": "homeowner-blender-draft-job/1",
+  "scene": {
+    "path": "./scene.blend",
+    "sha256": "REPLACE"
+  },
+  "tour": {
+    "path": "./tour.json",
+    "sha256": "REPLACE"
+  },
+  "bundle": {
+    "path": "./production-bundle.json",
+    "sha256": "REPLACE"
+  },
+  "staticApproval": {
+    "path": "./static-approved.json",
+    "sha256": "REPLACE"
+  },
+  "authorization": {
+    "path": "./capture-authorized.json",
+    "sha256": "REPLACE"
+  },
+  "executionProfile": {
+    "path": "./execution.json",
+    "sha256": "REPLACE"
+  },
+  "qualityProfile": {
+    "path": "./quality.json",
+    "sha256": "REPLACE"
+  },
+  "model": {
+    "width": "REPLACE",
+    "depth": "REPLACE"
+  },
+  "startFrame": "REPLACE",
+  "endFrameExclusive": "REPLACE",
+  "anchorFrame": "REPLACE",
+  "width": "REPLACE",
+  "samples": "REPLACE",
+  "routeReview": {
+    "path": "./route-approved.json",
+    "sha256": "REPLACE"
+  },
+  "routeScene": {
+    "path": "./runtime/scene.json",
+    "sha256": "REPLACE"
+  },
+  "routeGeometry": {
+    "path": "./runtime/geometry.bin",
+    "sha256": "REPLACE"
+  }
+}

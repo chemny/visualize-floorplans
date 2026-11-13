@@ -1,0 +1,8 @@
+// Actual exported-scene renderer smoke test; takes an existing HTTP runtime URL.
+import assert from 'node:assert/strict';import fs from 'node:fs';import path from 'node:path';import {pathToFileURL} from 'node:url';
+const args={};for(let i=2;i<process.argv.length;i+=2)args[process.argv[i].replace(/^--/,'')]=process.argv[i+1];
+if(!args['playwright-module']||!args.browser||!args.tour)throw Error('Pass --url --tour --playwright-module --browser');
+const pw=(await import(pathToFileURL(path.resolve(args['playwright-module'])).href)).default;
+const url=args.url;if(!url)throw Error('Pass HTTP URL of prepared renderer.html');const b=await pw.chromium.launch({headless:true,executablePath:args.browser});
+try{const p=await b.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(url);await p.waitForFunction(()=>window.rendererReady);const a=await p.evaluate(()=>window.inspectRenderTransport());assert.equal(a.shadowAutoUpdate,false);assert.equal(a.fixtureHousingShadowCasters,0);assert(a.fixtureShadows.length<=2);assert.deepEqual([...a.fixtureShadows].sort(),[...a.lighting.fixtureShadowIds].sort());assert.equal(a.sunShadow.normalBias,.003);assert(a.sunShadow.right>a.sunShadow.left);assert(a.sunShadow.top>a.sunShadow.bottom);
+const source=JSON.parse(fs.readFileSync(args.tour,'utf8')).frames[Number(args.frame||0)];assert(source);const result=await p.evaluate(async f=>{await window.renderFrame(f);const before=window.inspectRenderTransport();await window.renderFrame(f);return{before,after:window.inspectRenderTransport()}},source);assert.deepEqual(result.before,result.after);assert.deepEqual(errors,[]);console.log(JSON.stringify({pass:true,...a,errors}));}finally{await b.close();}

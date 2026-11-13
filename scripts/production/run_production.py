@@ -11,7 +11,8 @@ def main():
    i=args.index('--engine');del args[i:i+2]
   subprocess.run([sys.executable,str(Path(__file__).with_name('h5.py')),'run',*args],check=True)
   return
- ap=argparse.ArgumentParser();ap.add_argument('--engine',choices=['blender']);ap.add_argument('--bundle',required=True);ap.add_argument('--config',required=True);ap.add_argument('--views');ap.add_argument('--out',required=True);ap.add_argument('--blender');ap.add_argument('--ffmpeg');ap.add_argument('--ffprobe');ap.add_argument('--animation',action='store_true');ap.add_argument('--resolution',type=int,default=640);a=ap.parse_args()
+ if '--animation' in sys.argv:raise SystemExit('Blender animation disabled at this legacy entry; use h5.py blender-review-film with bound route and dynamic evidence.')
+ ap=argparse.ArgumentParser();ap.add_argument('--engine',choices=['blender']);ap.add_argument('--bundle',required=True);ap.add_argument('--config',required=True);ap.add_argument('--route',required=True);ap.add_argument('--runtime');ap.add_argument('--frame',type=int,default=0);ap.add_argument('--render-profile');ap.add_argument('--views');ap.add_argument('--out',required=True);ap.add_argument('--blender');ap.add_argument('--ffmpeg');ap.add_argument('--ffprobe');ap.add_argument('--animation',action='store_true');ap.add_argument('--resolution',type=int,default=640);a=ap.parse_args()
  if a.animation:raise SystemExit('Blender animation disabled until hash-bound route and dynamic-preview gates are integrated; use the reviewed H5 capture workflow. Stills remain available.')
  out=Path(a.out).resolve()
  if out.exists() and any(out.iterdir()):raise SystemExit('Output directory must be empty; use a new revision directory.')
@@ -24,11 +25,17 @@ def main():
  if not blender:raise SystemExit('Existing Blender executable unavailable; pass --blender')
  ffmpeg=a.ffmpeg or shutil.which('ffmpeg');ffprobe=a.ffprobe or shutil.which('ffprobe')
  if a.animation and (not ffmpeg or not ffprobe):raise SystemExit('Existing FFmpeg and ffprobe are required for animation')
+ from tour_render import validate_route
+ route=Path(a.route).resolve();validate_route(json.loads(route.read_text()),bundle['schemeSha256'])
+ if not 0<=a.frame<len(json.loads(route.read_text())['frames']):raise ValueError('Frame outside confirmed route')
  out.mkdir(parents=True,exist_ok=True);shutil.copy2(bpath,out/'production-bundle.json');shutil.copy2(a.config,out/'tour-config.json');scripts=Path(__file__).parent;commands=[]
  def run(command):
   commands.append(command);subprocess.run(command,check=True)
- run([sys.executable,str(scripts/'plan_route.py'),'--bundle',str(out/'production-bundle.json'),'--config',str(out/'tour-config.json'),'--output',str(out/'tour.json')])
- cmd=[blender,'--background','--python',str(scripts/'import_blender.py'),'--','--bundle',str(out/'production-bundle.json'),'--route',str(out/'tour.json'),'--out',str(out/'renders'),'--stills','--resolution',str(a.resolution)]
+ shutil.copy2(route,out/'tour.json')
+ cmd=[blender,'--background','--factory-startup','--python-exit-code','1','--python',str(scripts/'import_blender.py'),'--','--bundle',str(out/'production-bundle.json'),'--route',str(out/'tour.json'),'--out',str(out/'renders'),'--stills','--resolution',str(a.resolution)]
+ cmd+=['--frame',str(a.frame),'--engine','cycles']
+ if a.runtime:cmd+=['--runtime',str(Path(a.runtime).resolve())]
+ if a.render_profile:cmd+=['--render-profile',str(Path(a.render_profile).resolve())]
  if a.views:shutil.copy2(a.views,out/'interior-views.json');cmd+=['--views',str(out/'interior-views.json')]
  if a.animation:cmd+=['--animation']
  run(cmd);video=None

@@ -1,0 +1,12 @@
+{
+  "schema": "blender-render-quality/1",
+  "adaptiveSampling": false,
+  "minimumSamples": 0,
+  "noiseThreshold": 0.015,
+  "retainDiagnosticPasses": false,
+  "useDenoising": true,
+  "denoiser": "OPENIMAGEDENOISE",
+  "denoisingInputPasses": "RGB_ALBEDO_NORMAL",
+  "motionBlur": false,
+  "seed": 42
+}

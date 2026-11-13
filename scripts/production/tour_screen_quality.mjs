@@ -69,9 +69,17 @@ export function inspectScreen(rows,config,chapters){
    for(const [a,z] of runs(r=>{const v=r.focus?.[subject];return v>=.2&&!r.walkingAligned&&(r.seconds<ch.startSeconds-.35||r.seconds>ch.endSeconds+.35);} )){
     const local=rows.filter(r=>r.seconds>=a&&r.seconds<=z),sweep=local.slice(1).reduce((sum,r,i)=>sum+Math.abs(r.yawRadians-local[i].yawRadians),0)*180/Math.PI;
     if(z-a>=.5&&sweep>=8&&previouslyIntroduced(subject,a)&&!ex('repeat_subject',ch.id,subject)&&!chapters.some(c=>c.id!==ch.id&&c.endSeconds>=a&&c.startSeconds<=z&&(c.subjects||{})[subject])){
-     const deviations=local.map(r=>r.headingDeviationDegrees),normalExit=local.every(r=>r.phase==='transit'&&r.walkingForward===true&&Number.isFinite(r.headingDeviationDegrees))&&deviations.at(-1)<=deviations[0]-5&&Math.max(...deviations)<=deviations[0]+5;
-     navigationEvaluations.push({subjectId:subject,startSeconds:a,endSeconds:z,decision:normalExit?'forward_exit_aligning_with_path':'directed_reintroduction_requires_revision'});
-     if(!normalExit)issues.push({code:'transit_reintroduces_subject',chapter:ch.id,subjectId:subject,startSeconds:a,endSeconds:z});
+     const deviations=local.map(r=>r.headingDeviationDegrees),exitMovement=r=>r.walkingForward===true||(Number.isFinite(r.walkingSpeedMps)&&r.walkingSpeedMps>.03&&(r.headingDeviationDegrees<=90||r.walkingSpeedMps<=.2));
+     const normalExit=local.every(r=>r.phase==='transit'&&exitMovement(r)&&Number.isFinite(r.headingDeviationDegrees))&&deviations.at(-1)<=90&&deviations.at(-1)<=deviations[0]-5&&Math.max(...deviations)<=deviations[0]+5;
+     // A chapter boundary does not end a continuous first reveal. Require
+     // actual uninterrupted projection and a single direction in both camera
+     // and screen space; a visibility gap or a return pan remains a repeat.
+     const bridge=rows.filter(r=>r.seconds>=ch.endSeconds-.5&&r.seconds<=z),centers=bridge.map(r=>r.targets?.[subject]?.screenCenterX);
+     const turns=bridge.slice(1).map((r,i)=>r.yawRadians-bridge[i].yawRadians),xs=centers.slice(1).map((x,i)=>x-centers[i]);
+     const turnSign=Math.sign(turns.reduce((s,v)=>s+v,0)),screenSign=Math.sign(centers.at(-1)-centers[0]);
+     const continuedReveal=a>ch.endSeconds&&a-ch.endSeconds<=1&&z-ch.endSeconds<=2&&bridge.length>=3&&bridge.every(r=>readableTarget(r,subject))&&centers.every(Number.isFinite)&&turnSign!==0&&screenSign!==0&&turns.every(v=>v*turnSign>=-1e-6)&&xs.every(v=>v*screenSign>=-.04);
+     navigationEvaluations.push({subjectId:subject,startSeconds:a,endSeconds:z,decision:normalExit?'forward_exit_aligning_with_path':continuedReveal?'continuous_first_reveal_across_boundary':'directed_reintroduction_requires_revision'});
+     if(!normalExit&&!continuedReveal)issues.push({code:'transit_reintroduces_subject',chapter:ch.id,subjectId:subject,startSeconds:a,endSeconds:z});
     }
    }
   }

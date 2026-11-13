@@ -41,7 +41,7 @@ def regression_cases():
                 'requiredPass':['copy','header','sidebars','lighting','view','floors'] +
                                (['generated','components'] if len(rooms)>1 else []),
                 'requiredMechanisms':['shower','vanity','bathtub','door'] if len(rooms)>1 else [],
-                'expectedNotApplicable':['generated','components'] if len(rooms)==1 else []}
+                'expectedNotApplicable':['generated','components','plan-order'] if len(rooms)==1 else []}
 
     footprint = [[0,0],[10000,0],[10000,7000],[0,7000]]
     rooms = [room('zone-a91','起居',[[100,100],[4930,100],[4930,6900],[100,6900]],'living'),
@@ -55,6 +55,7 @@ def regression_cases():
                           'slideDirection':1,'slideOpen':0,'slideOverlap':20}]
     furniture = [item('seat-a','sofa',2200,5400,2200,850,850),
                  item('work-a','desk',2200,1700,1200,600,750),
+                 item('tucked-a','chair',2200,2125,450,450,850,180),
                  item('store-a','wardrobe',5700,4100,1500,600,2200,90),
                  item('glass-a','shower',6500,1400,900,900,2100,
                       showerDoor={'type':'hinged','hinge':'left','angle':90,'open':0,'width':860}),
@@ -79,6 +80,7 @@ def regression_cases():
                      'slideDirection':-1,'slideOpen':.4,'slideOverlap':20}])]
     furniture = [item('long-b','cabinet',1500,1300,1200,450,1800,180),
                  item('work-b','desk',3900,1500,1300,650,750,90),
+                 item('tucked-b','chair',3450,1500,450,450,850,-90),
                  item('glass-b','shower',7100,1400,900,900,2100,90,
                       showerDoor={'type':'hinged','hinge':'right','angle':90,'open':0,'width':860}),
                  item('wash-b','vanity',8500,3400,900,550,850,-90),

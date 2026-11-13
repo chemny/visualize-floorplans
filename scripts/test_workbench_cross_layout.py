@@ -49,6 +49,15 @@ class CrossLayoutTests(unittest.TestCase):
             self.assertTrue(prerequisite(spec['case'],'any_room')[0])
         self.assertFalse(prerequisite(regression_cases()[2]['case'],'components')[0])
 
+    def test_plan_order_has_independent_rotated_pairs_and_empty_boundary(self):
+        cases=regression_cases()
+        for spec in cases[:2]:
+            self.assertTrue(prerequisite(spec['case'],'plan_pair')[0])
+        self.assertFalse(prerequisite(cases[2]['case'],'plan_pair')[0])
+        self.assertIn('plan-order',cases[2]['expectedNotApplicable'])
+        seats=[next(f for f in spec['case']['initialState']['furniture'] if f['type']=='chair') for spec in cases[:2]]
+        self.assertNotEqual(seats[0]['rot'],seats[1]['rot'])
+
     def test_required_pass_cannot_be_replaced_with_skipped(self):
         spec=regression_cases()[0]
         report={'status':'pass','caseUnchanged':True,'serverStopped':True,

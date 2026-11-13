@@ -1,10 +1,10 @@
 {
   "schema": "h5-engine-provenance/1",
-  "sourceSha256": "821aaa0b73de545053cd59e6a857fee726cb28a91684251dc9fadd2707f99507",
+  "sourceSha256": "115feeb194eaf8b8a948f6c24c0f442ca658c4ddc44b177286606abaedbc140e",
   "inputs": [
     {
       "path": "assets/h5/source/app.js",
-      "sha256": "17670ab2d0b073ecbf084ba9bbd904e7d521dd2489c4dd9bc4c69d044aa3019b"
+      "sha256": "b5c9bd3ffe224ec186d5ccc2dad01ce8618b530e689b4ceeae58b773210968d0"
     },
     {
       "path": "assets/h5/source/architectural-presets.js",
@@ -48,11 +48,15 @@
     },
     {
       "path": "assets/h5/source/furniture-detail-v11.js",
-      "sha256": "1992ab699497dd3f981f89167b0f19ba98115add338b9fa7b520236c84304346"
+      "sha256": "e3f913adb99632348c15590fc181b29f18f8412863f4292344d12e0c81fca5c2"
     },
     {
       "path": "assets/h5/source/furniture-size.js",
       "sha256": "c8a102f759c59334fea500540e19558c5292d4c47e51c15717d73c2b209b06fd"
+    },
+    {
+      "path": "assets/h5/source/furniture-style.js",
+      "sha256": "fb9a21d51871db2803a09b95edc4c5ac25e0058fa3e072bf9ca2e138b66f52f4"
     },
     {
       "path": "assets/h5/source/lamp-models.js",
@@ -60,7 +64,7 @@
     },
     {
       "path": "assets/h5/source/lamp-style.js",
-      "sha256": "b22523e14053ff1c028b7bba823e66d141d8ac64d9b97fa6d158aa1dd3829355"
+      "sha256": "d19e43117bbc40db865c53a76d939130d412425c355e670be004efd8a9d52c52"
     },
     {
       "path": "assets/h5/source/lighting-profile.js",
@@ -83,6 +87,10 @@
       "sha256": "1239d4d885dcad42201a27ed9324f8f0f760b78700d8db9ced39a511cffe7eae"
     },
     {
+      "path": "assets/h5/source/plan-furniture-order.js",
+      "sha256": "a40492b6a520dd69ed45eaf51bed91f55288ab2bd0ccd88b23684981658a8798"
+    },
+    {
       "path": "assets/h5/source/pointer-lock-diagnostics.js",
       "sha256": "a652d7766ddd47a087401854a1341f3d4ebb932734ace94aebe3ee4a94ccbe74"
     },
@@ -92,7 +100,11 @@
     },
     {
       "path": "assets/h5/source/production-contract.js",
-      "sha256": "2f4b58af8d986fe9e9cde2546cfb2a41e839677f49c05b55d5bf694753cafcd5"
+      "sha256": "643f09f9206472f239b5e94ed8d042f9d760b1d19e7dd4851790fc11f50dd632"
+    },
+    {
+      "path": "assets/h5/source/production-textures.js",
+      "sha256": "7c87175a8bba8e6fd1012633c49acdd56b2a37388bb7ca6524f9a457d24bc00f"
     },
     {
       "path": "assets/h5/source/project-service-client.js",
@@ -109,6 +121,10 @@
     {
       "path": "assets/h5/source/room-labels.js",
       "sha256": "394f587f59395e94d715e866beaf561dbeba551b7f1d687d793e71e1b5d031eb"
+    },
+    {
+      "path": "assets/h5/source/room-style-policy.js",
+      "sha256": "be15c6ac301700742d6d1ce16e49c30f86dae0b5649dcc72853f37683a53184c"
     },
     {
       "path": "assets/h5/source/scheme-migration.js",
@@ -144,7 +160,7 @@
     },
     {
       "path": "assets/h5/source/styles-v8.js",
-      "sha256": "f90274efddc40e74b53343d707e0c5130fdd8913da7d81ecc21e7001d3c5d77f"
+      "sha256": "6be827619ed9198e1022262d162e81ec952920144f76e423e9c8c88be4c611ab"
     },
     {
       "path": "assets/h5/source/tabletop-decor.js",
@@ -164,7 +180,7 @@
     },
     {
       "path": "assets/h5/source/wall-decoration-style.js",
-      "sha256": "b69cfd95e948e0f77aaca4f34433d8b776c6e3dd38fbc525c3facf8724ed52c4"
+      "sha256": "fbff15bb5d1df555397d0c2e4da2b288500d5cd8e0178a9abd331c038674c5f5"
     },
     {
       "path": "assets/h5/source/wall-decoration-texture.js",
@@ -173,6 +189,10 @@
     {
       "path": "assets/h5/source/wall-edits.js",
       "sha256": "05c3196ba7097a331dba87739fa4d8496ab1c70f7697447953f0d3f6b3b7d697"
+    },
+    {
+      "path": "assets/h5/source/wall-surface-segments.js",
+      "sha256": "e34acf30971cfbbf2f94915dce11fb68f4d8c89a57b2751b3ee36b375032974a"
     },
     {
       "path": "assets/h5/source/walls.js",
@@ -188,10 +208,10 @@
     },
     {
       "path": "assets/h5/version.json",
-      "sha256": "3eaf2519342f04da275c3c0f3bd53465557199d460a00d48c5a3897e61b602bd"
+      "sha256": "f0c96887402653a1edd80e015a1db1791c220f9590a478f367e759f92e9e9143"
     }
   ],
-  "engineSha256": "620e499603fde5e2f923892dd0f6ddf27b4f5a9b78e720b19ad3dd11659a59e4",
+  "engineSha256": "093e83fb544698eb199817eeaea4c15d45534a71a26e1f42e66b0412c3f13a5b",
   "registrySha256": "79ec99aef2daeb2d0d7807cb2e135baa94295dbd80735d68573a64329540b839",
   "compiler": {
     "name": "esbuild",

@@ -82,3 +82,35 @@ Skill discovery and real browser/image/video validation.
 ## beta.4 local regression
 
 `release_smoke.py` now includes the interaction/material/storage/lighting module tests. Source contains a module-type declaration for supported Node imports; ordinary offline HTML construction still requires no Node. Synthetic browser checks require existing Playwright/Chromium and a local HTTP server scoped only to their generated fixtures. They do not certify browser-host pointer-lock policies, Windows or physical phone hardware. Keep those results separately pending; publication with these disclosed limitations requires explicit user acceptance.
+
+## Feature-scoped checks (0.2.14)
+
+`h5.py doctor --for basic` inspects no optional software. Use `--for video`,
+`blender`, `remote`, `quality` or `delivery` when selecting that capability.
+Pass explicit `--node`, `--browser`, `--playwright-module`, `--blender`,
+`--ffmpeg` and `--ffprobe` paths as needed. Blender capture validates existing
+5.2-compatible APIs before writing output; an incompatible version does not
+silently fall back to another renderer. The remote worker repeats this check.
+Windows remote Blender/OptiX rendering and remote encoding have been exercised;
+this is not certification of the full Windows Agent/workbench workflow.
+
+Missing optional tools must be reported with setup instructions; do not install
+them merely because a checker found them absent. Blender can be obtained from
+https://www.blender.org/download/ ; configure its executable after installation.
+FFmpeg/ffprobe and existing browser/Playwright paths are configured per task.
+Local optical-flow diagnostics additionally need OpenCV; after authorization,
+use the selected interpreter with `-m pip install opencv-python-headless` and
+rerun `doctor --for quality`. Base drawing requirements remain unchanged.
+
+Ordinary Python discovery imports no Blender API and starts no browser or remote
+worker. Explicit Blender API checks and synthetic media/browser integration use:
+
+```text
+python scripts/release_smoke.py --out NEW_CHECK_DIR --node EXISTING_NODE --test-node-modules EXISTING_NODE_MODULES --blender EXISTING_BLENDER --with-media-browser --browser EXISTING_BROWSER --playwright-module EXISTING_PLAYWRIGHT
+```
+
+These checks use independent fixtures and do not change current cases. GitHub CI
+runs the shared non-browser source regression on macOS/Windows and Python3.11/3.13.
+Its development-only Three.js/esbuild versions are pinned in tests.yml; no optional
+Blender, browser or remote model is installed by that workflow. Hardware/rendering
+and human media review remain separately documented checks.

@@ -1,0 +1,23 @@
+{
+  "schema": "homeowner-render-job/1",
+  "rendering": {
+    "engine": "h5"
+  },
+  "bundle": {
+    "path": "./production-bundle.json",
+    "sha256": "REPLACE"
+  },
+  "tour": {
+    "path": "./tour.json",
+    "sha256": "REPLACE"
+  },
+  "routeReview": {
+    "path": "./route-approved.json",
+    "sha256": "REPLACE"
+  },
+  "config": {
+    "path": "./camera-config.json",
+    "sha256": "REPLACE"
+  },
+  "runtime": "./runtime"
+}

@@ -15,6 +15,14 @@ manual top toggles, legacy mounts and export restoration before acceptance.
 
 ## Rendering and walk safeguards
 
+Plan furniture symbols and their label occlusion use the same stable surface
+order, independent of scheme insertion order. Table/desk/dresser tops cover the
+overlapping seat portion of tucked chairs. The chair back outside the tabletop
+remains visible; never change elevation, shrink or delete a chair to conceal a
+physical collision. Check actual 3D nesting separately. `plan-furniture-order.js`,
+`test_plan_furniture_order.mjs` and the generated `plan-order` browser check cover
+this behavior, including real exported SVG pixels and visible-part selection.
+
 Walk collision uses the vertical overlap of the furniture body and a standing
 viewer (eye height plus 150 mm head allowance); do not skip all hanging objects
 above 1100 mm. This remains a plan-footprint approximation, not a certified human
@@ -42,8 +50,8 @@ restore complete architecture; never alter saved scheme dimensions.
 Common component behavior must remain consistent across styles: thin default TV
 geometry (35 mm), side-emitting ceiling diffusers, fixed always-on room lighting,
 native display resolution and complete furniture in presentation cutaways.
-Style changes control colors/material finishes and supported main-fixture bodies
-under `lamp-style-linkage.md`; they do not override these common behaviors.
+Style changes control colors/material finishes, supported furniture bodies under
+`furniture-style-linkage.md` and main-fixture bodies under `lamp-style-linkage.md`; they do not override these common behaviors.
 Migrate legacy standard TV depths once while retaining nonstandard or already migrated edited sizes.
 Kitchen decoration positions and room finish approvals remain case-specific.
 
@@ -261,3 +269,31 @@ HTML inclusion with `scripts/test_floor_textures.mjs`.
 
 ### Exact room/wall finish boundaries
 H5 build normalizes orthogonal room finish polygons against the same wall-face/endpoint geometry used in the mesh. Merge explicit threshold/finish patches into their material-owning room, subtract actual floor-level solid walls and clip to footprint. Repair only small connected gaps (default120mm maximum travel); never fill large unknown space or cross a wall. Tiny detached overruns (at most tolerance² area) may join the physically adjacent room, with reported owner/area changes. Ambiguous free overlaps, unsupported topology or unassigned large gaps fail with a `.floors.json` report instead of a silent bounding-box fill. Normalization must be idempotent. Store the resulting room polygons as the canonical model so plan, mesh, area and labels use the same boundary. Walls, openings, furniture and manual finish choices stay unchanged. Material boundaries in real open passages remain passable. Explicit floorBoundaryPolicy.enabled=false is a recorded compatibility exception, not acceptance.
+
+### Production image transport and replay lighting
+
+- Production exports serialize decoded HTMLImageElement/ImageBitmap as well as Canvas
+  textures through `production-textures.js`. Preserve repeat, offset, centre,
+  rotation, flipY, wrapping and colour space; deduplicate by texture UUID.
+  Missing/undecoded/tainted images are errors, never silently `map:null`.
+- Both production capture entry points await embedded floor texture loading;
+  required-image fallback or timeout blocks export rather than certifying a plain floor.
+- Replay defaults reduce flat fill (hemisphere .72, ambient .16), fit the sun
+  shadow camera to the apartment bounds, and use 3mm normal bias. These are
+  presentation defaults, not calibrated physical illumination or photoreal acceptance.
+- Optional `presentationProfile.replayLighting.fixtureShadowIds` (or prepared
+  `renderSettings.lighting.fixtureShadowIds`) specifies at most two unique enabled
+  exported fixtures. No camera-dependent light selection. All other fixtures retain
+  their exported illumination; shadow maps remain static across camera movement.
+- Validate real image decode → mesh serialization → replay, including missing-image
+  failure, plus same-camera static images. Run `scripts/test_production_textures_browser.mjs --playwright-module EXISTING_MODULE --browser EXISTING_BROWSER`
+  and `scripts/test_replay_lighting_browser.mjs --url HTTP_RENDERER_URL --tour EXACT_TOUR --playwright-module EXISTING_MODULE --browser EXISTING_BROWSER`. Static image approval
+  does not certify full-tour performance, motion, or construction accuracy.
+- A legacy export with a missing map may only restore an explicitly identified
+  canonical asset, with provenance and unchanged geometry/state checks. Do not
+  fabricate a new texture or imply that a repaired replay is a fresh full export.
+
+- Replay fixture housings remain visible but do not cast shadows: schematic light
+  emitters can be embedded inside the housing and otherwise create false long
+  silhouettes. Furniture/architecture shadows remain enabled. This approximation
+  must not be described as physical luminaire photometry.

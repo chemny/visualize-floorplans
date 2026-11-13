@@ -1,10 +1,15 @@
 {
   "schema": "homeowner-tour-pages-job/1",
   "title": "当前案例名称",
+  "preview": {
+    "runtime": "./runtime",
+    "tourSha256": "REPLACE_WITH_EXACT_TOUR_JSON_SHA256"
+  },
   "video": {
     "path": "./tour-review.mp4",
     "sha256": "REPLACE_WITH_VIDEO_SHA256",
-    "tourSha256": "REPLACE_WITH_EXACT_TOUR_JSON_SHA256"
+    "tourSha256": "REPLACE_WITH_EXACT_TOUR_JSON_SHA256",
+    "kind": "h5"
   },
   "narration": {
     "videoSha256": "REPLACE_WITH_VIDEO_SHA256",
@@ -16,10 +21,14 @@
       "path": "./music-bed.m4a",
       "sha256": "REPLACE_WITH_MUSIC_SHA256"
     },
-    "captions": []
+    "captions": [],
+    "musicGain": 1
   },
   "videoReview": {
     "path": "./video-review.approved.json",
     "sha256": "REPLACE_AFTER_EXPLICIT_VIDEO_CONFIRMATION"
+  },
+  "rendering": {
+    "engine": "h5"
   }
 }

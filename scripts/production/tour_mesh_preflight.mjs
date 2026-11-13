@@ -67,7 +67,7 @@ for(const i of screenIndices){
  const extra=ids.filter(id=>!activeIds.includes(id)&&(focus[id]||0)>=.13);if(extra.length)Object.assign(subjects,shot(frame,extra));
  const targets=Object.fromEntries(Object.entries(subjects).map(([id,v])=>[id,{visibleFraction:v.screenAreaFraction,inFrameFraction:v.inFrustumSamples/Math.max(1,v.totalSamples),screenCenterX:v.screenCenterX}]));
  const elapsed=Math.max(1/tour.fps,(Math.min(tour.frames.length-1,i+Math.max(1,Math.round(tour.fps/4)))-i)/tour.fps),phase=config.chapters.find(c=>marks[c.from]<=i&&i<marks[c.to])?.phase;
- rows.push({frame:i,seconds:i/tour.fps,yawRadians:frame.yawRadians,phase,walkingForward:Math.hypot(dx,dy)/elapsed>200&&alignment<=Math.PI/2,headingDeviationDegrees:alignment*180/Math.PI,walkingAligned:Math.hypot(dx,dy)>20&&alignment<Math.PI/3,nearFraction:near/15,dominantFraction:Math.max(0,...Object.values(counts))/15,blankFraction:blank/15,focus,targets});
+ rows.push({frame:i,seconds:i/tour.fps,yawRadians:frame.yawRadians,phase,walkingSpeedMps:Math.hypot(dx,dy)/elapsed/1000,walkingForward:Math.hypot(dx,dy)/elapsed>200&&alignment<=Math.PI/2,headingDeviationDegrees:alignment*180/Math.PI,walkingAligned:Math.hypot(dx,dy)>20&&alignment<Math.PI/3,nearFraction:near/15,dominantFraction:Math.max(0,...Object.values(counts))/15,blankFraction:blank/15,focus,targets});
 }
 const screenQuality=inspectScreen(rows,config,chapters);
 screenQuality.issues.push(...coreTargets.issues);if(coreTargets.issues.length)screenQuality.status='needs_revision';

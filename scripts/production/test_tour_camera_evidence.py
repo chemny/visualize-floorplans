@@ -1,10 +1,18 @@
 import copy,math,subprocess,sys,tempfile,unittest
 from pathlib import Path
-from tour_camera_evidence import ordered_bearings,target_anchor,inspect
+from tour_camera_evidence import ordered_bearings,target_anchor,target_samples,inspect
 from tour_workflow import markers
 from tour_contract import inspect as contract
 
 class CameraEvidenceTests(unittest.TestCase):
+ def test_elevated_fixtures_use_world_height_for_anchor_and_samples(self):
+  b={'state':{'furniture':[{'id':'hob','cx':1000,'cy':2000,'w':600,'d':500,'h':20,'elevation':905},
+                            {'id':'sink','cx':2000,'cy':2000,'w':800,'d':450,'h':230,'elevation':900},
+                            {'id':'floor','cx':3000,'cy':2000,'h':800}]}}
+  self.assertEqual(target_anchor(b,'hob'),[1000,2000,915])
+  self.assertEqual(target_anchor(b,'sink'),[2000,2000,1015])
+  self.assertEqual({p[2] for p in target_samples(b,'sink')},{1015})
+  self.assertEqual(target_anchor(b,'floor')[2],400)
  def setUp(self):
   from test_tour_contract import ContractTests
   self.x=ContractTests();self.x.setUp();self.b,self.t,self.c=self.x.b,self.x.t,self.x.c
@@ -27,6 +35,18 @@ class CameraEvidenceTests(unittest.TestCase):
   m=markers(self.t);ch=self.c['chapters'][-1];a,z=m[ch['from']],m[ch['to']]
   for i in range(a+1,z+1):self.t['frames'][i]['yawRadians']+=math.sin((i-a)/(z-a)*math.pi)*.5
   self.assertEqual(before,contract(self.b,self.t,self.c)['checks']['cameraEvidence']['roomSweeps'])
+ def test_explicit_separate_introductions_keep_direction_checks_inside_each_episode(self):
+  self.x.split_view(['room','room'],['public','public']);chapters=self.c['chapters'][1:3];m=markers(self.t)
+  for index,ch in enumerate(chapters):
+   ch['episodeId']='intent-'+str(index);a,z=m[ch['from']],m[ch['to']]
+   ch['singleSweepDegrees']=8 if index==0 else -8
+   for i in range(a,z+1):self.t['frames'][i]['yawRadians']=math.radians(8*(i-a)/(z-a) if index==0 else 8-8*(i-a)/(z-a))
+  self.c['roomViewingPolicy']={'singleEpisode':False}
+  self.assertIn('room_wide_sweep_reversal',self.codes())
+  self.c['tourContract']['singleEpisodeExceptionReason']='Explicit separate functional introductions in the requested order'
+  self.assertNotIn('room_wide_sweep_reversal',self.codes())
+  chapters[1]['episodeId']=chapters[0]['episodeId']
+  self.assertIn('room_wide_sweep_reversal',self.codes())
  def test_sustained_wall_and_angular_kink_are_checked_without_chapter_refinement(self):
   class Wall:
    walls=[];leaves=[]

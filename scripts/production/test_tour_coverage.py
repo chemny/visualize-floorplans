@@ -66,3 +66,46 @@ class CoverageTests(unittest.TestCase):
   for marker in shifted['visits'][1:]:marker['frame']+=1
   a=inspect(bundle,t,Free(),80,100);b=inspect(bundle,shifted,Free(),80,100)
   self.assertEqual(a['rooms'],b['rooms']);self.assertEqual(a['temporalSampling'],'interval-anchored with endpoints')
+
+ def separate_fixture(self):
+  bundle={'model':{'rooms':[{'id':'public','poly':[[0,0],[1000,0],[1000,200],[0,200]]},
+   {'id':'other','poly':[[1200,0],[1800,0],[1800,200],[1200,200]]}]}}
+  positions=[-100]+[500]*3+[1500]*3+[500]*4+[1500]*2+[500]*3
+  tour={'fps':4,'frames':[{'pointMm':[x,100],'yawRadians':0 if i<7 else math.pi,'horizontalFovDegrees':76} for i,x in enumerate(positions)],
+   'visits':[{'name':name,'frame':frame} for name,frame in [('a',1),('b',2),('c',5),('d',6),('e',8),('f',9)]]}
+  config={'roomViewingPolicy':{'singleEpisode':False},'tourContract':{'singleEpisodeExceptionReason':'The user explicitly requests public functions in separate visits.'},'chapters':[
+   {'name':'first','phase':'observe','roomId':'public','episodeId':'first','from':'a','to':'b'},
+   {'name':'other','phase':'observe','roomId':'other','from':'c','to':'d'},
+   {'name':'later','phase':'observe','roomId':'public','episodeId':'later','from':'e','to':'f'}]}
+  return bundle,tour,config
+ def test_explicit_disjoint_introductions_aggregate_without_changing_denominator_or_reference(self):
+  b,t,c=self.separate_fixture();c['chapters'][0].update(roomId='other',coveredRoomIds=['public'],observationRegionId='public')
+  c['coverageReferencePolicy']={'mode':'reference_not_visual_acceptance','roomTargets':{'public':90,'other':90},'reviewTolerancePercentagePoints':5}
+  r=inspect(b,t,Free(),80,100,config=c);row=r['rooms'][0]
+  self.assertEqual(row['visitWindows'],[[1,3],[7,10]]);self.assertEqual(row['visitFrames'],[1,10])
+  self.assertEqual((row['sampleCount'],row['visibleSamples'],row['horizontalAreaPercent']),(20,16,80))
+  self.assertTrue(row['meetsProxyMinimum']);self.assertEqual(r['minimumPercent'],80)
+  self.assertEqual(r['referencePolicy'],c['coverageReferencePolicy'])
+  self.assertEqual(r['referenceFindings'][0]['gapPercentagePoints'],10)
+  self.assertEqual(r['scope'],'declared_introduction_visits')
+ def test_default_or_unjustified_policy_cannot_fill_first_visit_from_later_intro_or_pass(self):
+  b,t,c=self.separate_fixture()
+  for policy,reason in [({},'reason'),({'singleEpisode':False},''),({'singleEpisode':False},'  '),({'singleEpisode':False},True)]:
+   with self.subTest(policy=policy,reason=reason):
+    c['roomViewingPolicy']=policy;c['tourContract']['singleEpisodeExceptionReason']=reason
+    r=inspect(b,t,Free(),80,100,config=c);row=r['rooms'][0]
+    self.assertEqual(row['visitFrames'],[1,3]);self.assertEqual(row['horizontalAreaPercent'],40)
+    self.assertNotIn('visitWindows',row);self.assertFalse(row['meetsProxyMinimum'])
+    self.assertEqual(r['scope'],'first_continuous_visit')
+ def test_justified_policy_still_excludes_unintroduced_later_pass_through(self):
+  b,t,c=self.separate_fixture();c['chapters']=c['chapters'][:2]
+  r=inspect(b,t,Free(),80,100,config=c);row=r['rooms'][0]
+  self.assertEqual(row['visitWindows'],[[1,3]]);self.assertEqual(row['horizontalAreaPercent'],40)
+  self.assertFalse(row['meetsProxyMinimum'])
+ def test_another_room_introduction_never_fills_public_coverage_in_shared_camera_region(self):
+  b,t,c=self.separate_fixture();t['frames']=[{'pointMm':[500,100],'yawRadians':math.pi if 4<=i<=7 else 0,'horizontalFovDegrees':76} for i in range(13)]
+  t['visits']=[{'name':name,'frame':frame} for name,frame in [('a',1),('b',2),('c',4),('d',7),('e',10),('f',11)]]
+  c['chapters'][1]['observationRegionId']='public'
+  row=inspect(b,t,Free(),80,100,config=c)['rooms'][0]
+  self.assertEqual(row['visitWindows'],[[0,3],[8,12]])
+  self.assertEqual(row['horizontalAreaPercent'],40);self.assertFalse(row['meetsProxyMinimum'])

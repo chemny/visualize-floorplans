@@ -71,10 +71,10 @@ class StageGateTests(unittest.TestCase):
   if not ffmpeg or not ffprobe:self.skipTest('Existing FFmpeg tools unavailable')
   subprocess.run([ffmpeg,'-v','error','-y','-f','lavfi','-i','color=c=beige:s=320x180:r=2:d=2','-c:v','libx264','-pix_fmt','yuv420p',str(self.video)],check=True)
   subprocess.run([ffmpeg,'-v','error','-y','-f','lavfi','-i','sine=frequency=440:duration=2',str(self.voice)],check=True)
-  self.r=pending(self.video,self.tour);self.approved();j=self.job();j.update(ffprobe=ffprobe,music=bound(self.voice))
+  self.r=pending(self.video,self.tour);self.approved();j=self.job();j.update(ffprobe=ffprobe,music=bound(self.voice),musicGain=.35)
   r=compose(j,self.p,self.p/'mix',ffmpeg)
   self.assertEqual(r['captionsMode'],'selectable_mp4_and_sidecar');self.assertEqual(r['status'],'pending_narrated_review')
-  self.assertEqual(r['reproduction']['inputs']['music'],bound(self.voice));self.assertIn('sidechaincompress',str(r['reproduction']['ffmpeg']['argv']))
+  self.assertEqual(r['reproduction']['inputs']['music'],bound(self.voice));self.assertNotIn('sidechaincompress',str(r['reproduction']['ffmpeg']['argv']));self.assertIn('volume=0.35',str(r['reproduction']['ffmpeg']['argv']));self.assertEqual(r['reproduction']['musicGain'],.35)
  def test_cli_pending_review_cannot_start_composition(self):
   import sys
   self.save();job=self.p/'job.json';job.write_text(json.dumps(self.job()))

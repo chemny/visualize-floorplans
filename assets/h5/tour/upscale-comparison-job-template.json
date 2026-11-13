@@ -1,0 +1,27 @@
+{
+  "schema": "homeowner-upscale-comparison-job/1",
+  "purpose": "comparison",
+  "video": {
+    "path": "./review.mp4",
+    "sha256": "REPLACE"
+  },
+  "startFrame": "REPLACE",
+  "frameCount": "REPLACE",
+  "target": [
+    1920,
+    1080
+  ],
+  "methods": [
+    "lanczos",
+    "h3_latent"
+  ],
+  "diffusionSampling": false,
+  "frameInterpolation": false,
+  "vae": "REPLACE_INSTALLED_H3_VAE",
+  "upscalerModel": "REPLACE_INSTALLED_H3_UPSCALER",
+  "comfyUrl": "REPLACE_EXPLICIT_EXISTING_COMFY_URL",
+  "authorization": {
+    "path": "./upscale-authorized.json",
+    "sha256": "REPLACE"
+  }
+}

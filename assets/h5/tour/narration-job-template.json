@@ -14,5 +14,6 @@
   },
   "voice": null,
   "music": null,
-  "captions": []
+  "captions": [],
+  "musicGain": 1
 }

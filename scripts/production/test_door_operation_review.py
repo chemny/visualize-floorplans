@@ -11,6 +11,14 @@ class DoorOperationTest(unittest.TestCase):
   self.assertTrue(any(h['part']=='handle' and h.get('wallId')=='receiver' for h in r['doors'][0]['conflicts']))
  def test_furniture_sweep(self):
   c=case();c['initialState']['furniture']=[{'id':'cab','type':'wardrobe','cx':1500,'cy':600,'w':300,'d':300}];self.assertEqual(review_doors(c)['status'],'fail')
+ def test_handle_collision_uses_actual_height(self):
+  # At 90 degrees the handle on the negative-X face passes x=993, y~800.
+  for elevation,expected in [(300,False),(1250,False),(970,True)]:
+   c=case();c['initialState']['furniture']=[{'id':'plate','type':'socketplate','cx':987,'cy':800,'w':12,'d':86,'h':86,'elevation':elevation}]
+   hits=review_doors(c)['doors'][0]['conflicts'];self.assertEqual(any(h['part']=='handle' for h in hits),expected)
+ def test_leaf_still_checks_low_obstacles(self):
+  c=case();c['initialState']['furniture']=[{'id':'rug','type':'rug','cx':1500,'cy':600,'w':300,'d':300,'h':15}]
+  self.assertTrue(any(h['part']=='leaf' for h in review_doors(c)['doors'][0]['conflicts']))
  def test_slide_parking(self):
   c=case();c['initialState']['walls'][0]['opens'][0].update(kind='sliding',leaves=1,slideMount='wall',slideSide=1,slideDirection=1,slideOpen=0,slideOverlap=20)
   c['initialState']['furniture']=[{'id':'parking-cab','type':'wardrobe','cx':2300,'cy':90,'w':300,'d':100}]

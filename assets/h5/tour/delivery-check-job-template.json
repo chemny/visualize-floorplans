@@ -1,0 +1,27 @@
+{
+  "schema": "homeowner-delivery-check-job/1",
+  "video": {
+    "path": "./narrated.mp4",
+    "sha256": "REPLACE"
+  },
+  "sourceVideo": {
+    "path": "./review.mp4",
+    "sha256": "REPLACE"
+  },
+  "compositionReport": {
+    "path": "./composition-report.json",
+    "sha256": "REPLACE"
+  },
+  "playback": {
+    "path": "./playback-check.json",
+    "sha256": "REPLACE"
+  },
+  "visualReview": {
+    "path": "./visual-review.json",
+    "sha256": "REPLACE"
+  },
+  "pageReport": {
+    "path": "./tour-pages.json",
+    "sha256": "REPLACE"
+  }
+}

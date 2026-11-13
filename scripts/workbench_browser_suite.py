@@ -24,6 +24,9 @@ REGISTRY={
  'bathtub-resize':('test_bathtub_resize_browser.mjs','bathtub_fixture'),
  'styles':('test_style_linkage_browser.mjs','styled'),
  'style-locks':('test_style_manual_locks_browser.mjs','style_locks'),
+ 'wet-walls':('test_wet_wall_browser.mjs','wet_rooms'),
+ 'furniture-styles':('test_furniture_style_browser.mjs','furniture_styles'),
+ 'plan-order':('test_plan_furniture_order_browser.mjs','plan_pair'),
 }
 CORE=['generated','copy','sidebars','lighting','view','header']
 
@@ -57,6 +60,9 @@ def prerequisite(case,name):
   'bathtub':('bathtub' in types,'needs a bathtub'),
   'bathtub_fixture':('bathtub' not in types and point_inside([5800,14200],case['model'].get('footprint',[])),'existing bathtub regression adds a temporary fixture at [5800,14200] and requires no original bathtub'),
   'styled':({'living','dining','hall','primary','bed_nw','bed_ne','closet','kitchen','bath_public'}<=rooms and 'shower' in types and not any(v.get('floorStyleMode')=='fixed' for v in s.get('rooms',{}).values()),'existing style regression requires the declared reference room ids'),
+  'wet_rooms':(any((r.get('function') or r.get('usage') or r.get('role')) in {'kitchen','bathroom','bath','toilet'} or any(v in (str(r.get('id',''))+str(r.get('name',''))).lower() for v in ['kitchen','bath','toilet','厨','卫','浴']) for r in case['model']['rooms']),'needs a kitchen or bathroom'),
+  'furniture_styles':({'sofa','chair','tvstand'}<=types and case.get('readLocalStorage') is not False,'needs core furniture and enabled browser persistence'),
+  'plan_pair':(bool(types&{'chair','officechair','barstool'}) and bool(types&{'desk','dresser','table'}),'needs a tucked seat/table pair; no silent empty-target pass'),
   'style_locks':('wardrobe' in types and bool(s.get('wallFinishes')) and 'living' in rooms,'existing style-lock regression requires wardrobe, living and wall finishes'),
  }
  return conditions.get(name,(True,''))

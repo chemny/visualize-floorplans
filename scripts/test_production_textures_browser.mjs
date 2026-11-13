@@ -1,0 +1,20 @@
+// Real decoded HTMLImageElement/Canvas export and replay transport regression.
+import fs from 'node:fs';import http from 'node:http';import path from 'node:path';import {fileURLToPath,pathToFileURL} from 'node:url';import assert from 'node:assert/strict';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../assets/h5');
+const args={};for(let i=2;i<process.argv.length;i+=2)args[process.argv[i].replace(/^--/,'')]=process.argv[i+1];
+if(!args['playwright-module']||!args.browser)throw Error('Pass existing --playwright-module and --browser; no automatic installation');
+const pw=(await import(pathToFileURL(path.resolve(args['playwright-module'])).href)).default;
+const server=http.createServer((req,res)=>{const name=decodeURIComponent(req.url.split('?')[0]);if(name==='/'){res.setHeader('Content-Type','text/html');return res.end('<body><script id="caseData" type="application/json">{"model":{},"initialState":{"walls":[],"furniture":[]}}</script>texture transport test</body>');}const p=path.resolve(root,'.'+name);if(!p.startsWith(root+path.sep)){res.writeHead(403);return res.end();}try{res.setHeader('Content-Type',p.endsWith('.js')?'text/javascript':'text/plain');res.end(fs.readFileSync(p));}catch{res.writeHead(404);res.end();}});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser;
+try{browser=await pw.chromium.launch({headless:true,executablePath:args.browser});const page=await browser.newPage();await page.goto('http://127.0.0.1:'+server.address().port);
+const result=await page.evaluate(async()=>{
+ const THREE=await import('/runtime/three.module.js'),{serializeTextureImage,waitForProductionTextures}=await import('/source/production-textures.js');
+ const cv=document.createElement('canvas');cv.width=2;cv.height=2;cv.getContext('2d').fillStyle='#bc8942';cv.getContext('2d').fillRect(0,0,2,2);
+ const tex=await new THREE.TextureLoader().loadAsync(cv.toDataURL());tex.repeat.set(2,3);tex.offset.set(.2,.3);tex.rotation=.2;tex.flipY=false;tex.colorSpace=THREE.SRGBColorSpace;
+ const {serializeProductionMeshes}=await import('/source/production-contract.js');const material=new THREE.MeshStandardMaterial({map:tex,bumpMap:tex});const group=new THREE.Group();group.add(new THREE.Mesh(new THREE.BoxGeometry(),material));const meshExport=serializeProductionMeshes({furniture:group});if(meshExport.textures.length!==1||meshExport.materials[0].map!==0||meshExport.materials[0].bumpMap!==0)throw Error('Actual mesh export lost or duplicated the image texture');
+ const out=serializeTextureImage(tex),replayed=await new THREE.TextureLoader().loadAsync(out.dataUrl);const check=document.createElement('canvas');check.width=2;check.height=2;check.getContext('2d').drawImage(replayed.image,0,0);const pixel=[...check.getContext('2d').getImageData(0,0,1,1).data];
+ let missing=false,failed=false,timedOut=false;try{serializeTextureImage(new THREE.Texture());}catch{missing=true;}
+ const mat=new THREE.MeshStandardMaterial();const root=new THREE.Group();root.add(new THREE.Mesh(new THREE.BoxGeometry(),mat));mat.userData.floorTextureStatus='loading';setTimeout(()=>mat.userData.floorTextureStatus='ready',40);await waitForProductionTextures({root});mat.userData.floorTextureStatus='fallback';try{await waitForProductionTextures({root});}catch{failed=true;}mat.userData.floorTextureStatus='loading';try{await waitForProductionTextures({root},{timeoutMs:30});}catch{timedOut=true;}
+ return {imageType:tex.image.constructor.name,pixel,repeat:out.repeat,offset:out.offset,rotation:out.rotation,flipY:out.flipY,canvas:!!serializeTextureImage(new THREE.CanvasTexture(cv)).dataUrl,missing,failed,timedOut};
+});assert.equal(result.imageType,'HTMLImageElement');assert.deepEqual(result.pixel,[188,137,66,255]);assert.deepEqual(result.repeat,[2,3]);assert.deepEqual(result.offset,[.2,.3]);assert.equal(result.rotation,.2);assert.equal(result.flipY,false);for(const key of ['canvas','missing','failed','timedOut'])assert.equal(result[key],true);console.log(JSON.stringify({pass:true,...result}));
+}finally{if(browser)await browser.close();server.close();}

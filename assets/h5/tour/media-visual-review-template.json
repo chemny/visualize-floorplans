@@ -1,0 +1,19 @@
+{
+  "schema": "homeowner-media-visual-review/1",
+  "status": "pending",
+  "video": {
+    "path": "./review.mp4",
+    "sha256": "REPLACE"
+  },
+  "method": "continuous_playback",
+  "reviewer": "",
+  "notes": "",
+  "checks": {
+    "clarity": false,
+    "edges": false,
+    "localFlicker": false,
+    "occlusion": false,
+    "lighting": false
+  },
+  "knownIssues": []
+}

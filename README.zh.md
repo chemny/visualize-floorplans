@@ -10,9 +10,18 @@
 
 ## 效果预览
 
-![能力展示示意图：户型图、可编辑二维三维工作台与室内效果](assets/interior-design-hero-zh.png)
+![能力展示示意图：户型图、可编辑二维三维工作台与室内效果](assets/interior-design-hero-simple-zh.png)
 
 这是一张流程示意图；AI 装修效果图与可编辑三维预览是不同的输出。
+
+### 工作台操作录屏
+
+| 二维图纸与家具编辑 · 15秒 | 三维观察与显示效果 · 15秒 |
+| --- | --- |
+| [![二维工作台操作录屏](assets/demos/jujian-workbench/2d-operations.jpg)](assets/demos/jujian-workbench/2d-operations.mp4) | [![三维工作台操作录屏](assets/demos/jujian-workbench/3d-operations.jpg)](assets/demos/jujian-workbench/3d-operations.mp4) |
+| 切换户型图、家具布局和硬装图；旋转、拖动家具，打开尺寸入口并撤销。 | 拖拽鸟瞰视角，切换日照与夜景，聚焦房间、退出并切换俯视。 |
+
+点击图片查看录屏。两段均来自家装助手工作台的实际操作。
 
 [查看内置「居间 · 香槟珍珠」案例](assets/reference-cases/jujian-champagne-pearl/index.html)：原始参考、13 张效果图、可编辑工作台、图纸和 56 秒导览。安装后让 Agent 打开本地案例；GitHub 文件页面不能执行 HTML。案例保留的效果图、导览与当前示例工作台存在灯光和材质差异，详见[案例说明](assets/reference-cases/jujian-champagne-pearl/README.md)。
 
@@ -31,16 +40,13 @@
 | 配套装修效果图 | 根据确认的布局、风格制作房间及全屋效果，逐图检查差异。 |
 | 阶段性清理 | 检查失效素材和引用，经批次确认后备份隔离；不后台自动删除。 |
 | 本地交付 | 汇总工作台、图纸、方案数据和已确认效果图，附索引与文件校验信息。 |
-| 按需制作导览 | 规划、录制连续 H5 导览；生成式视频是另行选择的可选功能。 |
+| 按需制作导览 | 先确认路线与镜头，默认H5渲染，或选择Blender高质量渲染；视频确认后再合成讲解。 |
 
 这是概念设计工具，不提供实测 CAD、结构安全评估或施工文件。墙体性质不明确时，拆改建议需要先核实。视频、Blender 都不是必选步骤；不包含装修报价。
 
 ## 安装
 
-当前本地技能版本：**0.2.11**（未发布）。
-
-导览修订已接入有界门洞构图候选与验证选优、显式冻结已通过片段、同步前后对照和工程收口报告。
-具体入口见[原生修订流程](references/tour-native-revision.md)。工程检查与用户观看确认分别记录。
+技能版本：**0.2.14**。
 
 ### 配置要求
 
@@ -50,17 +56,20 @@
 | --- | --- |
 | Agent 客户端 | 已在 Codex 使用；面向 Claude Code、OpenClaw 设计，这两者尚未实测。 |
 | 基础运行环境 | Python 3.11 或更新版本；工作台需要现代浏览器。 |
-| 操作系统 | 已在 macOS 实测；Windows 路径和调用方式已审查，但尚未实机运行。 |
+| 操作系统 | macOS工作台与媒体流程；Windows可作为远程Blender渲染主机。其他客户端仍需按环境核验。 |
 | 装修效果图 | 可用且已授权、支持参考图输入的生图或图像编辑工具。 |
-| 浏览器录制 / 视频 | 可选 Node.js、浏览器自动化和 Chromium；编码需要 FFmpeg。 |
+| 标准视频 | 已有Node.js、Playwright、Chrome/Chromium和FFmpeg/ffprobe。 |
+| Blender视频 | 渲染主机需Blender 5.2兼容接口；支持本地或已有SSH的Windows远程主机。 |
+| 讲解与音乐 | 可用的本地或外部语音工具，以及已获授权的声音与音乐素材。 |
+| 局部闪烁诊断 / H3放大 | 按需配置OpenCV，或已有远程ComfyUI节点和模型；不是基础依赖。 |
 
 ### 快速安装
 
 把这段话发给你的 Agent：
 
 ```text
-帮我安装这个 Skill：https://github.com/chemny/interior-design
-先检查基础环境，缺什么帮我补齐，再安装并检查能否发现和使用。其他功能等我需要时再配置。
+帮我安装这个 Skill：https://github.com/chemny/visualize-floorplans
+先检查基础环境；缺少依赖时说明安装方案，经我确认后再安装。安装后检查能否发现和使用，视频功能等我需要时再配置。
 ```
 
 Agent 应说明哪些已经安装、可以使用，还有哪些工具或权限缺失。详细要求见[运行环境说明](references/platform-runtime.md)。
@@ -104,9 +113,30 @@ Agent 应说明哪些已经安装、可以使用，还有哪些工具或权限�
 根据这套确认方案，制作连续的房主导览。各主要房间要看清楚，转弯平缓。
 ```
 
-路线与镜头朝向分别规划，小房间浅入观察，门洞转场平滑。先看样片和完整预览，再制作最终视频。详见[房主导览方法](references/homeowner-tour-method.md)。
+参观制作固定为四步：
 
-H5 录制需要可选浏览器工具；生成式最终视频还需要单独可用的服务及独立验收。
+1. **路线与镜头**：在户型图上确认完整进出路线、朝向和各房间时间。
+2. **镜头预演**：播放同源实时三维，检查构图、转场、遮挡和观看节奏。
+3. **视频审阅**：生成所选方式的静音视频，完整播放后确认。
+4. **讲解成片**：按已确认画面的时间轴准备配音、短句字幕和背景音乐，再合成。
+
+| 视频方式 | 适合的需求 | 所需工具 |
+| --- | --- | --- |
+| 标准渲染（默认） | 快速看布局和运镜 | 浏览器工具与FFmpeg，无需Blender |
+| Blender高质量渲染 | 更细致的材质、窗光和阴影 | 渲染主机安装Blender，可使用已有远程GPU |
+
+两种方式共用确认后的路线。观看页面和视频不需要安装Blender。
+Blender先确认静态样板，再检查门洞、卫浴、窗景等动态短样，之后渲染整片。
+远程方式在远端渲染并编码，只取回视频、报告及少量代表帧。
+
+第三步可选择做视频放大短样；放大不保证增加真实细节，不会自动处理整片。
+生成式装修处理是另一项可选功能，需指定现有工具并检查结构变化。
+
+配音内容跟随实际镜头，不按房间套用同一段介绍；背景音乐使用固定音量参数。
+网页可切换配音、音乐和字幕，路线图与章节列表同步定位。
+下载版可包含可选字幕和独立SRT；网页黑描边不表示已烧录进视频。
+
+视频更换后需重新确认该版本，才继续配音合成。详见[双渲染流程](references/tour-render-branches.md)、[四步页面](references/tour-presentation-pages.md)和[执行与交付](references/production-execution-and-delivery.md)。
 
 ## 工作原理
 
@@ -150,6 +180,12 @@ LICENSE                  原创内容许可
 
 ## 关于我
 
-由 [chemny](https://github.com/chemny) 维护。问题和建议可以提交到[仓库 Issues](https://github.com/chemny/interior-design/issues)。
+由 [chemny](https://github.com/chemny) 维护。问题和建议可以提交到[仓库 Issues](https://github.com/chemny/visualize-floorplans/issues)。
 
-本地阶段收尾：[版本关系与验收边界](references/local-version-closeout.md)。Skills 0.2.11 包含工作台子系统 0.2.7，具体构建以哈希为准。
+## 工具检查
+
+基础环境：`python scripts/check_environment.py`。
+视频等可选能力使用 `python scripts/production/h5.py doctor --for FEATURE`，
+其中FEATURE可选video、blender、remote、quality或delivery。
+工具路径、远程主机、采样、帧率和音轨在案例中配置，缺少时提示，不自动安装。
+详见[运行环境说明](references/platform-runtime.md)。

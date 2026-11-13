@@ -44,7 +44,11 @@ def review_doors(case):
         hits=[]
         for part,a,b,pad in segments:
             for f in objects:
-                if f.get('elevation',0)>=height:continue
+                low,high=(991,1009) if part=='handle' else (915,1085) if part=='pull' else (0,height)
+                # H5 swing handles are at 1m; wall-slider pulls span 0.915–1.085m.
+                # A floor socket or a higher switch is not a handle collision.
+                bottom=f.get('elevation',0)
+                if bottom>=high or bottom+f.get('h',height)<=low:continue
                 if segment_in_body(a,b,f,pad):hits.append(dict(kind='furniture',part=part,objectId=f['id']))
             for wall_id,rect in solids:
                 if segment_in_body(a,b,rect_object(rect),pad):hits.append(dict(kind='wall',part=part,wallId=wall_id))

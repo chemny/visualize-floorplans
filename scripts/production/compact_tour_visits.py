@@ -17,9 +17,23 @@ def dense_path(path,step=20):
 def safe_path(planner,start,end):
     raw=[start]+planner.astar(start,end)+[end]
     if any(not planner.line_free(a,b) for a,b in zip(raw,raw[1:])):raise ValueError('Grid snap is not safely connected to exact endpoint')
-    simple=planner.simplify(raw);rounded=planner.round(simple)
-    if any(not planner.line_free(a,b) for a,b in zip(rounded,rounded[1:])):raise ValueError('Rounded path failed safety; replan, do not reuse sharp path')
-    return rounded
+    def checked(points):
+        rounded=planner.round(points)
+        if any(not planner.line_free(a,b) for a,b in zip(rounded,rounded[1:])):raise ValueError('Rounded path failed safety; replan, do not reuse sharp path')
+        return rounded
+    try:return checked(planner.simplify(raw))
+    except ValueError as original:
+        # A shortest polyline may hug a convex obstacle too closely to round.
+        # Reserve more space during search, then certify with the unchanged
+        # physical body. Atomic endpoints (including explicit waypoints) stay.
+        for reserve in (40,80,120):
+            roomy=Planner(planner.b,{**planner.cfg,'bodyRadiusMm':planner.radius+reserve})
+            try:
+                raw=[start]+roomy.astar(start,end)+[end]
+                if any(not roomy.line_free(a,b) for a,b in zip(raw,raw[1:])):continue
+                return checked(roomy.simplify(raw))
+            except ValueError:continue
+        raise ValueError('No safe rounded route within bounded additional search clearance') from original
 
 def at_distance(path,d):
     for a,b in zip(path,path[1:]):
