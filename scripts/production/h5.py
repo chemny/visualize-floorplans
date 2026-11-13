@@ -309,7 +309,7 @@ def parser():
     for name in ('narration-prepare','narration-compose'):
         p=sub.add_parser(name,help='Requires explicit approval of exact source video before narration work');p.add_argument('--job',required=True);p.add_argument('--out',required=True);p.add_argument('--ffmpeg')
     p=sub.add_parser('plan-route',help='Stage 1: rooms, openings, ordered path and returns; no cameras, frames or approval');p.add_argument('--job',required=True);p.add_argument('--out',required=True)
-    p=sub.add_parser('record-approval',help="Write the camera rehearsal or exact-video approval from the user's verbatim words; refuses agent names, empty evidence and unfinished rehearsals");p.add_argument('--kind',required=True,choices=('camera','video'));p.add_argument('--pending',required=True);p.add_argument('--confirmed-by',required=True);p.add_argument('--evidence',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('record-approval',help="Write the camera rehearsal, exact-video or narrated-film (--pending = composition-report.json) approval from the user's verbatim words; refuses agent names, empty evidence and unfinished rehearsals");p.add_argument('--kind',required=True,choices=('camera','video','narrated'));p.add_argument('--pending',required=True);p.add_argument('--confirmed-by',required=True);p.add_argument('--evidence',required=True);p.add_argument('--out',required=True)
     p=sub.add_parser('tour-draft',help='Seconds-long camera draft with diagnostics; never for confirmation');p.add_argument('--bundle',required=True);p.add_argument('--brief',required=True);p.add_argument('--out',required=True);p.add_argument('--runtime');p.add_argument('--node')
     p=sub.add_parser('validate-corpus',help='Run route, brief and camera draft for every case in a manifest and compare with recorded baselines');p.add_argument('--manifest',required=True);p.add_argument('--out',required=True);p.add_argument('--only',action='append')
     p=sub.add_parser('optimize-stations',help='Choose observation stations by exported-mesh audit inside the approved route tolerance; verifies and undoes moves that add turn failures');p.add_argument('--brief',required=True);p.add_argument('--plan',required=True);p.add_argument('--runtime',required=True);p.add_argument('--out',required=True);p.add_argument('--node');p.add_argument('--no-verify',action='store_true')
@@ -422,7 +422,7 @@ def main():
         return
     elif args.command=='record-approval':
         import record_approval
-        record=(record_approval.record_camera if args.kind=='camera' else record_approval.record_video)(args.pending,args.out,args.confirmed_by,args.evidence)
+        record={'camera':record_approval.record_camera,'video':record_approval.record_video,'narrated':record_approval.record_narrated}[args.kind](args.pending,args.out,args.confirmed_by,args.evidence)
         print(json.dumps({'status':record['status'],'kind':args.kind,'output':str(args.out),'note':'Any change to the bound files invalidates it'},ensure_ascii=False));return
     elif args.command=='tour-draft':
         from tour_draft import draft as make_draft

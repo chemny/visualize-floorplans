@@ -60,3 +60,28 @@ def record_video(pending,out,confirmed_by,evidence):
     except ValueError:
         out.unlink();raise
     return record
+
+NARRATED_SCHEMA='homeowner-narrated-approval/1'
+NARRATED_CHECKS=('filmHeardInFull','voiceAndScriptApproved','subtitlesApproved','timingMatchesPicture')
+
+def record_narrated(report,out,confirmed_by,evidence):
+    """Narrated-film confirmation (stage 4): binds the exact composed film, captions and the video approval it came from."""
+    from tour_stage_gate import require_video
+    report=Path(report).resolve();out=Path(out).resolve()
+    if out.exists():raise ValueError('Use a new approval path; existing records are preserved')
+    name,words=_signer(confirmed_by,evidence);rec=read(report)
+    if rec.get('status')!='pending_narrated_review' or rec.get('approvalGranted'):raise ValueError('Expected an untouched composition report awaiting narrated review')
+    film=resolve(rec.get('output'),report.parent);captions=resolve(rec.get('captions'),report.parent)
+    video=resolve(rec.get('video'),report.parent);tour=resolve(rec.get('tour'),report.parent);review=resolve(rec.get('videoReview'),report.parent)
+    require_video(review,video,tour)
+    record={'schema':NARRATED_SCHEMA,'status':'approved','approvalSource':'explicit_user_confirmation','confirmedBy':name,'evidence':words,
+            'film':bound(film),'captions':bound(captions),'compositionReport':bound(report),'videoReview':bound(review),'video':bound(video),'tour':bound(tour),
+            'checks':{k:True for k in NARRATED_CHECKS},'recordedAt':datetime.datetime.now().astimezone().isoformat(timespec='seconds')}
+    out.write_text(json.dumps(record,ensure_ascii=False,indent=2),encoding='utf-8');return record
+
+def require_narrated(approval,film):
+    """True only if the approval is valid and still bound to exactly this film file."""
+    approval=Path(approval);rec=read(approval)
+    if rec.get('schema')!=NARRATED_SCHEMA or rec.get('status')!='approved' or not all(rec.get('checks',{}).get(k) for k in NARRATED_CHECKS):raise ValueError('Not a valid narrated-film approval')
+    if resolve(rec.get('film'),approval.parent)!=Path(film).resolve():raise ValueError('Approval is for a different film')
+    resolve(rec.get('captions'),approval.parent);resolve(rec.get('compositionReport'),approval.parent);return rec

@@ -9,7 +9,7 @@
 | ① 路线 | `plan-route` 生成路线页 | 看路线页，说“确认路线” | `homeowner-spatial-approval/1` |
 | ② 镜头预演 | `brief-from-route`、`tour-draft`、`plan-tour` | 看预演，说确认；规则放宽逐项同意 | `homeowner-route-approval/1`（镜头预演确认） |
 | ③ 视频审阅 | 渲染评审片（H5 或 Blender） | 看视频，说确认 | `homeowner-video-approval/1` |
-| ④ 讲解成片 | 合成配音、字幕、音乐 | 提供声音，确认成片 | 视频确认之后 |
+| ④ 讲解成片 | 合成配音、字幕、音乐 | 提供声音，确认成片 | 视频确认之后；确认用 `h5.py record-approval --kind narrated --pending composition-report.json`（`homeowner-narrated-approval/1`） |
 
 阶段之间互相绑定哈希：改了路线、镜头、户型文件，后面的确认全部失效，需要用同一批原话重新记录。
 

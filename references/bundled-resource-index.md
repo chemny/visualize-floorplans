@@ -149,3 +149,4 @@ Paths below resolve from the Skill root. Consult when selecting a helper script 
 - `references/blender-lighting.md` — Blender 分支灯光配置的键、定光顺序、亮度参考、敞开门窗外的处理。
 - `references/blender-render-speed.md` — Blender 整片每帧耗时构成、提速实验结果与取舍。
 - `references/tour-production-playbook.md` — 参观视频制作手册：四阶段流程、各门槛、Blender 与远程渲染的做法和常见坑。
+- `references/tour-spatial-stage-status.md` — 四阶段各自的状态词（未准备、待确认、已确认、失效、被上游阻塞）和 `tour-stage-status` 的读法。

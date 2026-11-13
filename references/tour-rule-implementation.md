@@ -208,5 +208,5 @@ python scripts/production/route_rehearsal.py bind-quality --manifest REHEARSAL_M
 | 秒级镜头草稿 | `tour_draft.draft`（`h5.py tour-draft`） | `test_tour_spatial_plan.CorpusRegression`（合成案例走完整前半链） |
 | 站位按网格画面联合选择并复核撤销 | `optimize_stations`（`h5.py optimize-stations`） | `test_optimize_stations.py` |
 | 案例成绩表与基线比较 | `validate_case`（`h5.py validate-corpus`）、`assets/regression/tour-corpus-manifest.json` | `test_tour_spatial_plan.CorpusRegression` |
-| 镜头预演、整片视频确认记录 | `record_approval.record_camera`、`record_video`（`h5.py record-approval`） | `test_tour_spatial_plan.StageApprovals` |
+| 镜头预演、整片视频、讲解成片确认记录 | `record_approval.record_camera`、`record_video`、`record_narrated`（`h5.py record-approval`） | `test_tour_spatial_plan.StageApprovals` |
 

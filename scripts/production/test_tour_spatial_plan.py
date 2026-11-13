@@ -382,6 +382,22 @@ class StageApprovals(unittest.TestCase):
   sample=pending(p/'v.mp4',p/'t.json');sample['purpose']='sample';(p/'s.json').write_text(json.dumps(sample))
   with self.assertRaises(ValueError):record_video(p/'s.json',p/'y.json','王女士','确认')
 
+ def test_narrated_approval_binds_the_exact_film_and_refuses_unfinished_reports(self):
+  from record_approval import record_narrated,require_narrated,record_video
+  from tour_stage_gate import pending
+  p=self.p;(p/'v.mp4').write_bytes(b'video');(p/'t.json').write_text('{}');(p/'n.mp4').write_bytes(b'film');(p/'c.srt').write_text('1')
+  (p/'p.json').write_text(json.dumps(pending(p/'v.mp4',p/'t.json')));record_video(p/'p.json',p/'vr.json','王女士','整片看过，同意')
+  rep={'status':'pending_narrated_review','approvalGranted':False,'output':bound(p/'n.mp4'),'captions':bound(p/'c.srt'),'video':bound(p/'v.mp4'),'tour':bound(p/'t.json'),'videoReview':bound(p/'vr.json')}
+  (p/'rep.json').write_text(json.dumps(rep))
+  for who in ('Claude','synthetic user',''):
+   with self.subTest(who=who),self.assertRaises(ValueError):record_narrated(p/'rep.json',p/'x.json',who,'成片确认')
+  record=record_narrated(p/'rep.json',p/'na.json','王女士','成片确认');self.assertEqual(record['status'],'approved');require_narrated(p/'na.json',p/'n.mp4')
+  with self.assertRaisesRegex(ValueError,'preserved'):record_narrated(p/'rep.json',p/'na.json','王女士','再来')
+  (p/'n.mp4').write_bytes(b'other')
+  with self.assertRaises(ValueError):require_narrated(p/'na.json',p/'n.mp4')
+  (p/'rep2.json').write_text(json.dumps({**rep,'status':'draft'}))
+  with self.assertRaises(ValueError):record_narrated(p/'rep2.json',p/'y.json','王女士','成片确认')
+
 class CorpusRegression(unittest.TestCase):
  def test_each_regression_is_named_and_improvement_is_not_flagged(self):
   from validate_case import compare
