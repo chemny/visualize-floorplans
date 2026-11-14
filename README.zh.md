@@ -16,12 +16,14 @@
 
 ### 工作台操作录屏
 
-| 二维图纸与家具编辑 · 15秒 | 三维观察与显示效果 · 15秒 |
+| 二维图纸与家具编辑 · 15秒 | 三维观察与显示效果 · 20秒 |
 | --- | --- |
 | [![二维工作台操作录屏](assets/demos/jujian-workbench/2d-operations.jpg)](assets/demos/jujian-workbench/2d-operations.mp4) | [![三维工作台操作录屏](assets/demos/jujian-workbench/3d-operations.jpg)](assets/demos/jujian-workbench/3d-operations.mp4) |
-| 切换户型图、家具布局和硬装图；旋转、拖动家具，打开尺寸入口并撤销。 | 拖拽鸟瞰视角，切换日照与夜景，聚焦房间、退出并切换俯视。 |
+| 切换户型图、家具布局和硬装图；旋转、拖动家具，打开尺寸入口并撤销。 | 前 15 秒展示白天鸟瞰、顶面、剖切、俯视和房间聚焦；后 5 秒切换夜景并旋转。 |
 
-点击图片查看录屏。两段均来自家装助手工作台的实际操作。
+点击图片查看高清配乐录屏（2880 × 1620，30 fps）。两段均来自家装助手工作台的实际操作。
+
+配乐由 [YuE2-3B（m-a-p）](https://huggingface.co/m-a-p/YuE2-3B) 本地生成，采用 [ahmadw 的 MLX 转换](https://huggingface.co/ahmadw/YuE2-3B-MLX)及 [ddalcu 的 MLX-Serve 8-bit 模型](https://huggingface.co/ddalcu/YuE2-3B-MLX-Serve-8bit)。
 
 [查看内置「居间 · 香槟珍珠」案例](assets/reference-cases/jujian-champagne-pearl/index.html)：原始参考、13 张效果图、可编辑工作台、图纸和 56 秒导览。安装后让 Agent 打开本地案例；GitHub 文件页面不能执行 HTML。案例保留的效果图、导览与当前示例工作台存在灯光和材质差异，详见[案例说明](assets/reference-cases/jujian-champagne-pearl/README.md)。
 

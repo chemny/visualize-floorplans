@@ -16,12 +16,14 @@ Illustration of the workflow; AI interior concepts and the editable 3D preview a
 
 ### Workbench recordings
 
-| 2D drawings and furniture editing · 15 seconds | 3D views and lighting · 15 seconds |
+| 2D drawings and furniture editing · 15 seconds | 3D views and lighting · 20 seconds |
 | --- | --- |
 | [![2D workbench recording](assets/demos/jujian-workbench/2d-operations.jpg)](assets/demos/jujian-workbench/2d-operations.mp4) | [![3D workbench recording](assets/demos/jujian-workbench/3d-operations.jpg)](assets/demos/jujian-workbench/3d-operations.mp4) |
-| Switch between floor plan, furniture and finish drawings; rotate and move furniture, open dimensions and undo. | Drag the bird's-eye view, switch day/night, focus a room, return and switch to the top view. |
+| Switch between floor plan, furniture and finish drawings; rotate and move furniture, open dimensions and undo. | The first 15 seconds show daytime orbit, ceiling, section, top and room-focus views; the last 5 seconds switch to night and orbit. |
 
-Click a thumbnail to view the recording. Both clips show actual workbench interactions.
+Click a thumbnail to watch the HD recording with music (2880 × 1620, 30 fps). Both clips show actual workbench interactions.
+
+Music generated locally with [YuE2-3B (m-a-p)](https://huggingface.co/m-a-p/YuE2-3B), using [ahmadw’s MLX conversion](https://huggingface.co/ahmadw/YuE2-3B-MLX) and [ddalcu’s MLX-Serve 8-bit model](https://huggingface.co/ddalcu/YuE2-3B-MLX-Serve-8bit).
 
 [Explore the bundled Champagne Pearl case](assets/reference-cases/jujian-champagne-pearl/index.html): supplied references, 13 concept images, an editable workbench, drawings and a 56-second tour. Ask the Agent to open the installed local case; GitHub does not execute HTML file pages. Its retained images and tour differ from the current example workbench in lighting and materials; see the [case notes](assets/reference-cases/jujian-champagne-pearl/README.md).
 
