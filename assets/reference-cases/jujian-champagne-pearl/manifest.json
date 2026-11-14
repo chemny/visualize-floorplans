@@ -10,17 +10,18 @@
     "currentScheme": "data/scheme.json",
     "mediaSourceSchemeSha256": "7b9ba276f95077d7b1c9974a03035274811275dcd52bfa0a712c7e4c995c376e",
     "images": "selected concept images, retained bytes; not regenerated with current lighting/materials",
-    "tour": "selected older H5 walkthrough; current re-export deferred by user; not Seedance",
+    "tour": "updated 56-second native HD workbench tour with Chinese narration and music",
     "drawings": "selected older handoff drawings; current re-export deferred",
-    "mesh": "existing tour source; current re-export deferred",
-    "acceptance": "source-artifact acceptance is not transferred to current 0.2.0 preview",
-    "currentRendering": "native display pixel ratio without adaptive reductions or DPR cap; collision and batching/on-change rendering updated; generic indoor shadows disabled by default; current case trials one fixed 512-pixel dining pendant shadow pending visual review; unlit black wall cuts and omnidirectional ceiling diffusers; architectural presentation cut with complete furniture, closed architectural caps and full-model restoration; champagne finish revision 6, brushed silver fridge and 35 mm TV; dining/coffee accessories and scoped kitchen-corner decor; living/dining/entrance plain marble and champagne/pearl cabinets; common TV and lighting behavior shared across styles; isolated independent-HTML persistence and explicit material-following floor connection patches, connection area separately reported; reduced global fill and night gain, local ceiling finish lift"
+    "mesh": "historical concept-media source; not the updated narrated tour source",
+    "acceptance": "video presentation and historical reference materials have separate scopes; not an engineering certification",
+    "currentRendering": "native display pixel ratio without adaptive reductions or DPR cap; collision and batching/on-change rendering updated; generic indoor shadows disabled by default; current case trials one fixed 512-pixel dining pendant shadow pending visual review; unlit black wall cuts and omnidirectional ceiling diffusers; architectural presentation cut with complete furniture, closed architectural caps and full-model restoration; champagne finish revision 6, brushed silver fridge and 35 mm TV; dining/coffee accessories and scoped kitchen-corner decor; living/dining/entrance plain marble and champagne/pearl cabinets; common TV and lighting behavior shared across styles; isolated independent-HTML persistence and explicit material-following floor connection patches, connection area separately reported; reduced global fill and night gain, local ceiling finish lift",
+    "tourCamera": "tour/camera-frames.json; original planning files retained separately"
   },
   "files": [
     {
       "path": "README.md",
-      "bytes": 3330,
-      "sha256": "a8c067fa5ba648893cda00c3b5cf60703224d1d35dc167b55ad5ffa3e0e383ef"
+      "bytes": 3481,
+      "sha256": "19cedbb8ce42b4e1e704029f3df2412cc8047ef7ef83dc5306b29ac7fc2c3eec"
     },
     {
       "path": "data/case.json",
@@ -134,8 +135,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 8429,
-      "sha256": "ca93e6743fc448f82b56ab59e30feb818051a0e8166f51d24f6a86e95cd5c1d2"
+      "bytes": 8538,
+      "sha256": "903a0d55774629f3f9938862fbca2203186ae4922a50c3a67edc5aeb5e6b9448"
     },
     {
       "path": "inputs/家具参考.png",
@@ -174,8 +175,8 @@
     },
     {
       "path": "tour/script.md",
-      "bytes": 1260,
-      "sha256": "960cd3989af3b244337bf17fd366428eb912c513e7088dac2edd309eeae6d7d6"
+      "bytes": 1322,
+      "sha256": "da3a0d846b76a08ae92c5ce80bb7398252007ffaa311551426261685693c0f1e"
     },
     {
       "path": "tour/tour.json",
@@ -184,8 +185,8 @@
     },
     {
       "path": "tour/walkthrough.mp4",
-      "bytes": 9072826,
-      "sha256": "24b0a279a3f6cbcb52ac7c47cbf6748ed9da3da51a5be3076d9c040d1aeb33db"
+      "bytes": 52781327,
+      "sha256": "79915e722b35288d7b273e8e381d9bb53c5cfcae6b017a152e88d9ee7642c974"
     },
     {
       "path": "workbench/index.html",
@@ -196,7 +197,22 @@
       "path": "workbench/index.build.json",
       "bytes": 2254,
       "sha256": "c8d82deb40a783dfc3b6dc268e3bd6d6aba7445f8855437d47359d8e6f25dd19"
+    },
+    {
+      "path": "tour/camera-frames.json",
+      "bytes": 367970,
+      "sha256": "4a97fa1fdc91cab92c7d09e02718d41dc25dfb898ae469c666bca784c1d1c270"
+    },
+    {
+      "path": "tour/narration.json",
+      "bytes": 1463,
+      "sha256": "f05698d0b7df10ae6f9684a8acd3f1408bacf14f22880356778e5921324f3184"
+    },
+    {
+      "path": "tour/poster.jpg",
+      "bytes": 150255,
+      "sha256": "a0dcf2867841590edbb2f781462fa629785720e54db85b2d4df19546d3afcea9"
     }
   ],
-  "indexedBytes": 53884927
+  "indexedBytes": 98113438
 }

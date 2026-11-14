@@ -25,7 +25,11 @@ Click a thumbnail to watch the HD recording with music (2880 × 1620, 30 fps). B
 
 Music generated locally with [YuE2-3B (m-a-p)](https://huggingface.co/m-a-p/YuE2-3B), using [ahmadw’s MLX conversion](https://huggingface.co/ahmadw/YuE2-3B-MLX) and [ddalcu’s MLX-Serve 8-bit model](https://huggingface.co/ddalcu/YuE2-3B-MLX-Serve-8bit).
 
-[Explore the bundled Champagne Pearl case](assets/reference-cases/jujian-champagne-pearl/index.html): supplied references, 13 concept images, an editable workbench, drawings and a 56-second tour. Ask the Agent to open the installed local case; GitHub does not execute HTML file pages. Its retained images and tour differ from the current example workbench in lighting and materials; see the [case notes](assets/reference-cases/jujian-champagne-pearl/README.md).
+[Explore the bundled Champagne Pearl case](assets/reference-cases/jujian-champagne-pearl/index.html): supplied references, 13 concept images, an editable workbench, drawings and a 56-second tour. Ask the Agent to open the installed local case; GitHub does not execute HTML file pages. The HD tour now includes Chinese narration; the concept images and historical reference outputs still differ from the workbench in lighting and details. See the [case notes](assets/reference-cases/jujian-champagne-pearl/README.md).
+
+[![56-second HD narrated home tour](assets/reference-cases/jujian-champagne-pearl/tour/poster.jpg)](assets/reference-cases/jujian-champagne-pearl/tour/walkthrough.mp4)
+
+Whole-home tour · 56 seconds · 2880 × 1620 · Chinese narration and gentle music.
 
 [Explore the accepted 57-second homeowner tour](assets/reference-cases/dimensioned-homeowner-tour/index.html): final video, route/camera configuration and concise review records. Its user acceptance is separate from the pending internal continuous-playback review.
 

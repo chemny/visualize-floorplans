@@ -25,7 +25,11 @@
 
 配乐由 [YuE2-3B（m-a-p）](https://huggingface.co/m-a-p/YuE2-3B) 本地生成，采用 [ahmadw 的 MLX 转换](https://huggingface.co/ahmadw/YuE2-3B-MLX)及 [ddalcu 的 MLX-Serve 8-bit 模型](https://huggingface.co/ddalcu/YuE2-3B-MLX-Serve-8bit)。
 
-[查看内置「居间 · 香槟珍珠」案例](assets/reference-cases/jujian-champagne-pearl/index.html)：原始参考、13 张效果图、可编辑工作台、图纸和 56 秒导览。安装后让 Agent 打开本地案例；GitHub 文件页面不能执行 HTML。案例保留的效果图、导览与当前示例工作台存在灯光和材质差异，详见[案例说明](assets/reference-cases/jujian-champagne-pearl/README.md)。
+[查看内置「居间 · 香槟珍珠」案例](assets/reference-cases/jujian-champagne-pearl/index.html)：原始参考、13 张效果图、可编辑工作台、图纸和 56 秒导览。安装后让 Agent 打开本地案例；GitHub 文件页面不能执行 HTML。高清导览已更新并配上中文讲解；概念效果图和历史资料仍与工作台存在光色、细节差异，详见[案例说明](assets/reference-cases/jujian-champagne-pearl/README.md)。
+
+[![56 秒高清配音全屋导览](assets/reference-cases/jujian-champagne-pearl/tour/poster.jpg)](assets/reference-cases/jujian-champagne-pearl/tour/walkthrough.mp4)
+
+全屋导览 · 56 秒 · 2880 × 1620 · 中文配音与轻柔配乐。
 
 [查看已确认的 57 秒房主导览](assets/reference-cases/dimensioned-homeowner-tour/index.html)：最终视频、路线与镜头配置及简要核验记录。用户定稿确认与尚未完成的内部连续播放审阅分别记录。
 
