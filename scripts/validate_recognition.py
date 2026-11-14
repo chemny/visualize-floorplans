@@ -102,7 +102,7 @@ def validate_recognition(data: dict[str, Any]) -> dict[str, Any]:
             if data['schema_version'] == '0.3':
                 model = element.get('door_model')
                 count = element.get('leaf_count')
-                require(model in {'single','double','hidden','sliding'}, f'door {element_id} requires door_model')
+                require(model in {'single','double','hidden','sliding','security'}, f'door {element_id} requires door_model')
                 require(type(count) is int and count == (2 if model == 'double' else count if model == 'sliding' else 1) and (model != 'sliding' or count in (2,3)), f'door {element_id} invalid leaf_count')
                 ends = element.get('hinge_ends')
                 require(ends == [] if model == 'sliding' else ends == ['start','end'] if model == 'double' else ends in (['start'],['end']), f'door {element_id} invalid hinge_ends')

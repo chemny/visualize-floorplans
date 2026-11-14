@@ -81,6 +81,31 @@ record block generation with a rebuild instruction. Do not refresh the record
 without actually rebuilding. Template edits are tracked separately by the build's
 template hash and do not require a JavaScript rebuild.
 
+Rebuild with the compiler recorded in `engine.provenance.json` and the matching
+`three` release. Before editing sources, rebuild once and confirm the result is
+identical to the committed engine, so later differences come only from your edits.
+The stylesheet that ships is the one in `assets/h5/template.html`;
+`source/workbench-v8.css` mirrors it. Change the template or the edit will not
+appear, and keep the mirror aligned.
+
+### Edit verification
+
+- Read the result back from the page state (`getState`, a save/import round trip and
+  the rendered 2D/3D), not from the call that made the edit. Components the engine
+  does not accept or own are dropped silently; a count of zero is a failure, not noise.
+- For a geometry transform (rotation, move, resize), compare the transformed bounding
+  box of every user-placed item and every wall endpoint numerically against the input,
+  and add a rendered check. Round transformed coordinates (6 decimals) so edges that
+  coincided still coincide. Ids that embed coordinates (generated trim) cannot be
+  compared and must be excluded.
+- To prove a 3D object exists and is aligned, render it once in a temporary contrast
+  colour; its real finish may blend with its surroundings.
+- Browser tests build the geometry they need (for example two test walls), keep clear
+  of finished wall surfaces, and never rely on which library entry or position a
+  case happens to have.
+- The bundled engine escapes non-ASCII text and merges meshes. Search it for both
+  spellings, and read merged part names from `userData.sourceParts`.
+
 Run the shared browser entry against a newly generated copy, never the user's
 saved tab:
 
@@ -165,6 +190,14 @@ The default H5 build normalizer merges these input patches into their material-o
 
 ## Lighting and visual evaluation
 
+Room lights do not cast shadows in the performance profile, so a light that reaches past its
+room shines through walls. Limit each room light's range to its room (farthest corner times
+`roomLight.reach`, never the shared default) and scale its strength with the room area
+(`roomLightScale`), so a small corridor is not lit like a living room. Judge leakage by
+measurement: from a top-down night render, compare each room's floor brightness with its own
+light on and off. Most of the room's light should disappear with its own light, and the share
+that arrives from neighbours should stay small.
+
 Keep fixed room lights always on and maintain omnidirectional ceiling diffuser behavior in every style. Tune global ambient/hemisphere fill and exposure separately from fixture emission; avoid flattening pale finishes with excessive uniform fill. Day/night changes must alter interior lighting hierarchy, not only the background. Share profiles across bird's-eye and walk views rather than adapting to camera position.
 
 Use same-camera before/after views to assess pale surfaces, floor detail, cabinet tops and ceiling undersides. Numeric brightness parameters are not measured lux. Small local ceiling-finish compensation is a presentation approximation, not physical bounce lighting. Keep tuning values in the renderer/profile or case, not in mandatory Skill rules.
@@ -194,6 +227,11 @@ Collaborative project mode is documented in `project-save-confirm.md`. Its Save
 writes the project file; Confirm and continue binds that saved version. Browser
 cache saving remains distinct in portable mode. Do not show project-save success
 until the service acknowledges the write, or carry a service token into exports.
+
+The browser keeps the saved scheme per address and case id. A revised page of the
+same case on the same address can refuse that saved scheme because walls or openings
+no longer match. Give each revision a new address or case id; never clear or overwrite
+the saved scheme to get past the refusal.
 
 State explicitly that browser Save does not rewrite the original HTML. Verify
 current snapshot readback after writing; failures must never receive a saved

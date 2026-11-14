@@ -6,7 +6,8 @@ export const ARCHITECTURAL_PRESETS=[
  {id:'window',label:'普通窗洞',kind:'window',width:1200,height:1350,sillHeight:850},
  {id:'passage',label:'开放口',kind:'door',model:'single',width:900,leafRemoved:true},
  {id:'double',label:'对开门',kind:'door',model:'double',width:1400,leafRatio:.5,panelFinish:'solid',optional:true},
- {id:'hidden',label:'隐藏门',kind:'door',model:'hidden',width:900,panelFinish:'solid',optional:true}
+ {id:'hidden',label:'隐藏门',kind:'door',model:'hidden',width:900,panelFinish:'solid',optional:true},
+ {id:'security',label:'防盗门',kind:'door',model:'security',width:1000,panelFinish:'solid'}
 ];
 export const PANEL_FINISHES=[['solid','实心'],['clear','透明'],['frosted','磨砂']];
 export function presetOpening(preset,existing={}){
@@ -19,4 +20,4 @@ export function presetOpening(preset,existing={}){
  if(preset.model==='double')result.leafRatio=existing.leafRatio??.5;
  return result;
 }
-export function openingPresetId(o){return o.kind==='window'?'window':o.leafRemoved?'passage':o.kind==='sliding'?(o.leaves===1?'wallslide':'sliding'):o.doorModel==='double'?'double':o.doorModel==='hidden'?'hidden':'hinged';}
+export function openingPresetId(o){return o.kind==='window'?'window':o.leafRemoved?'passage':o.kind==='sliding'?(o.leaves===1?'wallslide':'sliding'):o.doorModel==='double'?'double':o.doorModel==='hidden'?'hidden':o.doorModel==='security'?'security':'hinged';}

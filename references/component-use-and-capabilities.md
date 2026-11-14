@@ -27,6 +27,15 @@
 
 设施到达、开启、使用和退出的声明检查见 `facility-use-checks.md`；构建输出 `.facilities.json`，缺少声明为not_provided，不能从通过门口推定所有设施可用。
 
+## 新增组件的必做项
+
+- 源码：尺寸表与库条目、2D 符号、3D 构造、风格取色、固定高度/可自定义尺寸的归类，缺一项就是半成品。
+- 依附型组件（门槛石、挡水条等由开口或家具生成）没有宿主会被引擎丢弃，不能当独立家具；需要独立摆放的做成独立类型。
+- 重建引擎并通过 `engine_provenance.py check`；`component-types.json` 随重建更新。
+- 在 `assets/component-capabilities.json` 登记，`check_component_capabilities.py` 会拒绝漏登记。
+- 测试覆盖：库里可见、可添加、默认值、保存再导入后仍在、2D 和 3D 都画出。
+- 在 `h5-tools-and-case-schema.md` 写一条用法。
+
 ## 可校验的组件行为索引
 
 `assets/component-capabilities.json` 使用 schemaVersion 2。每个注册项都明确保存

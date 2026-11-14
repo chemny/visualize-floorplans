@@ -1,11 +1,11 @@
 {
   "schema": "homeowner-validation-corpus/1",
-  "_instructions": "Machine-local real cases (paths below exist on the author machine only; other machines skip them). Run: h5.py validate-corpus --manifest THIS --out NEW_DIR. A case regresses when a stage fails, a protected issue appears that the baseline lacked, the worst connection turns more than the baseline plus slack, the route stations change, or the route gets 10% longer. Baselines record numbers, not quality; refresh them only after the user has judged the result better. Never contains approvals.",
+  "_instructions": "Optional real-case regression manifest. Place authorized case inputs under local-cases/<case-id>/ relative to this manifest, or supply your own manifest with configured paths. Missing cases are skipped, not counted as passed. Run: h5.py validate-corpus --manifest THIS --out NEW_DIR. Baselines are historical measurements, not quality acceptance. No approvals are included.",
   "cases": [
     {
       "id": "jujian-3br2ba",
-      "bundle": "/Users/neo/Codex/inbox/jujian-camera-20261103/bundle/production-bundle.json",
-      "runtime": "/Users/neo/Codex/inbox/jujian-camera-20261103/runtime",
+      "bundle": "local-cases/jujian-3br2ba/production-bundle.json",
+      "runtime": "local-cases/jujian-3br2ba/runtime",
       "maximumSeconds": 100,
       "coverageMinimumPercent": 80,
       "meshAudit": true,
@@ -41,8 +41,8 @@
     },
     {
       "id": "french-3br2ba",
-      "bundle": "/Users/neo/Codex/inbox/tour-recovered-20261114/french-current/production-bundle.json",
-      "caseFile": "/Users/neo/Codex/inbox/layout-candidate-review-20261024/french-style-native-20261028/case.json",
+      "bundle": "local-cases/french-3br2ba/production-bundle.json",
+      "caseFile": "local-cases/french-3br2ba/case.json",
       "maximumSeconds": 100,
       "coverageMinimumPercent": 80,
       "note": "法式住宅；路线未经用户判断",
@@ -72,8 +72,8 @@
     },
     {
       "id": "two-bed",
-      "bundle": "/Users/neo/Codex/inbox/interior-design-userplan-regression-20261024/bath-review-20261024/actual-layout-bundle-v3.json",
-      "caseFile": "/Users/neo/Codex/inbox/interior-design-userplan-regression-20261024/bath-review-20261024/case-current.json",
+      "bundle": "local-cases/two-bed/production-bundle.json",
+      "caseFile": "local-cases/two-bed/case.json",
       "maximumSeconds": 100,
       "coverageMinimumPercent": 80,
       "note": "两卧案例；路线未经用户判断",

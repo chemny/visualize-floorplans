@@ -4,9 +4,11 @@ from pathlib import Path
 
 def javascript_module_tests(root):
     # Browser entry modules are separately invoked through the artifact suite.
+    browser_entries={'test_sliding_editor.mjs','test_night_lighting.mjs',
+                     'test_platform_fridge_components.mjs','test_security_door.mjs','test_variant_switch.mjs'}
     return [p for directory in ('scripts','scripts/production')
             for p in sorted((Path(root)/directory).glob('test_*.mjs'))
-            if not p.name.endswith('_browser.mjs') and p.name!='test_sliding_editor.mjs']
+            if not p.name.endswith('_browser.mjs') and p.name not in browser_entries]
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)

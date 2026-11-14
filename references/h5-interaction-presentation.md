@@ -191,6 +191,15 @@ More Components explicitly opens the furniture pane and selects its furniture
 page; it must not toggle an already-open pane closed. Verify narrow-window drawer
 classes and desktop pane state, including return from the styles page.
 
+Specification (variant) menus: names are at most four characters and never repeat
+the size (the panel appends `· W×D`); a single spec reads `标准`; order small to large;
+identical sizes merge. Mark the selected row with a tint and bold, never a checkmark:
+style selects with `appearance:base-select` and hide `option::checkmark`, and accept
+the system menu where that is unsupported. Offer a `自定义…` entry only for furniture
+whose size genuinely varies; fixed-spec equipment switches between library specs only.
+The custom size form shows only the dimensions that vary, so furniture of fixed
+height (beds, tables, chairs, appliances) asks for length and depth only.
+
 Keep the library compact with readable names/dimensions, reduced whitespace and
 responsive width rules placed after competing rules. Specific pixel widths are
 presentation defaults, not case geometry. Verify visible and collapsed states.

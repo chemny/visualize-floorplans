@@ -30,6 +30,31 @@ class Base(unittest.TestCase):
   r.update(status='approved',approvalSource='synthetic_test_fixture',confirmedBy='synthetic user fixture',evidence='Synthetic test only',checks={k:True for k in spatial.CHECKS},**fields)
   path=out/'approved.json';path.write_text(json.dumps(r));return path
 
+class ShallowStations(Base):
+ """A room's station may be limited to a depth from its own door (stand just inside, not at the middle)."""
+ def depths(self,**extra):
+  self.count=getattr(self,'count',0)+1
+  plan,_=self.generate('route%d'%self.count,**extra);return {s['name']:s for s in plan['stations']}
+ def test_default_station_is_deep_and_limit_makes_it_shallow(self):
+  deep=self.depths()['东室'];shallow=self.depths(maxEntryDepthMm=900)['东室']
+  self.assertGreater(deep['entryDepthMm'],900)
+  self.assertLessEqual(shallow['entryDepthMm'],900);self.assertFalse(shallow['depthLimitRelaxed']);self.assertEqual(shallow['maxEntryDepthMm'],900)
+  self.assertLess(shallow['entryDepthMm'],deep['entryDepthMm'])
+ def test_per_visit_value_overrides_the_job_default_and_none_skips_it(self):
+  job=job_value(maxEntryDepthMm=900);job['visits'][1]['maxEntryDepthMm']=None
+  plan=spatial.run(job,self.p,self.p/'skip');station=[s for s in plan['stations'] if s['name']=='东室'][0]
+  self.assertIsNone(station['maxEntryDepthMm'])
+ def test_impossible_limit_relaxes_to_the_shallowest_candidates_and_says_so(self):
+  station=self.depths(maxEntryDepthMm=300)['东室']
+  self.assertTrue(station['depthLimitRelaxed']);self.assertGreater(station['entryDepthMm'],300)
+ def test_limit_must_be_a_sane_number(self):
+  for bad in (100,5000,True,'900'):
+   with self.subTest(bad=bad),self.assertRaises(ValueError):self.generate(maxEntryDepthMm=bad)
+ def test_openings_belong_to_the_rooms_they_touch(self):
+  b=bundle_value();rooms={r['id']:r for r in b['model']['rooms']};gates=spatial.gates(b)
+  hall=[g['id'] for g in spatial.room_gates(rooms['hall'],gates)];east=[g['id'] for g in spatial.room_gates(rooms['east'],gates)]
+  self.assertIn('IN',hall);self.assertIn('MID',hall);self.assertIn('MID',east);self.assertNotIn('IN',east)
+
 class RoutePlanning(Base):
  def test_plan_has_route_data_and_no_camera_or_frames(self):
   plan,out=self.generate()

@@ -9,12 +9,14 @@ export const DIMENSIONS={
  wallcab:{label:'吊柜',h:750,elevation:1800,min:300,max:1200,meaning:'柜体高度'},hood:{label:'油烟机',h:500,elevation:1575,min:250,max:1000,meaning:'完整机身高度',note:'灶面至烟机底部初值 650 mm，实际依所选灶具及烟机安装说明。'},
  fridgecab:{label:'冰箱上柜',h:600,elevation:2150,min:200,max:1000},endpanel:{label:'柜侧板',h:2750,min:300,max:2750},
  pendant:{label:'吊灯',h:500,elevation:2250,min:80,max:800},downlight:{label:'筒灯',h:40,elevation:2710,min:15,max:150},tracklight:{label:'轨道灯',h:120,elevation:2600,min:40,max:350},
- wardrobe:{label:'衣柜',h:2750,min:1500,max:2750},bookshelf:{label:'书柜',h:2750,min:1000,max:2750}
+ wardrobe:{label:'衣柜',h:2750,min:1500,max:2750},bookshelf:{label:'书柜',h:2750,min:1000,max:2750},
+ platform:{label:'台阶/平台',h:550,min:50,max:900,meaning:'本体加台面的总高度',note:'飘窗台阶、地台等抬高平面；本体取墙面色，台面取大理石色；高度按现场测量填写，初值仅供预览。'}
 };
 export const NEW_COMPONENTS=[
  ['wallcab','厨房吊柜',900,320,'#ece5db'],['hood','油烟机',750,480,'#9eaaa7'],
  ['fridgecab','冰箱上柜',600,650,'#ece5db'],['endpanel','柜侧板',50,650,'#ece5db'],
- ['pendant','餐厅吊灯',700,260,'#a8957b'],['downlight','嵌入筒灯',100,100,'#ece5db'],['tracklight','轨道灯',1200,90,'#5b5e58']
+ ['pendant','餐厅吊灯',700,260,'#a8957b'],['downlight','嵌入筒灯',100,100,'#ece5db'],['tracklight','轨道灯',1200,90,'#5b5e58'],
+ ['platform','飘窗台阶/平台',700,1800,'#f4f1eb']
 ];
 export const WALL_FINISHES={french_panel:{label:'法式线框饰面',role:'wall',kind:'french_panel'},paint:{label:'乳胶漆',role:'wall',kind:'plaster'},wallpaper:{label:'织纹壁纸',role:'wall',kind:'fabric'},wood:{label:'木饰面',role:'wood',kind:'wood'},tile:{label:'瓷砖',role:'tile',kind:'tile'}};
 export function validateDimensions(f,height=2750){

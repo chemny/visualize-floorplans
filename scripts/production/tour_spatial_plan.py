@@ -116,6 +116,15 @@ def anchor_of(bundle,room,visit):
  if not rows:raise ValueError('Visit anchor not found inside its room: '+visit['name'])
  return rows[0]
 
+def room_gates(room,all_gates):
+ """Openings that belong to a room: their centre lies inside it or within a wall thickness of its outline."""
+ out=[];poly=room['poly']
+ for g in all_gates:
+  mid=[(g['a'][k]+g['b'][k])/2 for k in (0,1)]
+  d=0 if inside(mid,poly) else min(dist_segment(mid,poly[i],poly[(i+1)%len(poly)]) for i in range(len(poly)))
+  if d<=g['halfThicknessMm']+200:out.append(g)
+ return out
+
 def station_candidates(bundle,planner,visit,limit,all_gates):
  """Cheap floor feasibility only: clearance, shallow depth, 2D wall view. Not a camera check."""
  room=next((r for r in planner.rooms if r['id']==visit['roomId']),None)
@@ -137,7 +146,18 @@ def station_candidates(bundle,planner,visit,limit,all_gates):
    rows.append(p)
  if not rows:raise SpatialBlocked('No walkable station candidates for '+visit['name'],{'visit':visit['name'],'roomId':room['id'],'bodyRadiusMm':planner.radius,'anchor':anchor and anchor['id']})
  rows=rows[::max(1,len(rows)//60)];scored=[]
- for p in rows:scored.append({'point':p,'viewFraction':sum(ray_clear(planner,p,q) for q in samples)/max(1,len(samples)),'source':'room_geometry'})
+ gates=room_gates(room,all_gates)
+ entry=lambda p:min((dist_segment(p,g['a'],g['b']) for g in gates),default=None)
+ for p in rows:scored.append({'point':p,'viewFraction':sum(ray_clear(planner,p,q) for q in samples)/max(1,len(samples)),'source':'room_geometry','entryDepthMm':None if not gates else round(entry(p))})
+ # Shallow stations: stand just inside the door instead of at the middle of the room. A room whose depth limit
+ # cannot be met keeps its shallowest candidates and says so, never fails the plan.
+ limit_mm=visit.get('maxEntryDepthMm')
+ if limit_mm is not None and gates:
+  near=[c for c in scored if c['entryDepthMm']<=limit_mm]
+  if not near:
+   floor=min(c['entryDepthMm'] for c in scored);near=[c for c in scored if c['entryDepthMm']<=floor+200]
+   for c in near:c['depthLimitRelaxed']=True
+  scored=near
  # Farthest-first keeps real alternatives across the room, not one cluster near a corner.
  top=max(c['viewFraction'] for c in scored);pool=[c for c in scored if c['viewFraction']>=top-.1]
  cx=sum(c['point'][0] for c in pool)/len(pool);cy=sum(c['point'][1] for c in pool)/len(pool)
@@ -367,6 +387,13 @@ def build(job,base='.'):
   reasons=explain_point(planner,p)
   if reasons:raise SpatialBlocked('Blocked '+label+' '+str(p)+': '+reasons[0]['code'],{'point':label,'pointMm':p,'reasons':reasons,'accessPolygons':access})
  visits=job['visits'];candidates={};meta={};dropped=[]
+ default_depth=job.get('maxEntryDepthMm')
+ if default_depth is not None:
+  if isinstance(default_depth,bool) or not isinstance(default_depth,(int,float)) or not 300<=default_depth<=4000:raise ValueError('maxEntryDepthMm must stay within 300..4000')
+  for v in visits:v.setdefault('maxEntryDepthMm',default_depth)
+ for v in visits:
+  m=v.get('maxEntryDepthMm')
+  if m is not None and (isinstance(m,bool) or not isinstance(m,(int,float)) or not 300<=m<=4000):raise ValueError('maxEntryDepthMm must stay within 300..4000: '+v['name'])
  for v in visits:
   try:rows,room,anchor=station_candidates(b,planner,v,count,all_gates)
   except SpatialBlocked as error:
@@ -424,7 +451,7 @@ def build(job,base='.'):
  for v,pick in zip(visits,picks[1:-1]):
   room,anchor=meta[v['name']]
   if not inside(pick['point'],room['poly']):issues.append({'code':'station_outside_room','visit':v['name']})
-  stations.append({'name':v['name'],'roomId':v['roomId'],'roomName':room.get('name'),'pointMm':[round(x,1) for x in pick['point']],'roomPolygon':room['poly'],'anchor':anchor and anchor['id'],'stationSource':pick.get('source'),'wallViewFraction2D':pick['viewFraction'] if pick['viewFraction'] is None else round(pick['viewFraction'],2)})
+  stations.append({'name':v['name'],'roomId':v['roomId'],'roomName':room.get('name'),'pointMm':[round(x,1) for x in pick['point']],'roomPolygon':room['poly'],'anchor':anchor and anchor['id'],'stationSource':pick.get('source'),'entryDepthMm':pick.get('entryDepthMm'),'maxEntryDepthMm':v.get('maxEntryDepthMm'),'depthLimitRelaxed':bool(pick.get('depthLimitRelaxed')),'wallViewFraction2D':pick['viewFraction'] if pick['viewFraction'] is None else round(pick['viewFraction'],2)})
  missing=[r['id'] for r in rooms if r['id'] not in {v['roomId'] for v in visits} and r['id'] not in excluded and not any(inside(p,r['poly']) for p,_ in resample(route))]
  for roomId in missing:issues.append({'code':'room_not_visited','roomId':roomId})
  if any(not str(v or '').strip() for v in excluded.values()):issues.append({'code':'exclusion_without_reason'})

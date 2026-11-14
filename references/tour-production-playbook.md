@@ -16,12 +16,14 @@
 ## 0. 开始前
 
 - 户型文件（production bundle）里结构、布局、风格三项必须是“已确认”才能做 Blender 和 H5 正式生产；低分辨率评审路径（`--preview`）不要求。确认来自用户：工作台里点击，或用户在对话里看过平面图后原话确认并明确委托助手写入（来源记 `explicit_user_chat_confirmation`，证据写原话）。写入后户型文件哈希会变，路线和镜头确认要用原话重新记录，镜头本身不变。
+- 户型文件丢失或要重导出时，先对上用户确认过的那一版（看过的导览页、截图、当时的方案状态），不要默认取最新的工作台文件。可用来源：仍在的工作台页面（`h5.py export --preview` 重新导出）、导览运行目录里的 `scene.json`（带当时完整方案状态，可导入还原）。只靠建模脚本重建得到的是第一版结构，不是确认版。
+- 重导出的版本，先把 2D 平面图（structure、furniture、hard 三张）给用户确认，再排路线、做镜头；结构、布局、风格仍是未确认，确认用原话记录。
 - 入户门用 `entranceOpeningId`（形如 `W09:0`）或 `caseFile` 的 `entranceOpenings` 指定，必须是外门。
 - 用户的目标是干练、直观、用最短时间讲清房子；时长数字只是估计。
 
 ## 1. 路线
 
-`h5.py plan-route --job JOB --out DIR` → 展示 `route.html` → 用户确认后 `h5.py record-route-approval --pending DIR/spatial-review.pending.json --confirmed-by 姓名 --evidence 原话 --out 新文件`。路线好坏由用户判断，不要用数字下结论。
+`h5.py plan-route --job JOB --out DIR` → 展示 `route.html` → 用户确认后 `h5.py record-route-approval --pending DIR/spatial-review.pending.json --confirmed-by 姓名 --evidence 原话 --out 新文件`。路线好坏由用户判断，不要用数字下结论。每站默认站在房间中部；用户嫌进得太深时，在作业里设 `maxEntryDepthMm`（整体默认，如 1200）或每站单独设（如阳台 800），站位会限制在离自己房间的门这个距离以内，满足不了的房间保留最浅的候选并在站位记录里标 `depthLimitRelaxed`。需要走到某件家具旁（如茶几）的房间用 `anchor`（`furnitureTypes`、`minimumMm`、`maximumMm`），并把该站的 `maxEntryDepthMm` 设为 `null`。
 
 ## 2. 镜头预演
 

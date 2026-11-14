@@ -10,6 +10,13 @@ def inspect(bundle,tour,planner,minimum_percent=None,grid_mm=300,sample_hz=4,con
     from tour_core_targets import declared_introductions
     separate=config is not None and declared_introductions(config)
     scoped={};room_ids={r['id'] for r in bundle['model']['rooms']}
+    # Rooms the approved route declares as not entered stay out of the denominator, with their reason on the report.
+    excluded={}
+    for value in ((config or {}).get('coveragePolicy') or {}).get('excludedRooms',[]):
+        room=value.get('roomId') if isinstance(value,dict) else None
+        if not isinstance(room,str) or room not in room_ids or room in excluded or not isinstance(value.get('reason'),str) or not value['reason'].strip():
+            raise ValueError('Coverage exclusion requires one known roomId, a unique entry and a reason')
+        excluded[room]=value['reason'].strip()
     for value in (config or {}).get('ruleExceptions',[]):
         if value.get('code')!='room_coverage_minimum_override':continue
         room=value.get('roomId');limit=value.get('minimumPercent')
@@ -29,6 +36,7 @@ def inspect(bundle,tour,planner,minimum_percent=None,grid_mm=300,sample_hz=4,con
     for a,z in zip(boundaries,boundaries[1:]):indices.update(range(a,z+1,stride))
     rows=[]
     for room in bundle['model']['rooms']:
+        if room['id'] in excluded:continue
         allowed=set(indices);window=None;windows=None
         if config is not None:
             from tour_workflow import markers
@@ -78,7 +86,7 @@ def inspect(bundle,tour,planner,minimum_percent=None,grid_mm=300,sample_hz=4,con
             meetsDefaultMinimum=bool(points) and percent>=minimum_percent,thresholdException=concession)
         rows.append(row)
     status='proxy_pass_actual_3d_pending' if all(r['meetsProxyMinimum'] for r in rows) else 'needs_revision'
-    report={'schema':'homeowner-room-coverage/1','scope':'declared_introduction_visits' if separate else 'first_continuous_visit' if config is not None else 'whole_timeline_diagnostic','minimumPercent':minimum_percent,'scopedExceptions':list(scoped.values()),'gridMm':grid_mm,'sampleHz':sample_hz,'temporalSampleCount':len(indices),'temporalSampling':'interval-anchored with endpoints','rooms':rows,'status':status,'actual3DVisibility':'pending','limitations':'Full room polygon denominator, including furniture footprints. Horizontal field and wall/door bounds only; furniture occlusion, vertical FOV and visible surfaces are not modelled. No actual 3D or human acceptance.'}
+    report={'schema':'homeowner-room-coverage/1','scope':'declared_introduction_visits' if separate else 'first_continuous_visit' if config is not None else 'whole_timeline_diagnostic','minimumPercent':minimum_percent,'scopedExceptions':list(scoped.values()),'excludedRooms':[{'roomId':k,'reason':v} for k,v in excluded.items()],'gridMm':grid_mm,'sampleHz':sample_hz,'temporalSampleCount':len(indices),'temporalSampling':'interval-anchored with endpoints','rooms':rows,'status':status,'actual3DVisibility':'pending','limitations':'Full room polygon denominator, including furniture footprints. Horizontal field and wall/door bounds only; furniture occlusion, vertical FOV and visible surfaces are not modelled. No actual 3D or human acceptance.'}
     reference=(config or {}).get('coverageReferencePolicy')
     if reference is not None:
         if reference.get('mode')!='reference_not_visual_acceptance':raise ValueError('Unknown explicit coverage reference mode')

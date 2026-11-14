@@ -245,6 +245,25 @@
       "runtimeType": "baycushion"
     },
     {
+      "id": "platform",
+      "family": "surfaces",
+      "familyLabel": "桌台",
+      "use": "飘窗台阶、地台等抬高的平面；高度和范围按现场测量填写，初值仅供预览。",
+      "checks": "与墙垛、窗台高度和窗帘的交接分别检查；台面标高影响可坐、可放物和窗台净高；不用于判断结构或防水。",
+      "optional": "依现场，已有台阶时必须建模，不可省略",
+      "defaultCatalog": "verify_runtime",
+      "alias": null,
+      "representation": "registry_and_source_inspected",
+      "operation": "manual_envelope_or_model_selection_required",
+      "evidence": [
+        "assets/h5/component-types.json",
+        "assets/h5/source/app.js",
+        "assets/h5/source/dimensions-v9.js"
+      ],
+      "behaviorProfile": "nominal-envelope",
+      "runtimeType": "platform"
+    },
+    {
       "id": "beanbag",
       "family": "seating",
       "familyLabel": "座椅",
@@ -1871,7 +1890,8 @@
     "open": "leafRemoved; aperture retained",
     "folding": "unsupported",
     "pocket": "unsupported",
-    "wall_mounted_sliding": "single wall-side panel; installation side, parking direction and sampled operation diagnostics; hardware installation unverified"
+    "wall_mounted_sliding": "single wall-side panel; installation side, parking direction and sampled operation diagnostics; hardware installation unverified",
+    "security": "hinged leaf finished as a red-brown security door; opens inward or outward; lock body and rating not modelled"
   },
   "caseOnly": [
     "Shower sliding or folding partitions remain unsupported; do not substitute hinged geometry for those mechanisms."
@@ -1887,7 +1907,8 @@
     ],
     "optional": [
       "double",
-      "hidden"
+      "hidden",
+      "security"
     ],
     "windowOperation": "opening geometry only",
     "showerOperation": "explicit showerDoor: hinged outward leaf, left/right hinge, angle 5–100, open/closed; SVG/actual mesh/navigation and facility review; absent field remains shape-only",
@@ -2788,6 +2809,32 @@
         "validation": [
           "scripts/test_architectural_presets.mjs",
           "scripts/production/test_door_operation_review.py"
+        ]
+      },
+      "acceptance": "case_operation_paths_and_product_conditions_required"
+    },
+    "security": {
+      "support": "hinged_geometry",
+      "requires": [
+        "真实墙洞及明确铰链、内开或外开方向、角度"
+      ],
+      "implemented": [
+        "平面/三维防盗门扇（红褐色，带凸起门板）、把手、内开/外开切换与扫掠诊断；门框同色。"
+      ],
+      "notImplemented": [
+        "防盗门的锁体、猫眼、门框钢结构、防火或防盗等级不建模；实地墙垛、五金和安装另验。"
+      ],
+      "evidence": {
+        "source": [
+          "assets/h5/source/architectural-presets.js",
+          "assets/h5/source/walls.js",
+          "assets/h5/source/app.js",
+          "scripts/production/door_operation_review.py"
+        ],
+        "validation": [
+          "scripts/test_architectural_presets.mjs",
+          "scripts/production/test_door_operation_review.py",
+          "scripts/test_security_door.mjs"
         ]
       },
       "acceptance": "case_operation_paths_and_product_conditions_required"

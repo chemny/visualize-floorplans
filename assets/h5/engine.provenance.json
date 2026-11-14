@@ -1,14 +1,14 @@
 {
   "schema": "h5-engine-provenance/1",
-  "sourceSha256": "115feeb194eaf8b8a948f6c24c0f442ca658c4ddc44b177286606abaedbc140e",
+  "sourceSha256": "30295b4c741e15e288271185c272d1cd0fc6a8f85076a5858d95a4d7cc030529",
   "inputs": [
     {
       "path": "assets/h5/source/app.js",
-      "sha256": "b5c9bd3ffe224ec186d5ccc2dad01ce8618b530e689b4ceeae58b773210968d0"
+      "sha256": "212f7813bfe04d5f998037f3600124e86eee11aa92a50ac93ea5ece508244a16"
     },
     {
       "path": "assets/h5/source/architectural-presets.js",
-      "sha256": "6a6c48379d9e422592c4f7b128f020ca8a182038995edf8f0df3ab23754e455e"
+      "sha256": "2ec955fcc7eaeedaf92e67c2ef12e6da51e0de28458c809cdbf850c93dae6b11"
     },
     {
       "path": "assets/h5/source/bathtub-body.js",
@@ -24,7 +24,7 @@
     },
     {
       "path": "assets/h5/source/dimensions-v9.js",
-      "sha256": "d401137a475711ef566c93e9282c4da5506d159a0cf7f770fc8b4023f6b1d95c"
+      "sha256": "cbe2a4bb097dc8465cc647f8a53d2f66ec263badb9a6f354689ff098ff291a99"
     },
     {
       "path": "assets/h5/source/enhancements.js",
@@ -68,11 +68,11 @@
     },
     {
       "path": "assets/h5/source/lighting-profile.js",
-      "sha256": "7480bee0708fe8c8b62a5129d5bb7ba8c19e1e17d15cdebddbdb71489994281a"
+      "sha256": "31f3af159217ae8fe998fc4683be13cf10be88b3921dab30bf08e7217503b958"
     },
     {
       "path": "assets/h5/source/lighting-runtime.js",
-      "sha256": "b271e1240daa858cca9e6b675e24d9fea80ce7791b47739e27fd9d2e6e2a3fc8"
+      "sha256": "35a559ea92f23924901c5e46e3166749ae97ada6467352d74559b16002d1c679"
     },
     {
       "path": "assets/h5/source/material-finish.js",
@@ -160,7 +160,7 @@
     },
     {
       "path": "assets/h5/source/styles-v8.js",
-      "sha256": "6be827619ed9198e1022262d162e81ec952920144f76e423e9c8c88be4c611ab"
+      "sha256": "2d162582980c1d2327d204b5c88e031c271d89d98ecd11095ec06b6390c8c94d"
     },
     {
       "path": "assets/h5/source/tabletop-decor.js",
@@ -204,15 +204,15 @@
     },
     {
       "path": "assets/h5/source/workbench-v8.css",
-      "sha256": "9561f4fded07964b869baf29becae08813cff60009aab0d3fecfe27fa67ce5e3"
+      "sha256": "a23cf53a7ce8d352e28160bdf712109c7fd94e0488c0776fa442da4ee8a71e80"
     },
     {
       "path": "assets/h5/version.json",
-      "sha256": "f0c96887402653a1edd80e015a1db1791c220f9590a478f367e759f92e9e9143"
+      "sha256": "3a389ee1bbcb8ca06a748e97c67fc2fee831cb565ad940e03a2ce5929feb9e25"
     }
   ],
-  "engineSha256": "093e83fb544698eb199817eeaea4c15d45534a71a26e1f42e66b0412c3f13a5b",
-  "registrySha256": "79ec99aef2daeb2d0d7807cb2e135baa94295dbd80735d68573a64329540b839",
+  "engineSha256": "8bdff236f8bcf5a3c72102d769de92434a1a788fdaee69baee2b134a0825befc",
+  "registrySha256": "f95f96bc465bc7f599cf7c30999e8695e0d28c459edf7207b0cded9f0aed36c5",
   "compiler": {
     "name": "esbuild",
     "version": "0.25.10",

@@ -22,7 +22,7 @@ class CapabilityInventoryTests(unittest.TestCase):
         r = check(self.data, self.ids)
         self.assertEqual(r['registeredComponents'], len(self.ids))
         self.assertEqual(r['behaviorProfiles'], 13)
-        self.assertEqual(r['architecturalMechanisms'], 9)
+        self.assertEqual(r['architecturalMechanisms'], 10)
 
     def test_missing_or_duplicate(self):
         for rows in [self.data['components'][:-1], self.data['components'] + [self.data['components'][0]]]:

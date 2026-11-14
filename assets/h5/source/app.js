@@ -52,10 +52,10 @@ const NAMES_EN = {
   '橡木地板':'Oak Flooring', '胡桃木地板':'Walnut Flooring', '800 地砖':'800 Tile', '600 地砖':'600 Tile', '大理石':'Marble',
   '300 防滑砖':'300 Anti-slip Tile', '水磨石':'Terrazzo', '满铺地毯':'Wall-to-wall Carpet',
   '卧室':'Bedroom', '餐厨':'Dining & Kitchen', '卫浴':'Bathroom', '家电':'Appliances', '书房 · 休闲':'Study & Leisure',
-  '双人床 1.8m':'Double Bed 1.8m', '双人床 1.5m':'Double Bed 1.5m', '双人床':'Double Bed', '单人床':'Single Bed', '婴儿床':'Crib',
+  '双人床 2.2m':'Double Bed 2.2m', '双人床 1.8m':'Double Bed 1.8m', '沙发床 1.2m（收起）':'Sofa Bed 1.2m (folded)', '沙发床 1.5m（收起）':'Sofa Bed 1.5m (folded)', '沙发床 1.8m（收起）':'Sofa Bed 1.8m (folded)', '双人床 1.5m':'Double Bed 1.5m', '双人床':'Double Bed', '单人床':'Single Bed', '婴儿床':'Crib',
   '床头柜':'Nightstand', '衣柜':'Wardrobe', '小衣柜':'Small Wardrobe', '梳妆台':'Dresser', '书桌':'Desk', '椅子':'Chair',
   '书架':'Bookshelf', '飘窗垫':'Bay Cushion', '三人沙发':'3-Seat Sofa', '双人沙发':'Loveseat', '转角沙发':'Corner Sofa',
-  '单人沙发':'Armchair', '懒人沙发':'Beanbag', '茶几':'Coffee Table', '边几':'Side Table', '电视柜':'TV Stand', '地毯':'Rug',
+  '单人沙发':'Armchair', '懒人沙发':'Beanbag', '茶几':'Coffee Table', '圆茶几 Ø600':'Round Coffee Table Ø600', '圆茶几 Ø800':'Round Coffee Table Ø800', '圆茶几 Ø1000':'Round Coffee Table Ø1000', '方茶几 800×800':'Square Coffee Table 800×800', '方茶几 1200×600':'Coffee Table 1200×600', '方茶几 1400×700':'Coffee Table 1400×700', '边几':'Side Table', '电视柜':'TV Stand', '地毯':'Rug',
   '鞋柜':'Shoe Cabinet', '玄关柜':'Entry Cabinet', '落地灯':'Floor Lamp', '绿植':'Plant', '大绿植':'Large Plant',
   '餐桌':'Dining Table', '六人餐桌':'6-Seat Dining Table', '圆桌':'Round Table', '餐椅':'Dining Chair', '岛台':'Kitchen Island',
   '吧椅':'Bar Stool', '橱柜台面':'Kitchen Counter', '燃气灶':'Gas Stove', '水槽':'Sink', '冰箱':'Fridge', '餐边柜':'Sideboard',
@@ -112,13 +112,13 @@ const MATS = {
 // 家具库：[类型, 名称, 宽, 深, 颜色]
 const LIB = [
   {cat:'卧室', items:[
-    ['bed','双人床 1.8m',1800,2000,'#c9d6df'],['bed','双人床 1.5m',1500,2000,'#d8c7dc'],['bed','单人床',1200,2000,'#e8d5b5'],
+    ['bed','双人床 2.2m',2200,2000,'#c9d6df'],['bed','双人床 1.8m',1800,2000,'#c9d6df'],['bed','双人床 1.5m',1500,2000,'#d8c7dc'],['bed','单人床',1200,2000,'#e8d5b5'],
     ['crib','婴儿床',1250,700,'#efe3d0'],['nightstand','床头柜',450,400,'#e8dccb'],['wardrobe','衣柜',2000,600,'#efe6d8'],
     ['wardrobe','小衣柜',1200,550,'#efe6d8'],['dresser','梳妆台',1000,450,'#efe6d8'],['desk','书桌',1200,600,'#e2cfb4'],
     ['chair','椅子',450,480,'#cfc6b8'],['bookshelf','书架',800,300,'#e2cfb4'],['baycushion','飘窗垫',520,1800,'#e7dccd']]},
   {cat:'客厅', items:[
     ['sofa','三人沙发',2400,900,'#b7c4b0'],['sofa','双人沙发',1700,880,'#c3cbd6'],['cornersofa','转角沙发',2800,1700,'#b7c4b0'],
-    ['armchair','单人沙发',850,850,'#d6b99a'],['beanbag','懒人沙发',800,800,'#e0b98f'],['coffeetable','茶几',1300,650,'#e8dccb'],['coffee','圆茶几',850,850,'#e8dccb'],['sofabed','沙发床（收起）',1500,820,'#c3cbd6'],
+    ['armchair','单人沙发',850,850,'#d6b99a'],['beanbag','懒人沙发',800,800,'#e0b98f'],['coffee','圆茶几 Ø600',600,600,'#e8dccb'],['coffee','圆茶几 Ø800',800,800,'#e8dccb'],['coffee','圆茶几 Ø1000',1000,1000,'#e8dccb'],['coffeetable','方茶几 800×800',800,800,'#e8dccb'],['coffeetable','方茶几 1200×600',1200,600,'#e8dccb'],['coffeetable','方茶几 1400×700',1400,700,'#e8dccb'],['sofabed','沙发床 1.2m（收起）',1200,820,'#c3cbd6'],['sofabed','沙发床 1.5m（收起）',1500,820,'#c3cbd6'],['sofabed','沙发床 1.8m（收起）',1800,820,'#c3cbd6'],
     ['sidetable','边几',500,500,'#d9c3a3'],['tvstand','电视柜',2400,400,'#e2cfb4'],['rug','地毯',2400,1700,'#d9cbb8'],
     ['shoecab','鞋柜',1000,350,'#efe6d8'],['shoecab','玄关柜',1400,380,'#e6dccc'],['floorlamp','落地灯',450,450,'#3d3a34'],
     ['plant','绿植',500,500,'#a9c39b'],['plant','大绿植',700,700,'#9dbb8c']]},
@@ -126,13 +126,13 @@ const LIB = [
     ['table','餐桌',1400,800,'#e2cfb4'],['table','六人餐桌',1800,900,'#d8c2a2'],['roundtable','圆桌',1000,1000,'#e2cfb4'],
     ['chair','餐椅',450,480,'#cfc6b8'],['island','岛台',1800,900,'#e9e5de'],['barstool','吧椅',420,420,'#6b5d4c'],
     ['counter','橱柜台面',1600,600,'#e9e5de'],['stove','燃气灶',750,450,'#dcdcdc'],['ksink','水槽',800,450,'#e1e6ea'],
-    ['fridge','冰箱',700,700,'#dfe4e8'],['cabinet','餐边柜',1600,400,'#efe6d8']]},
+    ['fridge','单开门冰箱',700,700,'#dfe4e8'],['fridge','双开门冰箱',910,700,'#c9ced3'],['cabinet','餐边柜',1600,400,'#efe6d8']]},
   {cat:'卫浴', items:[
     ['toilet','马桶',400,700,'#ffffff'],['vanity','浴室柜',800,500,'#eef1f3'],['vanity','双盆浴室柜',1200,500,'#eef1f3'],
     ['shower','淋浴房',900,900,'#e4edf2'],['bathtub','浴缸',1600,750,'#eef3f6'],['washer','洗衣机',600,600,'#e6ebee'],
     ['waterheater','电热水器',800,450,'#f4f4f2'],['cabinet','储物柜',1000,400,'#efe6d8']]},
   {cat:'家电', items:[
-    ['tv','65 寸电视',1450,35,'#1d1d1f'],['tv','55 寸电视',1230,35,'#1d1d1f'],['fridge','对开门冰箱',910,700,'#c9ced3'],
+    ['tv','65 寸电视',1450,35,'#1d1d1f'],['tv','55 寸电视',1230,35,'#1d1d1f'],['tv','75 寸电视',1680,35,'#1d1d1f'],['tv','85 寸电视',1900,35,'#1d1d1f'],['fridge','双开门冰箱',910,700,'#c9ced3'],
     ['aircon','柜机空调',500,380,'#f6f7f8'],['acwall','挂机空调',900,250,'#f6f7f8'],['dishwasher','洗碗机',600,600,'#c9ced3'],
     ['ovencol','蒸烤箱高柜',600,600,'#efe6d8'],['dryer','烘干机',600,600,'#e6ebee'],['purifier','空气净化器',400,300,'#f4f4f2']]},
   {cat:'书房 · 休闲', items:[
@@ -140,8 +140,9 @@ const LIB = [
     ['piano','立式钢琴',1500,600,'#1f1d1b'],['treadmill','跑步机',800,1800,'#3a3a3c'],['armchair','阅读椅',750,800,'#c9a98a']]},
 ];
 for(const [type,spec]of Object.entries(DIMENSIONS))nominalHeights[type]=spec.h;
-LIB.find(g=>g.cat==='餐厨').items.push(...NEW_COMPONENTS.filter(c=>!['pendant','downlight','tracklight'].includes(c[0])));
+LIB.find(g=>g.cat==='餐厨').items.push(...NEW_COMPONENTS.filter(c=>!['pendant','downlight','tracklight','platform'].includes(c[0])));
 LIB.push({cat:'顶面',items:NEW_COMPONENTS.filter(c=>['pendant','downlight','tracklight'].includes(c[0]))});
+LIB.push({cat:'构造',items:NEW_COMPONENTS.filter(c=>c[0]==='platform')});
 for(const c of RENOVATION_SPECS){DIMENSIONS[c.type]={label:c.name,h:c.h,elevation:c.elevation,min:15,max:DEFAULT.height,meaning:'装修构件本体高度'};nominalHeights[c.type]=c.h;}
 LIB.find(g=>g.cat==='顶面').items.push(...RENOVATION_SPECS.filter(c=>c.mount==='ceiling').map(c=>[c.type,c.name,c.w,c.d,'#ece5db']));
 LIB.push({cat:'装修 · 收口',items:RENOVATION_SPECS.filter(c=>c.mount!=='ceiling').map(c=>[c.type,c.name,c.w,c.d,'#ece5db'])});
@@ -650,6 +651,7 @@ function bindRoomPanel(){
 function furnPanel(f){
   return `<section><h3>${tr('家具属性','Furniture')}</h3>
     <div class="form">
+      ${variantPanelHtml(f)}
       <label class="full">${tr('名称','Name')}<input id="fName" value="${esc(nm(f.name))}"></label>
       <label>${tr('宽','Width')} (mm)<input type="number" id="fW" value="${f.w}" min="50" max="15000" step="10"></label>
       <label>${tr('深','Depth')} (mm)<input type="number" id="fD" value="${f.d}" min="50" max="15000" step="10"></label>
@@ -668,6 +670,7 @@ function furnPanel(f){
 }
 function bindFurnPanel(f){
   const upd = (fn) => mutate(() => { const g = getF(f.id); if (g) fn(g); });
+  if($('#fVariant'))$('#fVariant').onchange=e=>{if(e.target.value==='custom')return;if(e.target.value==='custom-edit'){renderPanel();const w=$('#fW');if(w){w.focus();w.select();}toast('请在下方输入宽、深');return;}switchVariant(f.id,e.target.value);};
   const num = (id, fn) => $(id).onchange = e => { const v=Number(e.target.value);if(e.target.value!==''&&Number.isFinite(v))upd(g=>fn(g,v));else{toast('请输入有效数字');renderPanel();} };
   $('#fName').onchange = e => upd(g => g.name = e.target.value.trim() || g.name);
   num('#fW', (g,v) => g.w = checkedSize(v));
@@ -681,6 +684,102 @@ function bindFurnPanel(f){
   $('#aBot').onclick = () => moveLayer(-1);
 }
 
+
+/* ======================= 同类型规格切换 ======================= */
+// 组件库里同类型的多个规格（如单开门/双开门冰箱、各尺寸的床）可在工具条或属性面板里直接切换。
+// 靠墙类家具切换时「背面那条边」不动，从背面向外长；其余以中心为准。
+// 一侧压到墙或窗时，自动向另一侧延伸；两侧都放不下才拒绝。
+const BACK_ANCHORED=new Set(['fridge','wardrobe','sofa','sofabed','vanity','cabinet','shoecab','bookshelf','desk','bed']);
+// 只有尺寸本来就可变的家具才提供「自定义」长宽；冰箱、水槽、灶具、洗衣机等固定规格的设备只切换库里的规格。
+const CUSTOM_SIZE_TYPES=new Set(['bed','sofa','sofabed','cornersofa','armchair','table','roundtable','desk','wardrobe','bookshelf','cabinet','tvstand','shoecab','coffeetable','coffee','rug','island','counter','dresser','nightstand','sidetable','vanity','platform']);
+// 高度基本固定的家具：自定义尺寸时只填长（宽）和进深，不再出现「高度」。衣柜、书柜、储物柜、绿植、台阶/平台等高度因户而异，保留。
+const FIXED_HEIGHT_TYPES=new Set(['bed','crib','sofa','sofabed','cornersofa','armchair','beanbag','chair','officechair','barstool','table','roundtable','desk','coffee','coffeetable','sidetable','nightstand','dresser','tvstand','island','counter','vanity','rug','fridge','stove','ksink','washer','dryer','dishwasher','toilet','bathtub']);
+const OVERLAP_IGNORED=new Set(['rug','curtain','curtainbox','curtainrail','wallart','robotvacuum','baycushion']);
+// 下拉里的规格名：不超过 4 个字，不重复尺寸；只有一个规格的显示「标准」。
+const VARIANT_LABELS={
+  bed:{'双人床 2.2m':'2.2 米','双人床 1.8m':'1.8 米','双人床 1.5m':'1.5 米','单人床':'单人'},
+  sofabed:{'沙发床 1.2m（收起）':'1.2 米','沙发床 1.5m（收起）':'1.5 米','沙发床 1.8m（收起）':'1.8 米'},
+  fridge:{'单开门冰箱':'单开门','双开门冰箱':'双开门'},
+  sofa:{'三人沙发':'三人','双人沙发':'双人'},
+  armchair:{'单人沙发':'单人','阅读椅':'阅读椅'},
+  table:{'餐桌':'四人','六人餐桌':'六人'},
+  wardrobe:{'衣柜':'2 米','小衣柜':'1.2 米'},
+  desk:{'书桌':'1.2 米','长书桌':'1.6 米'},
+  bookshelf:{'书架':'0.8 米','大书架':'1.6 米'},
+  shoecab:{'鞋柜':'1 米','玄关柜':'1.4 米'},
+  vanity:{'浴室柜':'单盆','双盆浴室柜':'双盆'},
+  cabinet:{'储物柜':'储物柜','餐边柜':'餐边柜'},
+  plant:{'绿植':'小','大绿植':'大'},
+  tv:{'55 寸电视':'55 寸','65 寸电视':'65 寸','75 寸电视':'75 寸','85 寸电视':'85 寸'},
+  chair:{'椅子':'椅子','餐椅':'椅子'},
+  coffee:{'圆茶几 Ø600':'Ø600','圆茶几 Ø800':'Ø800','圆茶几 Ø1000':'Ø1000'},
+  coffeetable:{'方茶几 800×800':'800×800','方茶几 1200×600':'1200×600','方茶几 1400×700':'1400×700'}
+};
+// 茶几只分圆形和方形：圆形的宽深可调（正圆、椭圆都包含），方形的长宽可调（正方、长方都包含）。两种形状在规格菜单里互相切换，底层仍是圆茶几和方茶几两种类型。
+const VARIANT_FAMILY={coffee:['coffee','coffeetable'],coffeetable:['coffee','coffeetable']};
+const VARIANT_GROUP={coffee:'圆形',coffeetable:'方形'};
+function variantLabel(it){return tr(VARIANT_LABELS[it[0]]?.[it[1]]||'标准',nm(it[1]));}
+function variantItems(f){
+  const family=VARIANT_FAMILY[f.type]||[f.type],seen=new Set(),out=[];
+  LIB.forEach((g,ci)=>g.items.forEach((it,ii)=>{if(!family.includes(it[0]))return;const label=variantLabel(it),k=it[0]+'|'+label+'|'+it[2]+'|'+it[3];if(seen.has(k))return;seen.add(k);out.push({it,key:ci+':'+ii,label,group:VARIANT_FAMILY[f.type]?VARIANT_GROUP[it[0]]:null});}));
+  return out.sort((a,b)=>family.indexOf(a.it[0])-family.indexOf(b.it[0])||a.it[2]-b.it[2]||a.it[3]-b.it[3]);
+}
+function variantMatch(f,items){return items.find(v=>v.it[0]===f.type&&Math.round(v.it[2])===Math.round(f.w)&&Math.round(v.it[3])===Math.round(f.d));}
+function variantOptionsHtml(f,items,withSize,customEntry){
+  const cur=variantMatch(f,items),option=v=>`<option value="${v.key}" ${cur&&cur.key===v.key?'selected':''}>${esc(v.label)}${withSize&&!/^Ø|×/.test(v.label)?` · ${v.it[2]}×${v.it[3]}`:''}</option>`;
+  let body='';
+  if(items.some(v=>v.group)){const groups=[...new Set(items.map(v=>v.group))];body=groups.map(g=>`<optgroup label="${esc(tr(g,g==='圆形'?'Round':'Square'))}">${items.filter(v=>v.group===g).map(option).join('')}</optgroup>`).join('');}
+  else body=items.map(option).join('');
+  return (cur?'':`<option value="custom" selected>${tr('自定义','Custom')} ${Math.round(f.w)}×${Math.round(f.d)}</option>`)+body+(customEntry?`<option value="custom-edit">${tr('自定义…','Custom…')}</option>`:'');
+}
+function variantPanelHtml(f){
+  const items=variantItems(f),custom=CUSTOM_SIZE_TYPES.has(f.type);if(items.length<(custom?1:2))return '';
+  return `<label class="full">${tr('规格','Variant')}<select id="fVariant">${variantOptionsHtml(f,items,true,custom)}</select></label>`;
+}
+// 沿本地宽度/进深方向平移，找离原位置最近、不压墙窗的位置；找不到返回 null。
+function fitAgainstWalls(probe,growth,axes){
+  const rects=snapRects();
+  const hits=(cx,cy)=>{const {hw,hh}=aabb({...probe,cx,cy});return rects.filter(r=>Math.min(cx+hw,r[2])-Math.max(cx-hw,r[0])>1&&Math.min(cy+hh,r[3])-Math.max(cy-hh,r[1])>1);};
+  const a=(probe.rot||0)*Math.PI/180,dirs={w:[Math.cos(a),Math.sin(a)],d:[-Math.sin(a),Math.cos(a)]};
+  const limit=Math.max(Math.abs(growth),50)+10;
+  for(const axis of axes){
+    const [ux,uy]=dirs[axis];let best=null;
+    for(let t=0;t<=limit;t+=5)for(const sign of (t?[1,-1]:[1])){
+      const cx=probe.cx+ux*t*sign,cy=probe.cy+uy*t*sign;
+      if(!hits(cx,cy).length){if(!best||t<best.t)best={cx,cy,t};}
+    }
+    if(best)return best;
+  }
+  return null;
+}
+function switchVariant(id,key){
+  const f=getF(id);if(!f)return;const [ci,ii]=key.split(':').map(Number),it=LIB[ci]?.items[ii];
+  if(!it||!(VARIANT_FAMILY[f.type]||[f.type]).includes(it[0])){renderPanel();return;}
+  const probe={...f,w:it[2],d:it[3]};
+  if(BACK_ANCHORED.has(f.type)){const a=(f.rot||0)*Math.PI/180,shift=(it[3]-f.d)/2;probe.cx=f.cx-Math.sin(a)*shift;probe.cy=f.cy+Math.cos(a)*shift;}
+  const before=aabb(f),wasOver=(r)=>Math.min(f.cx+before.hw,r[2])-Math.max(f.cx-before.hw,r[0])>1&&Math.min(f.cy+before.hh,r[3])-Math.max(f.cy-before.hh,r[1])>1;
+  const blocked=()=>{const {hw,hh}=aabb(probe);return snapRects().some(r=>!wasOver(r)&&Math.min(probe.cx+hw,r[2])-Math.max(probe.cx-hw,r[0])>1&&Math.min(probe.cy+hh,r[3])-Math.max(probe.cy-hh,r[1])>1);};
+  let extended=false;
+  if(blocked()){
+    // 靠墙类只沿宽度方向挪（背面要贴墙）；其余先宽度、再进深方向。
+    const fit=fitAgainstWalls(probe,Math.max(Math.abs(it[2]-f.w),Math.abs(it[3]-f.d)),BACK_ANCHORED.has(f.type)?['w']:['w','d']);
+    if(!fit){toast('放不下：会压到墙或窗');renderPanel();return;}
+    probe.cx=fit.cx;probe.cy=fit.cy;extended=fit.t>0;
+    if(blocked()){toast('放不下：会压到墙或窗');renderPanel();return;}
+  }
+  const {hw,hh}=aabb(probe);
+  const hit=state.furniture.filter(g=>g.id!==f.id&&!g.assemblyOwner&&(g.elevation||0)<400&&!OVERLAP_IGNORED.has(g.type)).filter(g=>{const b=aabb(g);return Math.min(probe.cx+hw,g.cx+b.hw)-Math.max(probe.cx-hw,g.cx-b.hw)>10&&Math.min(probe.cy+hh,g.cy+b.hh)-Math.max(probe.cy-hh,g.cy-b.hh)>10;});
+  const old=variantMatch(f,variantItems(f)),label=variantLabel(it);
+  mutate(()=>{
+    const g=getF(id);if(it[0]!==g.type){g.type=it[0];delete g.originalType;delete g.detailModel;delete g.detailAssembly;}g.w=it[2];g.d=it[3];g.cx=Math.abs(probe.cx-f.cx)<1e-6?f.cx:probe.cx;g.cy=Math.abs(probe.cy-f.cy)<1e-6?f.cy:probe.cy;g.catalogKey=key;
+    const libNames=new Set(LIB.flatMap(gr=>gr.items.filter(x=>(VARIANT_FAMILY[f.type]||[f.type]).includes(x[0])).map(x=>x[1])));
+    if(libNames.has(g.name)||/^[^\s]+ \d+×\d+$/.test(g.name))g.name=it[1];else if(old&&g.name.startsWith(old.it[1]))g.name=it[1]+g.name.slice(old.it[1].length);
+    if(f.type==='vanity')Object.assign(g,catalogSpec(it));
+    if(f.type==='tv')g.h=Math.round(it[2]*.5625+25);
+  });
+  const names=hit.map(g=>nm(g.name).split(/[ ·]/)[0]).filter((v,i,a)=>a.indexOf(v)===i).slice(0,3).join('、');
+  toast(`已切换：${label}${extended?'，已向另一侧延伸':''}${hit.length?`（与${names}重叠）`:''}`);
+}
 /* ======================= 操作 ======================= */
 function select(sel){ ui.sel = sel; renderSel(); renderPanel(); }
 function rotateSel(d){ if (ui.sel?.kind==='furn') mutate(() => { const f = getF(ui.sel.id); f.rot = norm(f.rot + d); }); }
@@ -1963,7 +2062,7 @@ function buildArch(){
     const pl=new THREE.PointLight(0xffd9a8,0,7,1.6);pl.position.set(wx(r.at[0]),H-.25,wz(r.at[1]));lampG.add(pl);
   });
   for(const p of wallPrisms(all))if(p.z0===0)colliders.push([wx(p.x0),wz(p.y0),wx(p.x1),wz(p.y1)]);
-  [...DOORS,...SLIDES].filter(d=>!d.hiddenLeaf&&!wallRemoved(d.wall)&&!state.furniture.some(f=>f.type==='threshold'&&f.openingId===d.id)).forEach(d=>{const[x0,y0,x1,y1]=d.rect;const threshold=box(M(x1-x0),.012,M(y1-y0),mat('#d8d0c0',{roughness:.3}),wx((x0+x1)/2),0,wz((y0+y1)/2));archFloor.add(threshold);});
+  // 门洞地面与所属房间的地面同材质、齐平：不再画凸起的门槛板；门槛石只在开口属性里手动开启。
   WINS.filter(r=>!wallRemoved(r[5])).forEach(r=>{
     const winGroup=new THREE.Group();winGroup.userData.opening=r.opening;archUp.add(winGroup);
     const sill=M(r.sillHeight??850),head=Math.min(sill+M(r.windowHeight??1350),top);if(head<=sill)return;
@@ -1976,6 +2075,7 @@ function buildArch(){
     const pivot=new THREE.Group(),L=M(d.len),dh=Math.min(M(d.height||2100),top);pivot.position.set(wx(d.h[0]),0,wz(d.h[1]));
     const leaf=box(L,dh,.04,d.hiddenLeaf?surfaceMaterial(finishPalette().wall,'plaster'):openingPanelMaterial(selectedOpening(d.opening)?.o||{},'solid',d.entry),L/2);leaf.userData.hiddenDoor=!!d.hiddenLeaf;
     const handle=rod([L-.12,1,.032],[L-.055,1,.032],.009,metal());if(d.hiddenLeaf){pivot.add(leaf);handle.visible=false;}else pivot.add(leaf,handle);
+    if(selectedOpening(d.opening)?.o.doorModel==='security'&&!d.hiddenLeaf){const pm=mat(SECURITY_DOOR.panel,{roughness:.3,metalness:.25});[-1,1].forEach(side=>{pivot.add(box(L*.72,dh*.13,.014,pm,L/2,dh*.8,side*.027),box(L*.62,dh*.5,.014,pm,L/2,dh*.13,side*.027),box(L*.54,dh*.42,.006,mat(SECURITY_DOOR.leaf,{roughness:.4,metalness:.18}),L/2,dh*.17,side*.036));});}
     const ang=v=>Math.atan2(-v[1],v[0]),door={id:d.id,len:L,pivot,a0:ang(d.c),a1:ang(d.o),open:state.doors[d.id]!==false};if(door.a1-door.a0>Math.PI)door.a1-=Math.PI*2;if(door.a0-door.a1>Math.PI)door.a1+=Math.PI*2;door.cur=door.open?door.a1:door.a0;pivot.rotation.y=door.cur;leaf.userData.door=handle.userData.door=door;leaf.userData.opening=handle.userData.opening=d.opening;doors.push(door);archUp.add(pivot);
     if(d.hiddenLeaf||d.secondLeaf||state.furniture.some(f=>f.type==='doortrim'&&f.assemblyOwner&&f.openingId===d.id))return;
     const[x0,y0,x1,y1]=d.rect,hz=x1-x0>y1-y0,m=mat(finishPalette().wood,{roughness:.6}),a=[wx(x0),wz(y0)],b=[wx(x1),wz(y1)],cx=(a[0]+b[0])/2,cz=(a[1]+b[1])/2;
@@ -2402,7 +2502,7 @@ function validateWalls(input,legacyDem=[]){
    if(o.kind==='door'&&(![1,-1].includes(o.swing)||!['start','end',undefined].includes(o.hingeEnd)||!Number.isFinite(o.angle??90)||(o.angle??90)<5||(o.angle??90)>180))throw Error('门轴或开启方向无效');
    if(o.height!==undefined&&(!Number.isFinite(o.height)||o.height<(o.kind==='window'?300:1800)||o.height>DEFAULT.height))throw Error(o.kind==='window'?'窗高须为有效尺寸且不超过层高':'门高须至少 1800 mm 且不超过层高');
    if(o.kind==='window'&&o.sillHeight!==undefined&&(!Number.isFinite(o.sillHeight)||o.sillHeight<0||o.sillHeight+(o.height||1350)>DEFAULT.height))throw Error('窗台高度与窗高之和不能超过层高');
-   if(o.doorModel!==undefined&&!['single','sliding','double','hidden'].includes(o.doorModel))throw Error('门型无效');
+   if(o.doorModel!==undefined&&!['single','sliding','double','hidden','security'].includes(o.doorModel))throw Error('门型无效');
    if(o.doorModel==='double'&&(o.width<600||!Number.isFinite(o.leafRatio??.5)||(o.leafRatio??.5)<.3||(o.leafRatio??.5)>.7))throw Error('对开门净宽至少 600 mm，门扇比例为 30%–70%');
    if(o.kind==='sliding'&&((o.leaves!==undefined&&![1,2,3].includes(o.leaves))||o.width<(o.leaves||2)*300||!Number.isFinite(o.slideOpen??0)||(o.slideOpen??0)<0||(o.slideOpen??0)>1||![1,-1].includes(o.slideDirection??1)))throw Error('推拉门扇数、净宽或开启程度无效');
    if(o.kind==='sliding')slidingDoorGeometry(w,o);
@@ -2515,7 +2615,7 @@ function componentIdentity(f){
  if(f.type==='vanity'){const count=f.basins??1,match=LIB.flatMap((g,ci)=>g.items.flatMap((it,ii)=>it[0]==='vanity'&&(it[1].includes('双盆')?2:1)===count?[{key:ci+':'+ii,name:it[1]}]:[]))[0];return {type:f.type,name:count===2?'双盆浴室柜':'浴室柜',key:match?.key||null};}
  const[keyCi,keyIi]=(f.catalogKey||'').split(':').map(Number),preset=LIB[keyCi]?.items[keyIi];
  if(preset&&preset[0]===f.type)return{key:f.catalogKey,name:preset[1],type:f.type};
- const names={bed:f.w>=1700?'双人床 1.8m':f.w>=1400?'双人床 1.5m':'单人床',sofabed:'沙发床（收起）',coffee:f.w<650?'圆边几':'圆茶几',sofa:f.originalType==='sofabed'?'沙发床（收起）':f.w>2200?'三人沙发':'双人沙发',roundtable:f.originalType==='coffee'?(f.w<650?'圆边几':'圆茶几'):'圆桌',counter:'橱柜台面与地柜',ksink:'独立水槽',stove:'双眼燃气灶',tvstand:'电视柜',vanity:(f.basins||1)===2?'双盆浴室柜':'浴室柜',wardrobe:'衣柜',bookshelf:'书架',chair:'椅子',nightstand:'床头柜',desk:'书桌',tv:'电视'};
+ const names={bed:f.w>=2000?'双人床 2.2m':f.w>=1700?'双人床 1.8m':f.w>=1400?'双人床 1.5m':'单人床',sofabed:f.w>=1700?'沙发床 1.8m（收起）':f.w>=1400?'沙发床 1.5m（收起）':'沙发床 1.2m（收起）',coffee:f.w<650?'圆边几':'圆茶几',sofa:f.originalType==='sofabed'?(f.w>=1700?'沙发床 1.8m（收起）':f.w>=1400?'沙发床 1.5m（收起）':'沙发床 1.2m（收起）'):f.w>2200?'三人沙发':'双人沙发',roundtable:f.originalType==='coffee'?(f.w<650?'圆边几':'圆茶几'):'圆桌',counter:'橱柜台面与地柜',ksink:'独立水槽',stove:'双眼燃气灶',tvstand:'电视柜',vanity:(f.basins||1)===2?'双盆浴室柜':'浴室柜',wardrobe:'衣柜',bookshelf:'书架',chair:'椅子',nightstand:'床头柜',desk:'书桌',tv:'电视'};
  const fallback=LIB.flatMap(g=>g.items).find(it=>it[0]===f.type);
  const matches=LIB.flatMap((g,ci)=>g.items.flatMap((it,ii)=>it[0]===f.type?[{key:ci+':'+ii,it,score:Math.abs(it[2]-f.w)+Math.abs(it[3]-f.d)}]:[])).sort((a,b)=>a.score-b.score);
  return{type:f.type,name:matches[0]?.it[1]||names[f.type]||fallback?.[1]||f.name,key:matches[0]?.key||null};
@@ -3041,7 +3141,7 @@ addItem=function(it,x,y){
  if(!NEW_COMPONENTS.some(c=>c[0]===it[0]))return v9Add(it,x,y);
  const spec=DIMENSIONS[it[0]],f=F(it[0],it[1],Math.round(x/10)*10,Math.round(y/10)*10,it[2],it[3],0,styleFurnitureColor(currentStyle(),it[0],it[4]));
  Object.assign(f,{h:spec.h,elevation:spec.elevation||0,fitToCeiling:it[0]==='endpanel',catalogKey:LIB.flatMap((g,ci)=>g.items.flatMap((v,ii)=>v===it?[ci+':'+ii]:[]))[0]});
- if(!['pendant','downlight','tracklight'].includes(f.type))pushOut(f);
+ if(!['pendant','downlight','tracklight','platform'].includes(f.type))pushOut(f);
  ui.sel={kind:'furn',id:f.id};mutate(()=>state.furniture.push(f));
 };
 const v9Symbol=furnSVG;
@@ -3049,6 +3149,7 @@ furnSVG=function(t,w,d,c,f={}){
  if(!NEW_COMPONENTS.some(x=>x[0]===t))return v9Symbol(t,w,d,c,f);
  const x=-w/2,y=-d/2,S='stroke="#666158" stroke-width="1.2" vector-effect="non-scaling-stroke"';
  if(['pendant','downlight'].includes(t))return '<ellipse cx="0" cy="0" rx="'+w/2+'" ry="'+d/2+'" fill="'+c+'" '+S+'/><ellipse cx="0" cy="0" rx="'+w*.36+'" ry="'+d*.36+'" fill="#fff6de" '+S+'/>';
+ if(t==='platform'){const m=Math.min(40,w*.12),n=Math.min(40,d*.04),fs=Math.max(50,Math.min(90,w*.12)),V='stroke="#7a7266" stroke-width="1.6" vector-effect="non-scaling-stroke"',label='台阶 '+Math.round(f.h||550);return '<defs><pattern id="platformHatch" patternUnits="userSpaceOnUse" width="240" height="240" patternTransform="rotate(45)"><rect width="240" height="240" fill="#f1eee8"/><path d="M0 0V240" stroke="#c9c2b6" stroke-width="14"/></pattern></defs><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+d+'" fill="'+c+'" '+V+'/><rect x="'+(x+m)+'" y="'+(y+n)+'" width="'+(w-2*m)+'" height="'+(d-2*n)+'" fill="url(#platformHatch)" stroke="#b7b0a4" stroke-width="1" vector-effect="non-scaling-stroke"/><g transform="translate(0 '+(y+n+fs*1.25)+') rotate('+(-(f.rot||0))+')"><rect x="'+(-w*.42)+'" y="'+(-fs*.75)+'" width="'+w*.84+'" height="'+fs*1.5+'" rx="'+fs*.3+'" fill="#fffdf8" fill-opacity=".92"/><text x="0" y="'+(fs*.35)+'" text-anchor="middle" font-size="'+fs+'" fill="#5f584e" pointer-events="none">'+label+'</text></g>';}
  if(t==='tracklight')return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+d+'" fill="'+c+'" '+S+'/>'+[-.3,0,.3].map(a=>'<circle cx="'+w*a+'" cy="0" r="'+d*.7+'" fill="#fff6de" '+S+'/>').join('');
  return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+d+'" fill="'+c+'" fill-opacity=".8" stroke-dasharray="4 2" '+S+'/>'+ (t==='hood'?'<rect x="'+(-w*.35)+'" y="'+(-d*.35)+'" width="'+w*.7+'" height="'+d*.7+'" fill="#53605b" '+S+'/>'+[-.2,0,.2].map(a=>'<path d="M'+w*a+' '+(-d*.25)+'v'+d*.5+'" '+S+'/>').join(''):'<path d="M0 '+y+'v'+d+'" '+S+'/>');
 };
@@ -3067,6 +3168,7 @@ buildFurniture=function(f){
    g.add(box(w-2*t,t,d,body,0,0),box(w-2*t,t,d,body,0,h-t),box(w-2*t,h-2*t,t,body,0,t,-d/2+t/2));
    const n=Math.max(1,Math.round(w/.6));for(let i=0;i<n;i++){const x=-w/2+(i+.5)*w/n;g.add(box(w/n-.004,h-.004,.018,body,x,.002,d/2),box(w/n*.6,.007,.015,m,x,.06,d/2+.018));}
   }else if(f.type==='endpanel'){g.add(box(w,h,d,surfaceMaterial(f.color,'lacquer')));}
+  else if(f.type==='platform'){const top=Math.min(.015,h*.4),stone=mat(p.stone||'#f1eee8',{roughness:.22});g.add(box(w,h-top,d,surfaceMaterial(f.color,'lacquer'),0,0,0),box(w,top,d,stone,0,h-top,0));}
   else if(f.type==='hood'){
    g.add(box(w,h*.18,d,m,0,0,0),box(w*.45,h*.82,d*.4,m,0,h*.18,-d*.28),box(w*.75,.012,d*.65,dark,0,.007,0));
    [-.27,0,.27].forEach(a=>g.add(box(w*.21,.014,d*.6,m,w*a,.023,0)));
@@ -3440,7 +3542,7 @@ const ASSEMBLY_REVISION='owned-components-20261005.1';
 const DOOR_COMPONENTS={...Object.fromEntries(ARCHITECTURAL_PRESETS.map(p=>[p.id,p])),slidingdoor:ARCHITECTURAL_PRESETS.find(p=>p.id==='sliding'),doubledoor:ARCHITECTURAL_PRESETS.find(p=>p.id==='double')};
 let pendingDoorComponent=null;
 function openingKey(w,o,i){return o.id||w.id+':'+i;}
-const DOOR_STYLE_OPTIONS=[['single','普通门'],['double','对开门'],['sliding','推拉门'],['hidden','隐藏门']];
+const DOOR_STYLE_OPTIONS=[['single','普通门'],['security','防盗门'],['double','对开门'],['sliding','推拉门'],['hidden','隐藏门']];
 function effectiveDoorOpening(s,w,o,i){const style=s.doorStyles?.[openingKey(w,o,i)];return style&&o.kind!=='window'?{...o,...style}:o;}
 const styleSelectedOpening=selectedOpening;selectedOpening=function(sel=ui.sel){const hit=styleSelectedOpening(sel);return hit?{...hit,o:effectiveDoorOpening(state,hit.w,hit.o,hit.index)}:null;};
 function doorStateKey(w,o,i){return i===0?w.id:w.id+':'+(o.id||i);}
@@ -3488,8 +3590,9 @@ const completedModel=buildFurniture;buildFurniture=function(f){
  [-.24,.24].forEach(x=>g.add(cyl(w*.035,w*.035,.014,steel,w*x,h*.35,d/2+.02)));
  g.position.set(wx(f.cx),M(f.elevation||0),wz(f.cy));g.rotation.y=-f.rot*Math.PI/180;g.userData={fid:f.id,caseHeight:f.h,mount:'wall'};return g;
 };
+const SECURITY_DOOR={leaf:'#5f2220',panel:'#74302a',frame:'#4a1a17'}; // 防盗门：红褐色，取自常见入户防盗门实物
 function openingPanelMaterial(o,fallback='solid',entry=false){
- const finish=o.panelFinish||fallback;if(finish==='solid')return mat(entry?finishPalette().entry:finishPalette().door,{roughness:.5});
+ const finish=o.panelFinish||fallback;if(o.doorModel==='security'&&finish==='solid')return mat(SECURITY_DOOR.leaf,{roughness:.34,metalness:.22});if(finish==='solid')return mat(entry?finishPalette().entry:finishPalette().door,{roughness:.5});
  if(finish==='clear')return glassMat;
  const m=glassMat.clone();m.roughness=.82;m.opacity=.78;m.transparent=true;m.userData.ownedFurnitureDetail=true;return m;
 }
@@ -3499,14 +3602,14 @@ function buildSliding3D(slide,top){const hit=selectedOpening(slide.opening),o=hi
  for(const p of slidePanelPositions(slide.rect,o,hit?.w)){const leaf=new THREE.Group(),w=M(p.pw),single=o.leaves===1,glass=box(w,h,single?.028:.018,openingPanelMaterial(o,single?'solid':'clear'),0,0,0);glass.name=single?'single-slide-opaque-panel':'sliding-glass-panel';leaf.add(glass);[0,h-.04].forEach(y=>leaf.add(box(w,.04,.035,frameMat,0,y)));[-1,1].forEach(s=>leaf.add(box(.035,h,.035,frameMat,s*(w/2-.0175))));leaf.position.set(wx(p.cx),0,wz(p.cy));leaf.rotation.y=p.v?-Math.PI/2:0;leaf.userData.opening=slide.opening;leaf.userData.slidingLeaf=true;if(single){const forward=hit?.w?Math.sign(p.v?hit.w.b[1]-hit.w.a[1]:hit.w.b[0]-hit.w.a[0]):1;const pull=box(.025,.17,.018,frameMat,w*.34,1.0,.03*(o.slideSide??-1)*forward);pull.name='single-slide-pull';leaf.add(pull);const rail=box(w*2,.045,.045,frameMat,(o.slideDirection??1)*w*(.5-(o.slideOpen??0)),h+.035,0);rail.name='single-slide-top-rail';leaf.add(rail);}g.add(leaf);}return g;}
 const completedGeometry=syncGeometry;syncGeometry=function(){completedGeometry();const doorsBefore=[...DOORS];DOORS.length=0;for(const d of doorsBefore){const hit=selectedOpening(d.opening);d.height=hit?.o.height||2100;if(hit?.o.doorModel==='hidden'){const {w,o}=hit,p=doorPose(w,o);d.hiddenLeaf=true;d.h=p.nominalHinge.map((v,i)=>v+p.inward[i]*(w.t/2-20)+p.closed[i]*25);}if(hit?.o.leafRemoved)continue;if(hit?.o.doorModel!=='double'){DOORS.push(d);continue;}const {w,o}=hit,ratio=o.leafRatio??.5;for(const [side,start,width]of [['start',o.at,o.width*ratio],['end',o.at+o.width*ratio,o.width*(1-ratio)]]){const p=doorPose(w,{...o,at:start,width,hingeEnd:side});DOORS.push({...d,h:p.hinge,c:p.closed,o:p.leaf,len:width-25,secondLeaf:side==='end',doubleLeaf:true});}}};
 const completedOpeningPanel=openingPanel;openingPanel=function(hit){const {w,o}=hit,locked=w.bearing;let html=completedOpeningPanel(hit);if(o.kind==='window')return html+`<section><h3>收口</h3><label><input type="checkbox" data-opening-finish="trim" ${o.finishOptions?.trim!==false?'checked':''} ${locked?'disabled':''}> 窗套</label></section>`;
- const mode=o.kind==='sliding'?'sliding':o.doorModel==='double'?'double':o.doorModel==='hidden'?'hidden':'single';
- const choices=`<section class="door-style-section"><h3>门型</h3><div class="door-style-options" role="group" aria-label="门型选择">${DOOR_STYLE_OPTIONS.map(([k,n])=>`<button type="button" class="btn door-style-choice" data-door-style="${k}" aria-pressed="${mode===k}">${n}${mode===k?'<span aria-hidden="true">✓</span>':''}</button>`).join('')}</div></section>`;
+ const mode=o.kind==='sliding'?'sliding':o.doorModel==='double'?'double':o.doorModel==='hidden'?'hidden':o.doorModel==='security'?'security':'single';
+ const choices=`<section class="door-style-section"><h3>门型</h3><div class="door-style-options" role="group" aria-label="门型选择">${DOOR_STYLE_OPTIONS.map(([k,n])=>`<button type="button" class="btn door-style-choice" data-door-style="${k}" aria-pressed="${mode===k}">${n}</button>`).join('')}</div></section>`;
  const controls=`<label>门高 / mm<input type="number" id="openingHeight" value="${o.height||2100}" min="1800" max="2500" ${locked?'disabled':''}></label>`;
  html=choices+html.replace('<div class="form">','<div class="form">'+controls).replace(' · 锁定',' · 尺寸锁定');
  if(mode==='double')html=html.replace(/<label>门轴[\s\S]*?<\/label>/,'')+`<section><label>左扇占比<input id="openingRatio" type="number" min="30" max="70" value="${Math.round((o.leafRatio??.5)*100)}" > %</label></section>`;
  if(mode==='sliding')html+=slidingControls(w,o);
  if(mode==='hidden')return html+`<section><p class="scene-mode-note">与墙面同色，无外露门套。</p><button type="button" class="btn" id="hiddenDoorToggle">${state.doors[doorStateKey(w,o,hit.index)]===false?'开门':'关门'}</button></section>`;
- return html+`<section><h3>收口</h3>${[['trim','门套'],['threshold','门槛石'],['transition','过渡条']].map(([k,n])=>`<label style="display:block"><input type="checkbox" data-opening-finish="${k}" ${o.finishOptions?.[k]!==false&&(k!=='transition'||o.finishOptions?.[k])?'checked':''} ${locked?'disabled':''}> ${n}</label>`).join('')}</section>`;
+ return html+`<section><h3>收口</h3>${[['trim','门套'],['threshold','门槛石（凸起，默认关）'],['transition','过渡条']].map(([k,n])=>`<label style="display:block"><input type="checkbox" data-opening-finish="${k}" ${(k==='transition'||k==='threshold'?o.finishOptions?.[k]===true:o.finishOptions?.[k]!==false)?'checked':''} ${locked?'disabled':''}> ${n}</label>`).join('')}</section>`;
 };
 function updateOpeningDecoration(hit,fn,style=null){return mutate(()=>{const doorKey=doorStateKey(hit.w,hit.o,hit.index),open=state.doors[doorKey];const raw=hit.w.opens[hit.index];if(hit.w.bearing){state.doorStyles=state.doorStyles||{};const key=openingKey(hit.w,raw,hit.index),next={kind:hit.o.kind,doorModel:hit.o.kind==='sliding'?'sliding':hit.o.doorModel||'single',...Object.fromEntries(['label','leaves','slideOpen','slideDirection','slideMount','slideSide','slideOverlap','panelFinish','leafRatio','swing','hingeEnd','angle','finishOptions'].filter(k=>hit.o[k]!==undefined).map(k=>[k,hit.o[k]])),...(state.doorStyles[key]||{})};fn(next);state.doorStyles[key]=next;}else fn(raw);clearOpeningDoorPose(hit.w.id);if(style==='hidden')state.doors[doorKey]=false;else if(!style&&open!==undefined)state.doors[doorKey]=open;});}
 function changeOpeningDoorStyle(mode,hit=selectedOpening()){
@@ -3556,7 +3659,7 @@ function syncOwnedAssemblies(s){
     const preserve=CASE.presentation?.preserveImportedOpeningTrim&&sameOpening&&baselineTrim;
     add(owner,'trim','windowtrim',{cx,cy,rot,openingId:w.id,w:o.width+70,d:w.t+30,h:preserve?baselineTrim.h:(o.height||1350)+80,elevation:preserve?baselineTrim.elevation:Math.max(0,(o.sillHeight??850)-40)});
    }}
-   else{if(o.doorModel==='hidden')return;if(opts.trim!==false)add(owner,'trim','doortrim',{cx,cy,rot,openingId:i===0?w.id:w.id+':'+(o.id||i),w:o.width+70,d:w.t+40,h:(o.height||2100)+50});if(opts.threshold!==false)add(owner,'threshold','threshold',{cx,cy,rot,openingId:i===0?w.id:w.id+':'+(o.id||i),w:o.width,d:w.t,h:15});if(opts.transition)add(owner,'transition','transition',{cx,cy,rot,w:o.width,d:30,h:15});}
+   else{if(o.doorModel==='hidden')return;if(opts.trim!==false)add(owner,'trim','doortrim',{cx,cy,rot,openingId:i===0?w.id:w.id+':'+(o.id||i),w:o.width+70,d:w.t+40,h:(o.height||2100)+50,...(o.doorModel==='security'?{color:SECURITY_DOOR.frame}:{})});if(opts.threshold===true)add(owner,'threshold','threshold',{cx,cy,rot,openingId:i===0?w.id:w.id+':'+(o.id||i),w:o.width,d:w.t,h:15});if(opts.transition)add(owner,'transition','transition',{cx,cy,rot,w:o.width,d:30,h:15});}
   });
  }
  for(const run of skirtingRuns(s.walls,ROOMS,roots,s.rooms,DEFAULT.floorConnections||[])){
@@ -3580,7 +3683,7 @@ const assembledDuplicate=duplicateSel;duplicateSel=function(){const f=ui.sel?.ki
 function validateDoorStyles(s){if(s.doorStyles===undefined)return;if(!s.doorStyles||Array.isArray(s.doorStyles)||typeof s.doorStyles!=='object')throw Error('门型数据无效');
  for(const [key,o]of Object.entries(s.doorStyles)){let aperture;for(const w of s.walls||[])w.opens.forEach((raw,i)=>{if(openingKey(w,raw,i)===key&&raw.kind!=='window')aperture=raw;});if(!aperture||!o||typeof o!=='object'||Object.keys(o).some(k=>!['kind','doorModel','label','leaves','slideOpen','slideDirection','slideMount','slideSide','slideOverlap','panelFinish','leafRatio','swing','hingeEnd','angle','finishOptions','leafRemoved'].includes(k)))throw Error('门型配置必须对应已有门洞');
  if(o.leafRemoved!==undefined&&typeof o.leafRemoved!=='boolean')throw Error('门扇状态无效');if(o.panelFinish!==undefined&&!PANEL_FINISHES.some(([k])=>k===o.panelFinish))throw Error('门扇材质无效');
- if(!['single','double','sliding','hidden'].includes(o.doorModel)||o.kind!==(o.doorModel==='sliding'?'sliding':'door'))throw Error('门型配置无效');
+ if(!['single','double','sliding','hidden','security'].includes(o.doorModel)||o.kind!==(o.doorModel==='sliding'?'sliding':'door'))throw Error('门型配置无效');
  if(o.doorModel==='double'&&(aperture.width<600||!Number.isFinite(o.leafRatio??.5)||(o.leafRatio??.5)<.3||(o.leafRatio??.5)>.7))throw Error('对开门门扇比例无效');
  if(o.kind==='sliding'&&(![1,2,3].includes(o.leaves||2)||aperture.width<(o.leaves||2)*300||!Number.isFinite(o.slideOpen??0)||(o.slideOpen??0)<0||(o.slideOpen??0)>1||![1,-1].includes(o.slideDirection??1)))throw Error('推拉门配置无效');
  if(o.kind==='sliding'&&o.leaves===1&&(o.slideMount!=='wall'||![1,-1].includes(o.slideSide??-1)))throw Error('单扇侧滑门安装配置无效');
@@ -3597,7 +3700,7 @@ renderFab=function(){
  fab.classList.toggle('door-style-fab',show);
  if(!show)return;
  const mode=hit.o.kind==='sliding'?'sliding':hit.o.doorModel||'single';
- fab.innerHTML=`<div class="door-style-options" role="group" aria-label="门型选择">${DOOR_STYLE_OPTIONS.map(([k,n])=>`<button type="button" class="btn door-style-choice" data-door-quick="${k}" aria-pressed="${mode===k}">${n}${mode===k?'<span aria-hidden="true">✓</span>':''}</button>`).join('')}</div>${deletionAllowed()?'<div class="door-shortcut-actions"><button type="button" class="btn danger" data-context="delete">删除</button></div>':''}`;
+ fab.innerHTML=`<div class="door-style-options" role="group" aria-label="门型选择">${DOOR_STYLE_OPTIONS.map(([k,n])=>`<button type="button" class="btn door-style-choice" data-door-quick="${k}" aria-pressed="${mode===k}">${n}</button>`).join('')}</div>${deletionAllowed()?'<div class="door-shortcut-actions"><button type="button" class="btn danger" data-context="delete">删除</button></div>':''}`;
  fab.setAttribute('aria-label','门型与操作');
  fab.querySelectorAll('[data-door-quick]').forEach(b=>b.onclick=()=>changeOpeningDoorStyle(b.dataset.doorQuick));
  fab.querySelector('[data-context="delete"]')?.addEventListener('click',deleteSel);
@@ -3980,10 +4083,11 @@ const quickObjectFab=renderFab;renderFab=function(){quickObjectFab();const hit=s
  const axisHorizontal=Math.abs(hit.w.b[0]-hit.w.a[0])>=Math.abs(hit.w.b[1]-hit.w.a[1]),forward=axisHorizontal?hit.w.b[0]>hit.w.a[0]:hit.w.b[1]>hit.w.a[1];
  const startLabel=axisHorizontal?(forward?'左侧':'右侧'):(forward?'上侧':'下侧'),endLabel=axisHorizontal?(forward?'右侧':'左侧'):(forward?'下侧':'上侧');
  const dropdown=(id,label,content)=>`<details class="door-dropdown" id="${id}"><summary>${label}<span aria-hidden="true">⌄</span></summary><div class="door-dropdown-pop">${content}</div></details>`;
- const shortTypes={hinged:'平开',wallslide:'侧滑',sliding:'推拉',double:'对开',hidden:'隐形',passage:'无门'};
- const type=dropdown('doorTypeMenu','门型',['hinged','wallslide','sliding','double','hidden','passage'].map(id=>`<button class="btn" data-door-preset="${id}" aria-pressed="${openingPresetId(hit.o)===id}">${shortTypes[id]}</button>`).join(''));
+ const shortTypes={hinged:'平开',security:'防盗',wallslide:'侧滑',sliding:'推拉',double:'对开',hidden:'隐形',passage:'无门'};
+ const type=dropdown('doorTypeMenu','门型',['hinged','security','wallslide','sliding','double','hidden','passage'].map(id=>`<button class="btn" data-door-preset="${id}" aria-pressed="${openingPresetId(hit.o)===id}">${shortTypes[id]}</button>`).join(''));
  const hinge=dropdown('doorHingeMenu','铰链',`<button class="btn" data-door-hinge="start" aria-pressed="${hit.o.hingeEnd!=='end'}">${startLabel}</button><button class="btn" data-door-hinge="end" aria-pressed="${hit.o.hingeEnd==='end'}">${endLabel}</button>`);
- const direction=dropdown('doorDirectionMenu','方向','<button class="btn" id="flipDoorSwing">反向</button>');
+ const securityIn=hit.o.doorModel==='security'?securityOpensInward(hit):null;
+ const direction=hit.o.doorModel==='security'?dropdown('doorDirectionMenu','开启',`<button class="btn" data-security-open="in" aria-pressed="${securityIn===true}">内开</button><button class="btn" data-security-open="out" aria-pressed="${securityIn===false}">外开</button>`):dropdown('doorDirectionMenu','方向','<button class="btn" id="flipDoorSwing">反向</button>');
  const angle=dropdown('doorAngleMenu','角度',[60,90,110,135].map(v=>`<button class="btn" data-door-angle="${v}" aria-pressed="${Number(hit.o.angle??90)===v}">${v}°</button>`).join(''));
  const slideActions=dropdown('doorSlideMenu','收扇','<button class="btn" id="flipSlideDirection">反向</button>')+(hit.o.leaves===1?dropdown('doorMountMenu','安装侧','<button class="btn" id="flipSlideSide">换侧</button>'):'');
  const more=dropdown('doorMaterialMenu','材质',PANEL_FINISHES.map(([key,name])=>`<button class="btn" data-door-finish="${key}" aria-pressed="${(hit.o.panelFinish||(sliding&&hit.o.leaves!==1?'clear':'solid'))===key}" ${hit.o.doorModel==='hidden'||removed?'disabled':''}>${key==='clear'?'玻璃':name}</button>`).join(''));
@@ -3998,6 +4102,7 @@ const quickObjectFab=renderFab;renderFab=function(){quickObjectFab();const hit=s
  fab.querySelectorAll('[data-door-angle]').forEach(button=>button.onclick=()=>update(o=>o.angle=Number(button.dataset.doorAngle)));
  $('#flipDoorHinge')?.addEventListener('click',()=>update(o=>o.hingeEnd=o.hingeEnd==='end'?'start':'end'));
  $('#flipDoorSwing')?.addEventListener('click',()=>update(o=>o.swing=-(o.swing||1)));
+ fab.querySelectorAll('[data-security-open]').forEach(button=>button.onclick=()=>{const want=button.dataset.securityOpen==='in';if(securityOpensInward(selectedOpening())!==want)update(o=>o.swing=-(o.swing||1));});
  $('#flipSlideDirection')?.addEventListener('click',()=>update(o=>o.slideDirection=-(o.slideDirection??1)));
  $('#flipSlideSide')?.addEventListener('click',()=>update(o=>o.slideSide=-(o.slideSide??-1)));
  fab.querySelectorAll('[data-door-finish]').forEach(button=>button.onclick=()=>update(o=>o.panelFinish=button.dataset.doorFinish));
@@ -4130,8 +4235,8 @@ const cabinetSizePanel=furnPanel;furnPanel=function(f){const html=cabinetSizePan
 let dimensionEditorId=null;
 const compactDimensionFab=renderFab;renderFab=function(){compactDimensionFab();const f=ui.sel?.kind==='furn'?getF(ui.sel.id):null,fab=$('#fab');fab.classList.remove('furniture-size-menu');if(!f||f.type==='shower'||f.assemblyOwner||previewMode||is3D()&&opt.mode==='walk'||alignmentItems().length>1){dimensionEditorId=null;return;}if(dimensionEditorId!==f.id)dimensionEditorId=null;
  const button=document.createElement('button');button.className='btn';button.id='editFurnitureSize';button.textContent='尺寸';button.setAttribute('aria-expanded',String(dimensionEditorId===f.id));const first=fab.querySelector('[data-context="copy"], [data-context="delete"]');fab.insertBefore(button,first||fab.firstChild);button.onclick=()=>{dimensionEditorId=dimensionEditorId===f.id?null:f.id;renderFab();if(dimensionEditorId)$('#sizeLength')?.focus();};
- if(dimensionEditorId===f.id){fab.classList.add('furniture-size-menu');fab.insertAdjacentHTML('beforeend',`<form id="furnitureSizeForm" class="furniture-size-form"><div class="size-fields"><label>${CABINET_SIZE_TYPES.has(f.type)?'长度':'宽度'}<input id="sizeLength" type="number" value="${f.w}" min="50" max="15000" step="1" required></label><label>进深<input id="sizeDepth" type="number" value="${f.d}" min="50" max="15000" step="1" required></label><label>高度<input id="sizeHeight" type="number" value="${f.h}" min="15" max="${DEFAULT.height-(f.elevation||0)}" step="1" required></label></div><div class="size-form-footer"><small>单位 mm</small><button class="btn" type="button" id="cancelFurnitureSize">取消</button><button class="btn on" type="submit">应用</button></div></form>`);
- $('#cancelFurnitureSize').onclick=()=>{dimensionEditorId=null;renderFab();};$('#furnitureSizeForm').onsubmit=e=>{e.preventDefault();const next={...f,w:Number($('#sizeLength').value),d:Number($('#sizeDepth').value),h:Number($('#sizeHeight').value)};try{next.w=checkedSize(next.w);next.d=checkedSize(next.d);if(!Number.isFinite(next.h)||next.h<15||next.h>DEFAULT.height-(f.elevation||0))throw Error('高度超出可用空间');next.h=Math.round(next.h);validateFurniturePlanSize(next);validateDimensions(next,DEFAULT.height);const heightChanged=next.h!==f.h;const ok=mutate(()=>{const g=getF(f.id);Object.assign(g,{w:next.w,d:next.d,h:next.h});if(heightChanged){g.fitToCeiling=false;g.topToCeiling=false;}});if(ok){dimensionEditorId=null;renderFab();}}catch(err){toast(err.message);}};
+ if(dimensionEditorId===f.id){fab.classList.add('furniture-size-menu');fab.insertAdjacentHTML('beforeend',`<form id="furnitureSizeForm" class="furniture-size-form"><div class="size-fields"><label>${CABINET_SIZE_TYPES.has(f.type)?'长度':'宽度'}<input id="sizeLength" type="number" value="${f.w}" min="50" max="15000" step="1" required></label><label>进深<input id="sizeDepth" type="number" value="${f.d}" min="50" max="15000" step="1" required></label>${FIXED_HEIGHT_TYPES.has(f.type)?'':`<label>高度<input id="sizeHeight" type="number" value="${f.h}" min="15" max="${DEFAULT.height-(f.elevation||0)}" step="1" required></label>`}</div><div class="size-form-footer"><small>单位 mm</small><button class="btn" type="button" id="cancelFurnitureSize">取消</button><button class="btn on" type="submit">应用</button></div></form>`);
+ $('#cancelFurnitureSize').onclick=()=>{dimensionEditorId=null;renderFab();};$('#furnitureSizeForm').onsubmit=e=>{e.preventDefault();const next={...f,w:Number($('#sizeLength').value),d:Number($('#sizeDepth').value),h:$('#sizeHeight')?Number($('#sizeHeight').value):f.h};try{next.w=checkedSize(next.w);next.d=checkedSize(next.d);if(!Number.isFinite(next.h)||next.h<15||next.h>DEFAULT.height-(f.elevation||0))throw Error('高度超出可用空间');next.h=Math.round(next.h);validateFurniturePlanSize(next);validateDimensions(next,DEFAULT.height);const heightChanged=next.h!==f.h;const ok=mutate(()=>{const g=getF(f.id);Object.assign(g,{w:next.w,d:next.d,h:next.h});if(heightChanged){g.fitToCeiling=false;g.topToCeiling=false;}});if(ok){dimensionEditorId=null;renderFab();}}catch(err){toast(err.message);}};
  }else fab.classList.remove('furniture-size-menu');positionObjectMenu();};
 const dimensionEditorClear=select;select=function(sel,opts){if(sel?.kind!=='furn'||sel.id!==dimensionEditorId)dimensionEditorId=null;return dimensionEditorClear(sel,opts);};window.homeStudio.select=select;window.select=select;
 renderAll();syncQuickActions();
@@ -4203,3 +4308,19 @@ furnSVG=function(t,w,d,c,f={}){const id=f.furnitureStyleId;if(!id)return shapedP
 };
 
 renderAll();
+
+// 防盗门开启方向：叶片摆动侧落在户内（户型轮廓内）为内开，否则为外开。
+function securityOpensInward(hit){
+  if(!hit)return null;const {w,o}=hit,p=doorPose(w,{...o,angle:o.angle??90}),L=Math.hypot(w.b[0]-w.a[0],w.b[1]-w.a[1]),c=[w.a[0]+(w.b[0]-w.a[0])/L*(o.at+o.width/2),w.a[1]+(w.b[1]-w.a[1])/L*(o.at+o.width/2)];
+  return inPolygon([c[0]+p.inward[0]*(w.t/2+500),c[1]+p.inward[1]*(w.t/2+500)],FOOTPRINT);
+}
+// 对象浮动菜单里直接切换同类型规格（与右侧属性面板的「规格」同一套逻辑）。
+const variantBaseFab=renderFab;renderFab=function(){
+  variantBaseFab();const f=ui.sel?.kind==='furn'?getF(ui.sel.id):null,fab=$('#fab');fab.querySelector('#fabVariant')?.remove();
+  if(!f||f.assemblyOwner||previewMode||is3D()&&opt.mode==='walk'||dimensionEditorId)return;
+  const items=variantItems(f),canEdit=!!fab.querySelector('#editFurnitureSize')&&CUSTOM_SIZE_TYPES.has(f.type);if(items.length<2&&!(items.length===1&&canEdit))return;
+  const sel=document.createElement('select');sel.id='fabVariant';sel.className='btn';sel.title=tr('规格','Variant');sel.setAttribute('aria-label',tr('规格','Variant'));
+  sel.innerHTML=variantOptionsHtml(f,items,false,canEdit);
+  sel.onchange=e=>{if(e.target.value==='custom')return;if(e.target.value==='custom-edit'){fab.querySelector('#editFurnitureSize')?.click();return;}switchVariant(f.id,e.target.value);};
+  fab.insertBefore(sel,fab.querySelector('[data-context="rotate"]')||fab.firstChild);positionObjectMenu();
+};

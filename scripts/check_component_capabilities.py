@@ -18,7 +18,7 @@ SPECIAL = {'shower': ('shower-fixed-leaf', 'fixed_leaf_variable_enclosure', {'sh
                        {'bathtubBody.width', 'bathtubBody.depth'})}
 MECHANISMS = {'hinged': 'hinged_geometry', 'wallslide': 'single_wall_slide_geometry',
               'sliding': 'multi_panel_slide_geometry', 'double': 'two_hinge_leaves_geometry',
-              'hidden': 'hinged_finish_variant', 'passage': 'aperture_only',
+              'hidden': 'hinged_finish_variant', 'security': 'hinged_geometry', 'passage': 'aperture_only',
               'window': 'aperture_only', 'folding': 'unsupported', 'pocket': 'unsupported'}
 
 

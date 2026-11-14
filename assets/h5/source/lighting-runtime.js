@@ -1,4 +1,4 @@
-import {LIGHTING_PROFILE,lightingProfile} from './lighting-profile.js';
+import {LIGHTING_PROFILE,lightingProfile,roomLightScale,roomLightRange} from './lighting-profile.js';
 export function createLightingRuntime({SpotLight,PointLight,Color,CASE,ROOMS,getF,inPolygon,opt,getRuntime,pixelRatio}){
 let performanceSlots=[],performanceSourceSignature='',performanceLightingSignature='',performanceSources=[];
 let shadowOverride=null,revision=0;
@@ -25,7 +25,10 @@ function updatePerformanceLighting(dt){
    l.userData.runtimeIllumination=true;l.userData.omnidirectional=omni;l.userData.anchorFixtureId=anchor.light.userData.fixtureId;l.position.copy(anchor.light.position);
    l.position.y+=omni?(f.h??70)/1000*.39+.012:-.08;
    if(l.target){l.target.position.set(l.position.x,0,l.position.z);scene.add(l.target);}scene.add(l);
-   performanceSlots.push({light:l,source:anchor.light,members:[]});
+   // Range and strength follow the room the fixture sits in; without a room the old shared defaults stay.
+   const room=ROOMS.find(r=>r.id===anchor.room);let scale=1;
+   if(room&&f){const area=Math.abs(room.poly.reduce((n,a,i)=>{const b=room.poly[(i+1)%room.poly.length];return n+a[0]*b[1]-b[0]*a[1]},0))/2e6,reach=Math.max(...room.poly.map(q=>Math.hypot(q[0]-f.cx,q[1]-f.cy)))/1000;scale=roomLightScale(area);l.distance=roomLightRange(reach,l.position.y);}
+   performanceSlots.push({light:l,source:anchor.light,members:[],scale});
   }
   for(const source of performanceSources){const candidates=performanceSlots.filter(slot=>performanceSources.find(s=>s.light===slot.source)?.room===source.room);const slot=candidates.sort((a,b)=>a.source.position.distanceTo(source.light.position)-b.source.position.distanceTo(source.light.position))[0];if(slot)slot.members.push(source);}
  }
@@ -43,7 +46,7 @@ function updatePerformanceLighting(dt){
   revision++;performanceLightingSignature=lightingSignature;
   for(const slot of performanceSlots){let intensity=0;const color=new Color(0,0,0);
    for(const member of slot.members){const s=member.light;if(!opt.lamps||!s.userData.enabled)continue;const weight=(s.userData.nominalIntensity||0)*(member.main?lightingProfile(opt.night).mainGain:.18);intensity+=weight;color.r+=s.color.r*weight;color.g+=s.color.g*weight;color.b+=s.color.b*weight;}
-   slot.light.intensity=Math.min(intensity,LIGHTING_PROFILE.maxGroupIntensity);if(intensity>0)slot.light.color.copy(color.multiplyScalar(1/intensity));
+   slot.light.intensity=Math.min(intensity*(slot.scale||1),LIGHTING_PROFILE.maxGroupIntensity);if(intensity>0)slot.light.color.copy(color.multiplyScalar(1/intensity));
   }
  }
  const profile=lightingProfile(opt.night);

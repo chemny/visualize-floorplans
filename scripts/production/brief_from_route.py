@@ -81,7 +81,12 @@ def build(plan_path,options):
     if first_room in shallow_stations:del shallow_stations[first_room]  # the entrance room is where the tour begins
     items=[];moved=set()
     for i,s in enumerate(stations):
-        subject,subjects,source=pick_subjects(bundle,standing[i],s,inv,taken-{s.get('anchor')},furniture)
+        forced=((options.get('overrides') or {}).get(s['name']) or {}).get('viewSubject')
+        if forced:
+            # A room with nothing to show can still be looked at: the named fixture only gives the view direction (its plan position).
+            if forced not in furniture:raise ValueError('viewSubject is not a furniture id in the bundle: '+str(forced))
+            subject,subjects,source=forced,[forced],'user-specified view target'
+        else:subject,subjects,source=pick_subjects(bundle,standing[i],s,inv,taken-{s.get('anchor')},furniture)
         if subject is None:
             notes['passThrough'].append({'station':s['name'],'reason':'no furniture or facility to show; the route passes through'});continue
         role=role_of(s['name']);f=furniture[subject]
@@ -99,7 +104,7 @@ def build(plan_path,options):
         item={'observationId':'s%02d'%i,'name':s['name'],'roomId':assigned[i],'tourRole':role,'subjectId':subject,'subjects':subjects,'targetMm':target,
               'candidatePoints':near,'candidatePointsOnly':True,'candidateDepthMm':0,'viewSeconds':seconds,'observationPanDegrees':0,'lockPanDirection':True,'preferredDistanceMm':2000,
               'episodeId':(standing[i]+'-'+str(furniture[s['anchor']]['type'])) if s.get('anchor') else assigned[i],
-              'viewPurpose':'在'+s['name']+'看'+('、'.join(types) or '主要陈设')+'，按已批准路线观看'}
+              'viewPurpose':('在'+s['name']+'门口看房间整体（没有可介绍的家具，视线朝向指定物件的位置），按已批准路线观看') if source=='user-specified view target' else '在'+s['name']+'看'+('、'.join(types) or '主要陈设')+'，按已批准路线观看'}
         if assigned[i]!=standing[i]:
             item.update(observationRegionId=standing[i],coveredRoomIds=[standing[i]],adjacentViewReason='按已批准路线在'+room_name[standing[i]]+'看属于相邻房间的功能；物件及房间归属不改变。')
         items.append(item);notes['stations'].append({'station':s['name'],'observationId':item['observationId'],'standingRoom':standing[i],'filedUnder':assigned[i],'subject':subject,'subjects':subjects,'subjectSource':source,'tourRole':role,'viewSeconds':seconds})
@@ -145,7 +150,12 @@ def build(plan_path,options):
         if name=='_brief':brief.update(change);continue
         match=[x for x in items if x['name']==name]
         if not match:raise ValueError('Override names an unknown station: '+name)
+        change={k:v for k,v in change.items() if k!='viewSubject'}
         match[0].update(change);notes['needsReview'].append('已按覆盖修改：'+name)
+    # Rooms the approved route declares as not entered (with a reason) are not counted as uncovered; the reason stays in the brief.
+    declared=[{'roomId':r['roomId'],'reason':str(r['reason']).strip()} for r in plan.get('excludedRooms',[]) if r.get('roomId') and str(r.get('reason') or '').strip() and not str(r['reason']).startswith('自动判定')]
+    if declared and brief['coveragePolicy'].get('enabled'):
+        brief['coveragePolicy']['excludedRooms']=declared;notes['needsReview'].append('路线声明未走入、不计覆盖率的房间：'+'、'.join(r['roomId'] for r in declared))
     from tour_stage_chain import check_brief_alignment,pass_through_stations
     drift=check_brief_alignment(brief,plan)
     if drift:raise ValueError('Generated brief drifts from the route: '+json.dumps(drift,ensure_ascii=False))

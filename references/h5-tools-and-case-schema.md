@@ -92,6 +92,42 @@ review. The blank template intentionally fails build: it cannot fabricate walls.
   `entranceOpenings` explicitly names entrance opening/wall IDs. The structure
   drawing keeps that door symbol and shows other doors as blank openings.
 - `furniture`: stable `id`, `type`, `name`, `cx,cy,w,d,h,elevation,rot,color`.
+- Same-type variants: when the library holds several items of one type (single/double-door fridge, 1.5/1.8 m bed,
+  wardrobe sizes, sofa, dining table, desk, TV 55/65/75/85 inch and so on) the furniture panel and the floating object menu show a `规格` list: short labels (≤4 characters, no repeated size; the panel adds `· 宽×深`), sorted small to large, `标准` for a single spec, identical sizes merged (椅子/餐椅). Switching
+  sets width and depth (and the TV height from its width), renames items that still carry a library name, and updates
+  `catalogKey`. Wall-backed types (fridge, wardrobe, sofa, vanity, cabinet, shoe cabinet, bookshelf, desk, bed) keep their back
+  edge fixed and grow outward; other types keep their centre. A switch that would push the item into a wall or window first slides it
+  toward the free side (wall-backed items only along their width, others along width then depth); only when neither side has room is it
+  refused. Overlap with other floor furniture only produces a warning. A custom size shows as `自定义`. Flexible furniture (bed, sofa,
+  sofa bed, dining table, desk, wardrobe, bookshelf, cabinets, TV stand, rug, vanity, platform and similar) also gets a `自定义…`
+  entry that opens the size form (length and depth; the height field is shown only for furniture whose height varies from home to home:
+  wardrobe, bookshelf, storage cabinet, plant, platform and similar — beds, sofas, tables, chairs, desks and appliances keep their height). Fixed-spec equipment (fridge, sink, stove, washer, toilet, shower, TV and so on)
+  only switches between library specs. The library now holds sofa beds of 1.2 / 1.5 / 1.8 m and a 2.2 m double bed.
+- Coffee tables have only two shapes, 圆形 (Ø600 / Ø800 / Ø1000) and 方形 (800×800 / 1200×600 / 1400×700); the spec menu groups
+  them and switches between the two (types `coffee` and `coffeetable` underneath). Width and depth stay adjustable, so a round table
+  can be an oval and a square one a rectangle. A name that is only a name plus a size (such as `茶几 1000×550`) follows the switch.
+- Doorway floors are flush: the strip under a doorway belongs to the side outside the room the door serves (the public side, or the balcony for a bedroom's balcony door), never to the room's inside; it takes the floor material of the room it is assigned to (`floorConnections`
+  `materialRoomId`) and no raised sill is drawn. Raised 15 mm threshold stones are opt-in per opening (panel option 门槛石);
+  they are off by default.
+- Security door: `doorModel:'security'` (preset `security`, label 防盗门, 1000 mm) is a hinged leaf for the entrance, finished
+  red-brown (leaf `#5f2220`, raised panels `#74302a`, casing `#4a1a17`) whatever the room style. Its door menu offers 内开/外开
+  instead of a bare flip: inward means the leaf swings to the inside of the footprint. The swing and sweep checks treat it as a
+  single leaf; lock body, peephole and security rating are not modelled. The floating object menu also carries the 规格 list
+  for furniture that has same-type variants.
+- Orientation: the workbench has no compass; north is whatever is drawn at the top. When the real
+  orientation is known, rotate the case instead of annotating it: `python3 scripts/rotate_case.py CASE.json OUT.json
+  --reason TEXT` turns the whole case counter-clockwise by quarter turns (`--turns`, default 1) so north is up. Coordinates,
+  furniture headings, `supportPose`, `wallAnchor.side`, `walkStart` and `dimensionChains` turn together; areas, lengths and door
+  swings are unchanged, and a new `caseId` suffix keeps saved schemes of the old orientation apart. The result is recorded in
+  `orientation`. Ceiling zones, measures and non-zero chain starts stop the tool; any confirmation recorded on the old
+  orientation must be redone because the scheme hash changes. Auto-generated trim ids embed coordinates, so they differ after rotation.
+  Raised surfaces such as a bay-window step or a floor platform use the `platform`
+  component (library group 构造, default 700×1800×550 mm, `elevation:0`). It is one solid
+  block: the body takes the style wall colour and a 15 mm marble top slab sits on the total
+  height `h`. Set `cx,cy,w,d` to the measured extent and `h` to the measured height; the
+  default height is only a preview value. Walls cannot be lowered (they stay 2700 mm), so
+  never model a step as a wall. The kitchen/dining group lists both `冰箱` (700×700) and the
+  double-door `对开门冰箱` (910×700); widths above 850 mm draw two side-by-side doors.
   All sizes/positions are mm; `rot` is degrees. Optional `fitToCeiling`,
   `topToCeiling`, `mount`, `supportId`, `assemblyOwner`, `fixedToWalls`,
   `lightOn`, `lightTemperature`, `lightIntensity` carry actual object behavior.

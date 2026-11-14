@@ -24,7 +24,7 @@ def signature(o):
     if o['kind'] != 'door':
         return None
     model = o.get('doorModel', 'single')
-    if model not in ('single', 'double', 'hidden'):
+    if model not in ('single', 'double', 'hidden', 'security'):
         raise ValueError('Unsupported swing door model')
     if model == 'double':
         ratio = o.get('leafRatio', .5)

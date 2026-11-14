@@ -62,9 +62,9 @@ header .header-actions{grid-column:3;grid-row:1;justify-self:end;margin:0;white-
 .menubar{position:static;grid-column:2;grid-row:1;transform:none;width:max-content;height:46px;border:0;padding:0;gap:4px;flex-wrap:nowrap;white-space:nowrap}
 .project-meta .menu-status{margin:0;padding:0}
 .work-menu>.menu-pop{top:39px}
-.menubar .menu-pop .btn.on{background:transparent;color:var(--ink);box-shadow:none;font-weight:400}
-.menubar .menu-pop .btn.on:hover{background:#f2ece2}
-.menubar .menu-pop .btn.on::after{content:'✓';margin-left:auto;font-size:11px;line-height:1;color:var(--ink);flex:none}
+.menubar .menu-pop .btn.on{background:var(--accent-soft);color:#896747;box-shadow:none;font-weight:600}
+.menubar .menu-pop .btn.on:hover{background:#f0e5d6}
+/* 选中项用底色和加粗表示，不再画对勾 */
 .menubar .menu-pair .btn{justify-content:space-between;gap:10px}
 @media(max-width:1100px){
  .menubar{gap:2px}
@@ -227,7 +227,7 @@ aside.lib #lib .item small{font-size:9px;line-height:13px;white-space:nowrap;let
 #fab:not(.door-style-fab)>.btn+.btn::before{content:"";position:absolute;left:-1px;top:50%;height:14px;transform:translateY(-50%);border-left:1px solid var(--line)}
 #fab.door-style-fab{background:var(--panel);display:flex;flex-direction:row;align-items:center;width:max-content;gap:0;padding:3px}
 #fab.door-style-fab .door-style-options{display:flex;gap:0}
-#fab.door-style-fab .door-style-choice{position:relative;min-height:26px;padding:4px 17px 4px 7px;border:0;border-radius:4px;font-size:11px;line-height:16px;white-space:nowrap;background:transparent}
+#fab.door-style-fab .door-style-choice{position:relative;min-height:26px;padding:4px 7px;border:0;border-radius:4px;font-size:11px;line-height:16px;white-space:nowrap;background:transparent}
 #fab.door-style-fab .door-style-choice>span{position:absolute;right:5px}
 #fab.door-style-fab .door-style-choice+.door-style-choice::before{content:"";position:absolute;left:0;top:50%;height:14px;transform:translateY(-50%);border-left:1px solid var(--line)}
 #fab.door-style-fab .door-style-choice:hover{background:#f8f2e9}
@@ -263,3 +263,11 @@ body.walking #joy{width:116px;height:116px;left:24px;bottom:24px;border-color:rg
 body.walking #joy i{background:rgba(250,247,241,.9)}
 @media(max-width:600px){#walkToolbar{top:10px;right:10px;max-width:calc(100% - 20px)}#walkToolbar .viewport-action{font-size:10px;padding:4px 6px}#walkNotice{top:53px;left:10px;font-size:11px}body.walking #joy{left:16px;bottom:16px}body.walking footer #tip{font-size:9px}}
 @media(prefers-reduced-motion:reduce){#walkToolbar{transition:none}}
+/* 规格下拉：选中项用底色加粗表示，不画对勾（支持可定制 select 的浏览器；其他浏览器退回系统菜单） */
+#fVariant,#fabVariant{appearance:base-select}
+#fVariant::picker(select),#fabVariant::picker(select){appearance:base-select;border:1px solid var(--line);border-radius:8px;background:#fffdf9;padding:4px;box-shadow:0 8px 24px rgba(60,45,30,.16)}
+#fVariant option,#fabVariant option{padding:5px 10px;border-radius:5px;font-weight:400;color:#514b43}
+#fVariant option::checkmark,#fabVariant option::checkmark{display:none}
+#fVariant option:hover,#fabVariant option:hover{background:#f8f2e9}
+#fVariant option:checked,#fabVariant option:checked{background:#f0e5d6;color:#896747;font-weight:600}
+#fVariant optgroup,#fabVariant optgroup{font-size:11px;color:#8a8175;font-weight:400}
