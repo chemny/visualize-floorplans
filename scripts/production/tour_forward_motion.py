@@ -15,7 +15,7 @@ MAXIMUM_BACKWARD_SECONDS = 1.0  # was .5; user decision 2026-11-02 after plan 1 
 MINIMUM_WALKING_SPEED_MPS = .2
 # Case-enabled exception (config.smallRoomBackOut): leaving a small single-exit room by
 # stepping back while still facing it. Product limits, not a standard; a config can only tighten them.
-SMALL_ROOM_AREA_M2 = 12.
+SMALL_ROOM_AREA_M2 = 15.  # was 12; user decision 2026-11-15: small rooms (under 15 m2, single exit) back out instead of circling
 BACK_OUT_METERS = 1.2
 BACK_OUT_SECONDS = 2.5
 

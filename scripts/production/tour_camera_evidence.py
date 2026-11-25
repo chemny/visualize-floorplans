@@ -122,7 +122,14 @@ def inspect(bundle,tour,config,planner):
             rows.append(row)
     for room,row in rooms.items():
         row.pop('lastYaw')
-        if not str(room).startswith('__undeclared__:') and min(row['positiveDegrees'],row['negativeDegrees'])>1:
+        allowed=1
+        tiers=config.get('roomSizeTiers')
+        if tiers is not None:
+            # Room-size tiers: a bigger room may retrace a little, a small one never.
+            from tour_room_tiers import area_m2,retrace_budget
+            poly=next((r['poly'] for r in bundle['model']['rooms'] if r['id']==row.get('roomId',room)),None)
+            if poly:allowed=retrace_budget(area_m2(poly),tiers.get('retraceBudgetDegrees'));row['retraceBudgetDegrees']=allowed
+        if not str(room).startswith('__undeclared__:') and min(row['positiveDegrees'],row['negativeDegrees'])>allowed:
             issues.append({'code':'room_wide_sweep_reversal','roomId':row.get('roomId',room),**row})
     # Sample the full timeline, including exit/transit; not just chosen refinements.
     stride=max(1,round(fps/8));run=longest=total=0;wall_spans=[];run_start=None

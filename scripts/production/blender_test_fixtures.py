@@ -16,7 +16,7 @@ def approved_route(p,scheme='synthetic-route'):
  p=Path(p);p.mkdir(parents=True,exist_ok=True)
  def save(name,value):
   f=p/name;f.write_text(json.dumps(value,ensure_ascii=False,indent=2),encoding='utf-8');return bound(f)
- frames=[{'pointMm':[500+i*30,500],'eyeMm':1600,'yawRadians':0,'pitchRadians':0,'shiftY':0,'horizontalFovDegrees':76} for i in range(8)]
+ frames=[{'pointMm':[500+i*30,500],'eyeMm':1300,'yawRadians':0,'pitchRadians':0,'shiftY':0,'horizontalFovDegrees':76} for i in range(8)]
  tour={'schemeSha256':scheme,'fps':2,'seconds':4,'frames':frames,'visits':[{'name':'start','frame':0},{'name':'view','frame':3},{'name':'end','frame':7}]}
  bundle={'schemeSha256':scheme,'model':{'width':2000,'depth':2000,'rooms':[{'id':'living','poly':[[0,0],[2000,0],[2000,2000],[0,2000]]}]},'state':{'walls':[],'furniture':[{'id':'sofa','type':'tv','cx':1700,'cy':500,'w':100,'d':20}]}}
  config={'chapters':[{'name':'连接','from':'start','to':'view','phase':'transit'},{'name':'客厅','from':'view','to':'end','phase':'observe','subjects':['sofa'],'roomId':'living','episodeId':'living','viewPurpose':'Synthetic room arrangement','singleSweepDegrees':0,'tourRole':'public'}],'tourContract':{'schema':'homeowner-tour-contract/1','tourMode':'indoor_segment','bodyRadiusMm':100,'rulesetVersion':RULESET},'maximumSeconds':5,'coveragePolicy':{'enabled':True,'minimumPercent':1},'roomViewingPolicy':{'singleEpisode':True},'observationPointPolicy':{'defaultPointsPerRoom':1,'maximumPointsPerRoom':2,'maximumSecondsPerPoint':3,'maximumStillSeconds':.5},'roomBudgetPolicy':{'maximumTotalSeconds':5,'rooms':[{'name':'Living','roomIds':['living'],'maximumSeconds':5}]}}

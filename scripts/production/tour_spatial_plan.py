@@ -389,11 +389,21 @@ def build(job,base='.'):
  visits=job['visits'];candidates={};meta={};dropped=[]
  default_depth=job.get('maxEntryDepthMm')
  if default_depth is not None:
-  if isinstance(default_depth,bool) or not isinstance(default_depth,(int,float)) or not 300<=default_depth<=4000:raise ValueError('maxEntryDepthMm must stay within 300..4000')
+  if isinstance(default_depth,bool) or not isinstance(default_depth,(int,float)) or not 200<=default_depth<=4000:raise ValueError('maxEntryDepthMm must stay within 200..4000')
   for v in visits:v.setdefault('maxEntryDepthMm',default_depth)
+ if job.get('roomSizeTiers',True) is not False:
+  # Room-size tiers: a smaller room is entered less deeply. A case value may only make the cap stricter.
+  from tour_room_tiers import tier_for_room,stricter_depth
+  for v in visits:
+   room=next((r for r in rooms if r['id']==v['roomId']),None)
+   if room is None or v.get('pointMm') is not None:continue
+   name,tier=tier_for_room(room);v['sizeTier']=name
+   v['maxEntryDepthMm']=stricter_depth(tier['maxEntryDepthMm'],v.get('maxEntryDepthMm'))
+   # Keep a feasible band between the station's keep-out from the door line and the depth cap.
+   v['stationDepthMm']=min(v.get('stationDepthMm',500),v['maxEntryDepthMm']-150)
  for v in visits:
   m=v.get('maxEntryDepthMm')
-  if m is not None and (isinstance(m,bool) or not isinstance(m,(int,float)) or not 300<=m<=4000):raise ValueError('maxEntryDepthMm must stay within 300..4000: '+v['name'])
+  if m is not None and (isinstance(m,bool) or not isinstance(m,(int,float)) or not 200<=m<=4000):raise ValueError('maxEntryDepthMm must stay within 200..4000: '+v['name'])
  for v in visits:
   try:rows,room,anchor=station_candidates(b,planner,v,count,all_gates)
   except SpatialBlocked as error:
@@ -450,8 +460,9 @@ def build(job,base='.'):
  issues=[];excluded={r['roomId']:r.get('reason') for r in job.get('excludedRooms',[])+dropped};stations=[]
  for v,pick in zip(visits,picks[1:-1]):
   room,anchor=meta[v['name']]
-  if not inside(pick['point'],room['poly']):issues.append({'code':'station_outside_room','visit':v['name']})
-  stations.append({'name':v['name'],'roomId':v['roomId'],'roomName':room.get('name'),'pointMm':[round(x,1) for x in pick['point']],'roomPolygon':room['poly'],'anchor':anchor and anchor['id'],'stationSource':pick.get('source'),'entryDepthMm':pick.get('entryDepthMm'),'maxEntryDepthMm':v.get('maxEntryDepthMm'),'depthLimitRelaxed':bool(pick.get('depthLimitRelaxed')),'wallViewFraction2D':pick['viewFraction'] if pick['viewFraction'] is None else round(pick['viewFraction'],2)})
+  outside=bool(v.get('outsideStation'))  # a room too narrow to enter is introduced from its doorway, outside it; the case says so explicitly
+  if not inside(pick['point'],room['poly']) and not outside:issues.append({'code':'station_outside_room','visit':v['name']})
+  stations.append({'name':v['name'],'roomId':v['roomId'],'roomName':room.get('name'),'pointMm':[round(x,1) for x in pick['point']],'roomPolygon':room['poly'],'anchor':anchor and anchor['id'],'stationSource':pick.get('source'),'entryDepthMm':pick.get('entryDepthMm'),'maxEntryDepthMm':v.get('maxEntryDepthMm'),'sizeTier':v.get('sizeTier'),'outsideStation':outside,'depthLimitRelaxed':bool(pick.get('depthLimitRelaxed')),'wallViewFraction2D':pick['viewFraction'] if pick['viewFraction'] is None else round(pick['viewFraction'],2)})
  missing=[r['id'] for r in rooms if r['id'] not in {v['roomId'] for v in visits} and r['id'] not in excluded and not any(inside(p,r['poly']) for p,_ in resample(route))]
  for roomId in missing:issues.append({'code':'room_not_visited','roomId':roomId})
  if any(not str(v or '').strip() for v in excluded.values()):issues.append({'code':'exclusion_without_reason'})
@@ -521,7 +532,7 @@ def require_approval(approval,plan,bundle=None):
  return value
 
 def page(plan,image=None,bounds=None):
- """Static SVG from the same plan data; no player, camera or timing presentation."""
+ """Route SVG from the plan data, with a station-by-station walk-through marker (play, pause, previous/next station). The marker only shows direction and order: no camera, no timeline, no durations."""
  from tour_pages import fill,theme,navigation,ASSETS
  b=read(plan['bundle']['path']);xs=[p[0] for p in b['model']['footprint']]+[p[0] for p in plan['routeMm']];ys=[p[1] for p in b['model']['footprint']]+[p[1] for p in plan['routeMm']];margin=500
  view=bounds or [min(xs)-margin,min(ys)-margin,max(xs)-min(xs)+2*margin,max(ys)-min(ys)+2*margin]
@@ -539,15 +550,46 @@ def page(plan,image=None,bounds=None):
  for row in plan['retraces']:parts.append(f'<circle cx="{(row["startMm"][0]+row["endMm"][0])/2}" cy="{(row["startMm"][1]+row["endMm"][1])/2}" r="110" fill="{colors[row["classification"]]}" opacity=".8"/>')
  marks=[('入',plan['entrance']['startPointMm'])]+[(str(i+1),s['pointMm']) for i,s in enumerate(plan['stations'])]
  for label,p in marks:parts.append(f'<circle cx="{p[0]}" cy="{p[1]}" r="170" fill="#94623e" stroke="#fff" stroke-width="30"/><text x="{p[0]}" y="{p[1]+70}" text-anchor="middle" font-size="200" fill="#fff" font-family="system-ui,sans-serif">{label}</text>')
+ start=plan['routeMm'][0];parts.append(f'<polyline id="walked" points="" fill="none" stroke="#e9a23b" stroke-width="58" stroke-linejoin="round" stroke-linecap="round"/><circle id="runner" cx="{start[0]}" cy="{start[1]}" r="150" fill="#e9a23b" stroke="#fff" stroke-width="34"/>')
  parts.append('</svg>')
- rows=''.join(f'<tr><td>{html.escape(leg["from"])} → {html.escape(leg["to"])}</td><td>{leg["distanceM"]:.1f} 米</td></tr>' for leg in plan['legs'])
+ rows=''.join(f'<tr data-leg="{i}" style="cursor:pointer"><td>{html.escape(leg["from"])} → {html.escape(leg["to"])}</td><td>{leg["distanceM"]:.1f} 米</td></tr>' for i,leg in enumerate(plan['legs']))
  words={'required_bottleneck':'必经往返','required_single_exit_branch':'单出口房间必要往返','alternative_exists':'可调整，待确认','not_evaluated':'未能判定'}
  returns=''.join(f'<li>{words[r["classification"]]}：{" / ".join(html.escape(room_name(b,x)) for x in r["rooms"])}，约 {r["lengthM"]:.1f} 米</li>' for r in plan['retraces']) or '<li>无重复路段</li>'
  issues=''.join('<li>'+html.escape(i['code'])+'</li>' for i in plan['issues'])
- body='<div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:18px"><div>'+''.join(parts)+'</div><aside><h2>参观顺序</h2><table style="width:100%;font-size:14px">'+rows+f'</table><p>全程约 {plan["distanceM"]:.1f} 米；路径自交 {len(plan["selfCrossings"])} 处；粗略用时约 {plan["budget"]["estimatedSeconds"]:.0f} 秒，非成片时长。</p><h2>重复路段</h2><ul>'+returns+'</ul>'+(('<h2>未走入</h2><ul>'+''.join('<li>'+html.escape(r.get('name') or room_name(b,r['roomId']))+'：'+html.escape(str(r.get('reason')))+'</li>' for r in plan['excludedRooms'])+'</ul>') if plan['excludedRooms'] else '')+(('<h2>需调整</h2><ul>'+issues+'</ul>') if issues else '')+'</aside></div>'
+ body='<div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:18px"><div>'+'<div id="walkbar" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 10px"><button type="button" id="wprev">上一站</button><button type="button" id="wplay">播放</button><button type="button" id="wnext">下一站</button><button type="button" id="wreset">重播</button><label>速度 <select id="wrate"><option value="0.6">慢</option><option value="1" selected>正常</option><option value="2">快</option></select></label><span id="wnow" style="font-size:14px">入口</span></div>'+''.join(parts)+'</div><aside><h2>参观顺序</h2><table style="width:100%;font-size:14px">'+rows+f'</table><p>全程约 {plan["distanceM"]:.1f} 米；路径自交 {len(plan["selfCrossings"])} 处；粗略用时约 {plan["budget"]["estimatedSeconds"]:.0f} 秒，非成片时长。</p><h2>重复路段</h2><ul>'+returns+'</ul>'+(('<h2>未走入</h2><ul>'+''.join('<li>'+html.escape(r.get('name') or room_name(b,r['roomId']))+'：'+html.escape(str(r.get('reason')))+'</li>' for r in plan['excludedRooms'])+'</ul>') if plan['excludedRooms'] else '')+(('<h2>需调整</h2><ul>'+issues+'</ul>') if issues else '')+'</aside></div>'
  status='路线待确认' if plan['status']=='pending_user_confirmation' else '路线需调整'
  title=html.escape(str(plan.get('title') or '全屋参观'))
- return fill((ASSETS/'stage-template.html').read_text(),{'TITLE':'参观路线','STYLE':theme()+'@media(max-width:760px){main div[style*="grid-template-columns"]{grid-template-columns:1fr!important}}','CASE_TITLE':title,'NAV':navigation(1),'INTRO':'先确认走向、经过的门和必要往返；此页没有镜头和时间线。','STATUS':status,'BODY':body,'SCRIPTS':''})
+ return fill((ASSETS/'stage-template.html').read_text(),{'TITLE':'参观路线','STYLE':theme()+'@media(max-width:760px){main div[style*="grid-template-columns"]{grid-template-columns:1fr!important}}','CASE_TITLE':title,'NAV':navigation(1),'INTRO':'先确认走向、经过的门和必要往返；点“播放”可逐站走一遍，移动只示意走向和顺序，没有镜头和时间线。','STATUS':status,'BODY':body,'SCRIPTS':walk_script(plan)})
+
+WALK_JS="""(function(){var D=__DATA__;var run=document.getElementById('runner'),trail=document.getElementById('walked'),now=document.getElementById('wnow'),play=document.getElementById('wplay');
+if(!run||!D.pts.length)return;var seg=[0];for(var i=1;i<D.pts.length;i++)seg.push(seg[i-1]+Math.hypot(D.pts[i][0]-D.pts[i-1][0],D.pts[i][1]-D.pts[i-1][1]));var total=seg[seg.length-1];
+var s=0,playing=false,wait=0,last=0,pause=700,rows=document.querySelectorAll('tr[data-leg]');
+function at(d){d=Math.max(0,Math.min(total,d));var k=1;while(k<seg.length-1&&seg[k]<d)k++;var a=D.pts[k-1],b=D.pts[k],u=seg[k]>seg[k-1]?(d-seg[k-1])/(seg[k]-seg[k-1]):0;return [a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u,k]}
+function stopIndex(){var k=0;for(var i=0;i<D.stops.length;i++)if(D.stops[i]<=s+1)k=i;return k}
+function draw(){var p=at(s);run.setAttribute('cx',p[0]);run.setAttribute('cy',p[1]);var pts=D.pts.slice(0,p[2]).map(function(q){return q[0]+','+q[1]}).concat([p[0]+','+p[1]]);trail.setAttribute('points',pts.join(' '));
+ var k=stopIndex(),moving=!(Math.abs(s-D.stops[k])<1);now.textContent=moving?('正在去：'+D.names[Math.min(k+1,D.names.length-1)]):('当前：'+D.names[k]);rows.forEach(function(r,i){r.style.background=(i===(moving?k:k-1))?'#f6e7c8':''})}
+function nextStop(){for(var i=0;i<D.stops.length;i++)if(D.stops[i]>s+1)return i;return -1}
+function frame(t){if(!playing){last=0;return}var dt=last?Math.min(80,t-last):0;last=t;if(wait>0){wait-=dt}else{var rate=parseFloat(document.getElementById('wrate').value)||1,n=nextStop(),step=2200*rate*dt/1000;if(n<0){playing=false;play.textContent='播放';draw();return}
+ if(s+step>=D.stops[n]){s=D.stops[n];wait=pause/rate;if(n===D.stops.length-1){playing=false;play.textContent='播放'}}else s+=step}
+ draw();requestAnimationFrame(frame)}
+function go(on){playing=on;play.textContent=on?'暂停':'播放';last=0;if(on){if(s>=total-1)s=0;requestAnimationFrame(frame)}}
+play.onclick=function(){go(!playing)};
+document.getElementById('wnext').onclick=function(){go(false);var n=nextStop();if(n>=0)s=D.stops[n];draw()};
+document.getElementById('wprev').onclick=function(){go(false);var k=stopIndex();s=D.stops[Math.abs(s-D.stops[k])<1?Math.max(0,k-1):k];draw()};
+document.getElementById('wreset').onclick=function(){s=0;wait=0;go(true)};
+rows.forEach(function(r){r.onclick=function(){go(false);s=D.stops[parseInt(r.dataset.leg,10)];draw()}});
+draw()})();"""
+
+def walk_script(plan):
+ """Inline script for the route page's walk-through marker: stations as stops along the planned route polyline."""
+ pts=[];stops=[0.]
+ for leg in plan['legs']:
+  for q in leg['pointsMm']:
+   if not pts or math.dist(pts[-1],q)>1e-6:pts.append(list(q))
+  stops.append(sum(math.dist(a,b) for a,b in zip(pts,pts[1:])))
+ names=['入口']+[leg['to'] for leg in plan['legs']]
+ data=json.dumps({'pts':pts,'stops':stops,'names':names},ensure_ascii=False)
+ return '<script>'+WALK_JS.replace('__DATA__',data)+'</script>'
 
 def room_name(bundle,room_id):
  return next((r.get('name',room_id) for r in bundle['model']['rooms'] if r['id']==room_id),{'exterior':'门外'}.get(room_id,room_id))

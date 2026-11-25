@@ -12,7 +12,7 @@ class RouteRehearsalTests(unittest.TestCase):
   self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.p=Path(self.tmp.name);p=self.p
   # Later-stage gate tests; the chain itself is tested in test_tour_spatial_plan.
   chain=patch('tour_stage_chain.require_rehearsal_chain');chain.start();self.addCleanup(chain.stop)
-  self.t={'schemeSha256':'case','fps':2,'seconds':4,'frames':[{'pointMm':[500+i*30,500],'eyeMm':1600,'yawRadians':0,'pitchRadians':0,'horizontalFovDegrees':76} for i in range(8)],'visits':[{'name':'start','frame':0},{'name':'view','frame':3},{'name':'end','frame':7}]}
+  self.t={'schemeSha256':'case','fps':2,'seconds':4,'frames':[{'pointMm':[500+i*30,500],'eyeMm':1300,'yawRadians':0,'pitchRadians':0,'horizontalFovDegrees':76} for i in range(8)],'visits':[{'name':'start','frame':0},{'name':'view','frame':3},{'name':'end','frame':7}]}
   self.c={'chapters':[{'name':'连接','from':'start','to':'view','phase':'transit'},{'name':'客厅','from':'view','to':'end','phase':'observe','subjects':['sofa']}]}
   self.b={'schemeSha256':'case','model':{'rooms':[{'id':'living','poly':[[0,0],[2000,0],[2000,2000],[0,2000]]}]},'state':{'walls':[],'furniture':[]}}
   for name,v in [('tour.json',self.t),('config.json',self.c),('bundle.json',self.b),('scene.json',{'schemeSha256':'case','renderSettings':{'size':[640,360]},'materials':['warm']})]:dump(p/name,v)

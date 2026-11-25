@@ -25,6 +25,44 @@ class CoverageTests(unittest.TestCase):
  def test_threshold_is_not_silently_relaxed(self):
   for bad in [0,101,float('nan')]:
    with self.assertRaises(ValueError):inspect({}, {'frames':[]},Free(),bad)
+ def test_rooms_the_route_declares_as_not_entered_leave_the_denominator_with_their_reason(self):
+  bundle,tour,config=self.scoped_fixture();config['ruleExceptions']=[]
+  config['coveragePolicy']={'enabled':True,'minimumPercent':80,'excludedRooms':[{'roomId':'bed','reason':'用户：并入客厅，不单独设站'}]}
+  with patch('design_homeowner_tour.clear_distance',return_value=0):result=inspect(bundle,tour,Free(),80,100,config=config)
+  self.assertEqual([r['roomId'] for r in result['rooms']],['hall'])
+  self.assertEqual(result['excludedRooms'],[{'roomId':'bed','reason':'用户：并入客厅，不单独设站'}])
+ def test_an_exclusion_needs_a_known_room_a_reason_and_no_duplicate(self):
+  bundle,tour,config=self.scoped_fixture();config['ruleExceptions']=[]
+  for bad in ([{'roomId':'nowhere','reason':'x'}],[{'roomId':'bed','reason':'  '}],[{'roomId':'bed'}],[{'roomId':'bed','reason':'a'},{'roomId':'bed','reason':'b'}]):
+   config['coveragePolicy']={'enabled':True,'minimumPercent':80,'excludedRooms':bad}
+   with self.subTest(bad=bad),self.assertRaises(ValueError):inspect(bundle,tour,Free(),80,100,config=config)
+ def class_case(self,**policy):
+  # hall: 75% in view and holds a sofa (a main room); bed: 0% in view and holds a toilet (an other room).
+  bundle,tour,config=self.scoped_fixture();config['ruleExceptions']=[]
+  bundle['state']={'furniture':[{'id':'s1','type':'sofa','cx':100,'cy':100},{'id':'t1','type':'toilet','cx':100,'cy':100}]}
+  bundle['model']['rooms'][1]['poly']=[[1000,1000],[1200,1000],[1200,1200],[1000,1200]];bundle['state']['furniture'][1].update(cx=1100,cy=1100)
+  config['chapters']=[{'name':'view','phase':'observe','roomId':'hall','coveredRoomIds':['bed'],'from':'a','to':'b'}];tour['visits']=[{'name':'a','frame':0},{'name':'b','frame':0}]
+  config['coveragePolicy']={'enabled':True,'minimumPercent':80,**policy};return bundle,tour,config
+ def run_case(self,bundle,tour,config,minimum=80):
+  with patch('design_homeowner_tour.clear_distance',side_effect=lambda p,origin,yaw,d:0 if yaw<0 and d<600 else d):return inspect(bundle,tour,Free(),minimum,100,config=config)
+ def test_other_rooms_use_their_own_lower_minimum_and_main_rooms_keep_theirs(self):
+  from tour_room_class import classify
+  bundle,tour,config=self.class_case(otherMinimumPercent=50);self.assertEqual(classify(bundle),{'hall':'major','bed':'other'})
+  rows={r['roomId']:r for r in self.run_case(bundle,tour,config)['rooms']}
+  self.assertEqual((rows['hall']['roomClass'],rows['bed']['roomClass']),('major','other'))
+  self.assertEqual((rows['hall']['requiredPercent'],rows['bed']['requiredPercent']),(80,50))
+  # The main room (75%) misses 80; the other room is checked against 50, not 80.
+  self.assertFalse(rows['hall']['meetsProxyMinimum']);self.assertEqual(rows['hall']['horizontalAreaPercent'],75)
+ def test_the_lower_minimum_lets_an_other_room_pass_while_it_is_still_measured(self):
+  bundle,tour,config=self.class_case(otherMinimumPercent=50);config['coveragePolicy']['roomClasses']={'hall':'other'}
+  rows={r['roomId']:r for r in self.run_case(bundle,tour,config)['rooms']}
+  self.assertTrue(rows['hall']['meetsProxyMinimum']);self.assertEqual(rows['hall']['requiredPercent'],50)
+ def test_a_case_can_name_a_rooms_class_and_other_minimum_must_not_exceed_the_main_one(self):
+  for bad in (90,0,True):
+   bundle,tour,config=self.class_case(otherMinimumPercent=bad)
+   with self.subTest(bad=bad),self.assertRaises(ValueError):self.run_case(bundle,tour,config)
+  bundle,tour,config=self.class_case(otherMinimumPercent=50,roomClasses={'nowhere':'major'})
+  with self.assertRaises(ValueError):self.run_case(bundle,tour,config)
  def scoped_fixture(self):
   bundle={'model':{'rooms':[{'id':name,'poly':[[0,0],[200,0],[200,200],[0,200]]} for name in ('hall','bed')]}}
   tour={'fps':4,'frames':[{'pointMm':[-500,100],'yawRadians':0,'horizontalFovDegrees':76}]}

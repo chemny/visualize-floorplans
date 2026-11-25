@@ -1,5 +1,5 @@
 import math,unittest
-from design_homeowner_tour import flow_sweep,flow_candidates,forward_plan,navigation_gaze,delta
+from design_homeowner_tour import flow_sweep,flow_candidates,forward_plan,navigation_gaze,delta,readable_subjects
 class Open:
  walls=[];vision_leaves=[];leaves=[]
  def blocked(self,p):return False
@@ -47,6 +47,14 @@ class MinimalTurning(unittest.TestCase):
  def test_pivot_cost_is_counted_so_dead_end_exit_turns_once(self):
   dense,run=track([[0,0],[2000,0]]);start=math.radians(180);plan=forward_plan(dense,run,start,0,band=60)
   self.assertLessEqual(self.total(plan,start),185)
+ def test_pivot_weight_trades_turning_on_the_spot_for_turning_while_walking(self):
+  dense,run=track([[0,0],[3000,0]]);start=math.radians(100)
+  spot=lambda plan:sum(abs(math.degrees(delta(a,b))) for a,b in zip([start]+plan['startPivot'],plan['startPivot']))
+  plain=forward_plan(dense,run,start,0,band=70);weighted=forward_plan(dense,run,start,0,band=70,pivot_weight=4.)
+  self.assertLess(spot(weighted),spot(plain)+1e-9);self.assertLessEqual(spot(weighted),32)  # 100 deg off a 70 deg band: only the 30 deg overshoot is pivoted
+ def test_ceiling_mounted_fixtures_only_aim_the_camera_and_are_not_read(self):
+  bundle={'state':{'furniture':[{'id':'bed','type':'bed','elevation':0},{'id':'lamp','type':'ceilinground','elevation':2655},{'id':'shelf','type':'shelf','elevation':1200}]}}
+  self.assertEqual(readable_subjects(bundle,['lamp','bed','shelf']),['bed','shelf'])
  def test_candidates_keep_subjects_framed_and_are_diverse(self):
   rows=flow_candidates(Open(),[0,0],[math.radians(40)],math.radians(30),(24,60))
   self.assertGreater(len(rows),3);self.assertEqual(len({(round(math.degrees(a)),round(math.degrees(b))) for _,a,b in rows}),len(rows))

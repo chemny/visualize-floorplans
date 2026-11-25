@@ -24,7 +24,7 @@ class BackOut(unittest.TestCase):
   tour,config=rig(1.0,2.0);config['smallRoomBackOut']['rooms'][0]['chapter']='别处 → 客厅';self.assertEqual(self.codes(tour,config),['sustained_backward_walking'])
  def test_config_cannot_loosen_the_limits_or_the_room_size(self):
   tour,config=rig(1.6,2.4);config['smallRoomBackOut'].update(maximumMeters=5,maximumSeconds=9);self.assertEqual(self.codes(tour,config),['sustained_backward_walking'])
-  tour,config=rig(1.0,2.0,area=14.);self.assertEqual(self.codes(tour,config),['sustained_backward_walking'])
+  tour,config=rig(1.0,2.0,area=16.);self.assertEqual(self.codes(tour,config),['sustained_backward_walking'])  # above the 15 m2 limit (user decision 2026-11-15)
  def test_walking_forward_or_turning_in_place_is_unaffected(self):
   tour,config=rig(1.0,2.0,face=math.pi);self.assertEqual(self.codes(tour,config),[])
  def test_scheme_must_confirm_the_declared_small_room(self):

@@ -61,7 +61,7 @@ def shaped_distance_times(f,policy):
   d=dists[i]
   if d<1e-6:continue
   mid=(arc[i]+arc[i+1])/2;k=bisect.bisect_left(stops,mid);before=(mid-stops[k-1])/1000 if k>0 else 1e9;after=(stops[k]-mid)/1000 if k<len(stops) else 1e9
-  speeds[i]=min(f[i].get('speedLimitMps',cruise),cruise,math.sqrt(floor**2+2*start_accel*before),math.sqrt(floor**2+2*stop_accel*after))
+  speeds[i]=min(f[i].get('speedLimitMps',cruise),cruise*(policy.get('backOutSpeedFactor',1.) if f[i].get('backOut') else 1.),math.sqrt(floor**2+2*start_accel*before),math.sqrt(floor**2+2*stop_accel*after))
  for i in range(len(f)-1):
   if dists[i]>1e-6:out[i]=dists[i]/1000/speeds[i]
  return limit_acceleration(f,out,policy)
@@ -79,6 +79,47 @@ def limit_acceleration(f,times,policy):
  out=list(times)
  for i in moving:out[i]=max(times[i],dists[i]/1000/speeds[i])
  return out
+
+
+def limit_frame_acceleration(frames,fps,maximum_mps2):
+    """Smooth the sampled walking speed so the planar acceleration between frames stays within maximum_mps2.
+
+    Two parts are limited separately (each to 70% of the maximum, so together they stay inside it): the change of speed along the
+    path (a start from rest no longer jumps) and the sideways part of a turn (speed is capped where the path bends sharply).
+    Works stretch by stretch between stops: the stretch is rescaled so it still ends on its original point. Positions stay on the
+    original path; stops, yaw and pitch are untouched."""
+    pts=[list(f['pointMm']) for f in frames];n=len(pts);step=.7*maximum_mps2*1000/fps/fps  # mm per frame, per frame
+    moving=[math.dist(pts[i],pts[i+1])>.5 for i in range(n-1)];i=0
+    wrap=lambda x:(x+math.pi)%(2*math.pi)-math.pi
+    while i<n-1:
+        if not moving[i]:i+=1;continue
+        a=i
+        while i<n-1 and moving[i]:i+=1
+        b=i  # intervals a..b-1 move; frames a..b
+        d=[math.dist(pts[k],pts[k+1]) for k in range(a,b)];total=sum(d)
+        if len(d)<3:continue
+        heading=[math.atan2(pts[k+1][1]-pts[k][1],pts[k+1][0]-pts[k][0]) for k in range(a,b)]
+        bend=[max(abs(wrap(heading[k]-heading[k-1])) if k>0 else 0,abs(wrap(heading[k+1]-heading[k])) if k+1<len(d) else 0) for k in range(len(d))]
+        cap=[min(d[k],step/max(bend[k],1e-3)) for k in range(len(d))]
+        def fit(v):
+            v[0]=min(v[0],step);v[-1]=min(v[-1],step)
+            for k in range(1,len(v)):v[k]=min(v[k],v[k-1]+step)
+            for k in range(len(v)-2,-1,-1):v[k]=min(v[k],v[k+1]+step)
+            return v
+        w=fit(cap[:])
+        for _ in range(8):
+            if sum(w)>=total-.05:break
+            gain=total/max(1e-9,sum(w));w=fit([min(cap[k],w[k]*gain) for k in range(len(w))])
+        target=[0.]
+        for x in w:target.append(target[-1]+x)
+        target=[x*total/target[-1] for x in target]
+        cum=[0.]
+        for x in d:cum.append(cum[-1]+x)
+        for j,t in enumerate(target[1:-1],1):
+            u=max(0,min(len(d)-1,bisect.bisect_right(cum,t)-1));r=(t-cum[u])/max(1e-9,cum[u+1]-cum[u])
+            frames[a+j]['pointMm']=[pts[a+u][k]*(1-r)+pts[a+u+1][k]*r for k in (0,1)]
+    return frames
+
 
 def retime(t,c,limits):
  """Time each segment by maximum movement/yaw/pitch effort, then chapter reading budget.
@@ -138,6 +179,7 @@ def retime(t,c,limits):
   values=smooth([v[key] for v in new],c.get('cameraProfile',{}).get('finalSmoothSeconds',.5),fps)
   for frame,value in zip(new,values):frame[key]=value
  o['frames']=new;o['seconds']=n/fps
+ if c.get('speedPolicy',{}).get('frameAccelerationMps2'):limit_frame_acceleration(o['frames'],fps,c['speedPolicy']['frameAccelerationMps2'])
  for name in ['visits','stopFrames']:
   for m in o.get(name,[]):
    index=m.get('frameIndex',m.get('frame'));at=min(n-1,round(times[index]*fps));m['seconds']=at/fps

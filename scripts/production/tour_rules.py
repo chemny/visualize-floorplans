@@ -30,7 +30,7 @@ def inspect(tour, config):
         if bad: fail('camera_profile_frame_mismatch',field=key,frames=bad[:8])
     for ch in config['chapters']:
         if ch.get('phase')!='observe': continue
-        if not ch.get('subjects') and not ch.get('orderedViewTargets'): fail('missing_view_targets',chapter=ch['name'])
+        if not ch.get('subjects') and not ch.get('orderedViewTargets') and not ch.get('aimOnlySubjects'): fail('missing_view_targets',chapter=ch['name'])  # a ceiling fixture may only aim the view
         if ch.get('tourRole') not in ('public','primary','secondary','service','return_public','return'): fail('missing_or_invalid_tour_role',chapter=ch['name'])
         if ch.get('observationRegionId',ch.get('roomId'))!=ch.get('roomId') and not str(ch.get('adjacentViewReason','')).strip(): fail('unexplained_adjacent_room_view',chapter=ch['name'])
         if set(ch.get('coveredRoomIds',[]))-{ch.get('roomId')} and not str(ch.get('adjacentViewReason','')).strip():fail('unexplained_adjacent_room_view',chapter=ch['name'])

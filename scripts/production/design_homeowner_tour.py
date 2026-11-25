@@ -78,6 +78,13 @@ def select_observation(bundle,planner,intent):
 
 def path_length(path): return sum(math.dist(a,b) for a,b in zip(path,path[1:]))
 
+CEILING_MOUNTED_MM=1800  # a subject whose bottom is this high cannot be read at an eye height of 1.3 m, so it only gives direction
+
+def readable_subjects(bundle,ids):
+    """Subjects a viewer is asked to read: ceiling-mounted fixtures (lights) only aim the camera and are not checked for readability."""
+    high={f['id'] for f in bundle['state']['furniture'] if f.get('elevation',0)>=CEILING_MOUNTED_MM}
+    return [i for i in ids if i not in high]
+
 
 def order_groups(start,groups,distance,end_id=None,return_to=None,stages=None):
     """Held-Karp on groups; suite members stay together. Exact for chosen fixed stops."""
@@ -175,10 +182,10 @@ def mark_speed_limits(frames,planner,policy):
         before=frames[max(0,i-reach)]['pointMm'];after=frames[min(len(frames)-1,i+reach)]['pointMm']
         if math.dist(before,f['pointMm'])>1 and math.dist(after,f['pointMm'])>1:
             turn=abs(delta(math.atan2(f['pointMm'][1]-before[1],f['pointMm'][0]-before[0]),math.atan2(after[1]-f['pointMm'][1],after[0]-f['pointMm'][0])));slow=slow or turn>bend
-        f['speedLimitMps']=policy['narrowCruiseMps'] if slow else policy['cruiseMps']
+        f['speedLimitMps']=(policy['narrowCruiseMps'] if slow else policy['cruiseMps'])*(policy.get('backOutSpeedFactor',1.) if f.get('backOut') else 1.)
 
 
-def forward_plan(dense,distances,start_yaw,end_yaw,band=60,ahead=900,grid=2.0,tie=.0005,coarse=False,clearance=None,wall_weight=1.5,wall_range=1800,start_band=None,ramp_mm=1000):
+def forward_plan(dense,distances,start_yaw,end_yaw,band=60,ahead=900,grid=2.0,tie=.0005,coarse=False,clearance=None,wall_weight=1.5,wall_range=1800,start_band=None,ramp_mm=1000,pivot_weight=1.):
     """Fewest degrees of turning for one connection, never spinning the long way round.
 
     The camera stays within `band` of the look-ahead walking heading. It may pivot in place
@@ -214,7 +221,7 @@ def forward_plan(dense,distances,start_yaw,end_yaw,band=60,ahead=900,grid=2.0,ti
             seen[key]=0. if gap is None else wall_weight*max(0.,1-gap/wall_range)
         return seen[key]
     def solve(h,cap):
-        INF=float('inf');size=2*K+1;cost=[abs(h[0]+(k-K)*grid-y0)+tie*abs(k-K)*grid+wall(0,h[0]+(k-K)*grid) if abs((k-K)*grid)<=allowed(0)+1e-9 else INF for k in range(size)];back=[]
+        INF=float('inf');size=2*K+1;cost=[pivot_weight*abs(h[0]+(k-K)*grid-y0)+tie*abs(k-K)*grid+wall(0,h[0]+(k-K)*grid) if abs((k-K)*grid)<=allowed(0)+1e-9 else INF for k in range(size)];back=[]
         for i in range(n-1):
             nxt=[INF]*size;arg=[-1]*size;dh=h[i+1]-h[i]
             for k in range(size):
@@ -228,7 +235,7 @@ def forward_plan(dense,distances,start_yaw,end_yaw,band=60,ahead=900,grid=2.0,ti
                     if v<nxt[k2]:nxt[k2]=v;arg[k2]=k
             cost=nxt;back.append(arg)
             if min(cost)==INF:return None
-        end=[(cost[k]+min(abs(aim+360*j-(h[-1]+(k-K)*grid)) for j in range(-2,3)),k) for k in range(size) if cost[k]!=INF]
+        end=[(cost[k]+pivot_weight*min(abs(aim+360*j-(h[-1]+(k-K)*grid)) for j in range(-2,3)),k) for k in range(size) if cost[k]!=INF]
         if not end:return None
         total,k=min(end);path=[k]
         for arg in reversed(back):k=arg[k];path.append(k)
@@ -512,7 +519,7 @@ def design(bundle,brief):
         candidates={}
         for rid in order:
             obs=by_id[rid];bearings=[math.atan2(items[i]['cy']-obs['point'][1],items[i]['cx']-obs['point'][0]) for i in dict.fromkeys(obs.get('flowSubjects') or [obs['subjectId']]+obs.get('subjects',[])) if i in items]
-            smallest=brief.get('flowMinSweepDegrees',24);reach=(smallest,max(smallest,min(obs.get('maxSweepDegrees',999),int(obs['viewSeconds']*limit/1.5))))
+            smallest=obs.get('minSweepDegrees',brief.get('flowMinSweepDegrees',24));reach=(smallest,max(smallest,min(obs.get('maxSweepDegrees',999),int(obs['viewSeconds']*limit/1.5))))
             # Subjects too far apart for one sweep: keep the primary and drop the farthest until it fits, and say so.
             dropped=[]
             while True:
@@ -521,7 +528,12 @@ def design(bundle,brief):
                     if len(bearings)<=1:raise
                     lead=bearings[0];far=max(range(1,len(bearings)),key=lambda k:abs(delta(lead,bearings[k])));dropped.append(round(math.degrees(bearings[far])));bearings.pop(far)
             if dropped:obs['flowDroppedBearingsDegrees']=dropped
-        if full:points['__exit__']=brief['startPoint']
+            sign=obs.get('flowPanSign')
+            if sign in (1,-1):
+                # The case fixes the sweep direction of this room (for example the same way the camera is already turning on the approach).
+                kept=[c for c in candidates[rid] if c[2]*sign>0]
+                if kept:candidates[rid]=kept
+        if full:points['__exit__']=brief.get('finishPoint',brief['startPoint'])
         first=route(start,order[0]);first_yaw=math.atan2(first[1][1]-first[0][1],first[1][0]-first[0][0])
         exit_aim=math.atan2(outward[1]-brief['startPoint'][1],outward[0]-brief['startPoint'][0]) if full else None
         table=[]
@@ -557,8 +569,8 @@ def design(bundle,brief):
         small_rooms={r['id']:r for r in bundle['model']['rooms'] if polygon_area_m2(r['poly'])<=SMALL_ROOM_AREA_M2 and exits.get(r['id'],{}).get('exitCount')==1}
     sequence=order[:]
     if full:
-        by_id['__exit__']={'name':'入户门外','point':brief['startPoint'],'targetMm':outward,'viewSeconds':0}
-        points['__exit__']=brief['startPoint'];sequence.append('__exit__')
+        by_id['__exit__']={'name':'入户门外','point':brief.get('finishPoint',brief['startPoint']),'targetMm':outward,'viewSeconds':0}
+        points['__exit__']=brief.get('finishPoint',brief['startPoint']);sequence.append('__exit__')
     for ix,rid in enumerate(sequence):
         obs=by_id[rid];polyline=route(previous,rid);dense=[polyline[0]]
         for a,b in zip(polyline,polyline[1:]):
@@ -571,7 +583,7 @@ def design(bundle,brief):
         walk_pitch=math.radians(brief.get('walkingPitchDegrees',-3)) if subject_pitch else math.radians(brief.get('observationPitchDegrees',-5))
         if subject_pitch:
             reach=math.hypot(obs['targetMm'][0]-obs['point'][0],obs['targetMm'][1]-obs['point'][1]) or 1
-            view_pitch=max(math.radians(brief.get('observationPitchMinDegrees',-16)),min(math.radians(brief.get('observationPitchMaxDegrees',-2)),math.atan2(obs['targetMm'][2]-eye,reach)))
+            view_pitch=max(math.radians(obs.get('observationPitchMinDegrees',brief.get('observationPitchMinDegrees',-16))),min(math.radians(brief.get('observationPitchMaxDegrees',-2)),math.atan2(obs['targetMm'][2]-eye,reach)))
         else:view_pitch=walk_pitch
         pitch=leg_pitch0 if subject_pitch else walk_pitch
         distances=[0]
@@ -618,7 +630,7 @@ def design(bundle,brief):
                 best=None
                 for hold in options:
                     if hold>len(dense)-3:continue
-                    rest=forward_plan(dense[hold:],[d-distances[hold] for d in distances[hold:]],y0,aim,band,ahead_mm,clearance=free,wall_weight=weight,start_band=leg_policy.get('afterStopBandDegrees'))
+                    rest=forward_plan(dense[hold:],[d-distances[hold] for d in distances[hold:]],y0,aim,band,ahead_mm,clearance=free,wall_weight=weight,start_band=leg_policy.get('afterStopBandDegrees'),pivot_weight=leg_policy.get('pivotWeight',1.))
                     near=lambda q,y:max(0.,1-free(q,y)/1800) if free(q,y) is not None else 0.
                     arc=sum(near(dense[hold],y) for y in rest['startPivot'])*2*weight
                     backing=sum(near(dense[i],y0) for i in range(0,hold+1))*weight
@@ -630,7 +642,7 @@ def design(bundle,brief):
                 _,hold,rest=best
                 forward={'yaws':[y0]*(hold+1)+rest['yaws'][1:],'startPivot':[],'pivotAtHold':rest['startPivot'],'holdIndex':hold,'endPivot':rest['endPivot']}
                 back_out_rows.append({'roomId':room['id'],'areaM2':round(polygon_area_m2(room['poly']),3),'chapter':('入户' if previous==start else by_id[previous]['name'])+' → '+obs['name'],'holdMm':round(distances[hold])})
-            else:forward=forward_plan(dense,distances,frames[-1]['yawRadians'],aim,band,ahead_mm,clearance=lambda q,y:clear_distance(planner,q,y,3000) if leg_policy.get('avoidWallFacing',True) else None,wall_weight=leg_policy.get('wallFacingWeight',2.5))
+            else:forward=forward_plan(dense,distances,frames[-1]['yawRadians'],aim,band,ahead_mm,clearance=lambda q,y:clear_distance(planner,q,y,3000) if leg_policy.get('avoidWallFacing',True) else None,wall_weight=leg_policy.get('wallFacingWeight',2.5),pivot_weight=leg_policy.get('pivotWeight',1.))
             planned_yaws=forward['yaws']
             for yaw in forward['startPivot']:
                 append(dense[0],yaw,pitch)
@@ -640,6 +652,7 @@ def design(bundle,brief):
             if subject_pitch:
                 ramp=min(900,total_distance*.5) or 1;u=min(1,distances[j]/ramp);pitch=leg_pitch0+(walk_pitch-leg_pitch0)*(u*u*(3-2*u))
             append(point,yaw,pitch)
+            if forward and 'holdIndex' in forward and j<=forward['holdIndex']:frames[-1]['backOut']=True  # stepping back out of a small room
             if abs(delta(last_key_yaw,yaw))>=math.radians(8) or j==len(dense)-1:
                 key(previous_marker,len(frames)-1-leg_start);last_key_yaw=yaw
             if forward and forward.get('holdIndex')==j:
@@ -655,7 +668,7 @@ def design(bundle,brief):
         chapters.append({'name':('入户' if previous==start else by_id[previous]['name'])+' → '+obs['name'],'from':previous_marker,'to':arrive,'phase':'transit','subjects':[],'purpose':'沿真实通路连接；不重复介绍已看主体'})
         moving_view=bool(same_region and obs.get('episodeId') and obs.get('episodeId')==prior.get('episodeId') and obs['roomId']==prior.get('roomId'))
         if moving_view:
-            chapters[-1].update(phase='observe',subjects=[obs['subjectId']],roomId=obs['roomId'],episodeId=obs['episodeId'],viewPurpose=obs['viewPurpose'],tourRole=obs.get('tourRole','secondary'),minimumSeconds=0,singleSweepDegrees=math.degrees(delta(start_yaw,aim)),movingView=True)
+            chapters[-1].update(phase='observe',subjects=readable_subjects(bundle,[obs['subjectId']]),aimOnlySubjects=[i for i in [obs['subjectId']] if i not in readable_subjects(bundle,[obs['subjectId']])],roomId=obs['roomId'],episodeId=obs['episodeId'],viewPurpose=obs['viewPurpose'],tourRole=obs.get('tourRole','secondary'),minimumSeconds=0,singleSweepDegrees=math.degrees(delta(start_yaw,aim)),movingView=True)
             chapters[-1]['observationRegionId']=obs.get('observationRegionId',obs['roomId'])
             for field in ('adjacentViewReason','coveredRoomIds'):
                 if field in obs:chapters[-1][field]=copy.deepcopy(obs[field])
@@ -672,7 +685,9 @@ def design(bundle,brief):
             key(arrive,step)
         view_end=obs['name']+' · 看完';mark(view_end);key(view_end)
         chapters.append({'name':obs['name']+' · 观看','from':view_start,'to':view_end,'phase':'observe','subjects':obs.get('orderedViewTargets') or [obs['subjectId']],'minimumSeconds':obs['viewSeconds'],'singleSweepDegrees':obs['selectedPanDegrees'],'episodeId':obs.get('episodeId',obs['roomId']),'roomId':obs['roomId'],'viewPurpose':obs.get('viewPurpose','展示当前房间的主要功能与空间关系'),'tourRole':obs['tourRole'],'observationId':rid,'secondPointReason':obs.get('secondPointReason',''),'orderedViewTargets':obs.get('orderedViewTargets',[]),'observationRegionId':obs.get('observationRegionId',obs['roomId'])})
-        chapters[-1]['subjects']=list(dict.fromkeys([obs['subjectId']]+obs.get('subjects',[])+obs.get('orderedViewTargets',[])))
+        chapters[-1]['subjects']=readable_subjects(bundle,list(dict.fromkeys([obs['subjectId']]+obs.get('subjects',[])+obs.get('orderedViewTargets',[]))))
+        chapters[-1]['aimOnlySubjects']=[i for i in dict.fromkeys([obs['subjectId']]+obs.get('subjects',[])) if i not in chapters[-1]['subjects']]
+        if obs.get('aimOnly'):chapters[-1]['subjects']=[];chapters[-1]['aimOnlySubjects']=list(dict.fromkeys([obs['subjectId']]+obs.get('subjects',[])))  # case choice: walk in and out, nothing is presented in this room
         for field in ('adjacentViewReason','coveredRoomIds'):
             if field in obs:chapters[-1][field]=obs[field]
         if moving_view:chapters[-1]['viewContinuation']=True
@@ -692,8 +707,9 @@ def design(bundle,brief):
         config['speedPolicy']=copy.deepcopy(brief['speedPolicy'])
         for key in ('cruiseMps','narrowCruiseMps','rampSeconds'):
             if not isinstance(config['speedPolicy'].get(key),(int,float)) or isinstance(config['speedPolicy'][key],bool) or config['speedPolicy'][key]<=0:raise ValueError('speedPolicy needs positive cruiseMps, narrowCruiseMps and rampSeconds')
-    if back_out_rows:config['smallRoomBackOut']={'maximumAreaM2':12,'maximumMeters':1.2,'maximumSeconds':2.5,'rooms':back_out_rows}
-    for k in ('ruleExceptions','motionReviewLimits','timingLocks','trajectoryPolicy','cameraEvidencePolicy','visualQualityPolicy','visualReview','choreographyOverrideReason'):
+    if brief.get('navigationPolicy',{}).get('roomSizeTiers'):config['roomSizeTiers']={'retraceBudgetDegrees':brief['navigationPolicy'].get('retraceBudgetDegrees',{})}
+    if back_out_rows:config['smallRoomBackOut']={'maximumAreaM2':SMALL_ROOM_AREA_M2,'maximumMeters':1.2,'maximumSeconds':2.5,'rooms':back_out_rows}
+    for k in ('ruleExceptions','coreTargetPolicy','motionReviewLimits','timingLocks','trajectoryPolicy','cameraEvidencePolicy','visualQualityPolicy','visualReview','choreographyOverrideReason'):
         if k in brief:config[k]=copy.deepcopy(brief[k])
     tour={'schema':'floor-visualization-tour/1.0','previewOnly':True,'humanAcceptance':'pending','schemeSha256':bundle['schemeSha256'],'fps':fps,'seconds':len(frames)/fps,'frames':frames,'visits':visits,'legs':legs}
     if config.get('speedPolicy'):mark_speed_limits(tour['frames'],planner,config['speedPolicy'])

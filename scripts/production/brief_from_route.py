@@ -18,11 +18,13 @@ ROLES=[('primary',('主卧','主卫','套卫','衣帽间')),('service',('厨房'
 MAIN_ROOMS=('客厅','厨房')
 VIEW_SECONDS={'primary':3.0,'public':2.5,'secondary':2.5,'service':2.0}
 ENTER_EXIT_SECONDS=12.0
+DEFAULT_EYE_MM=1300  # default eye height (user decision 2026-11-15: 1.6 m is too high); lower or higher needs camera_profile_override
 
 def role_of(name):
     return next((role for role,words in ROLES if any(w in name for w in words)),'secondary')
 
-def seconds_of(name,role):
+def seconds_of(name,role,tier=None):
+    if tier:return tier['viewSeconds']  # room-size tier: smaller rooms are looked at more briefly
     if '阳台' in name:return 2.0
     if any(w in name for w in MAIN_ROOMS):return 3.0
     return VIEW_SECONDS[role]
@@ -50,10 +52,13 @@ def build(plan_path,options):
     if plan.get('status')!='pending_user_confirmation':raise ValueError('Spatial plan has unresolved issues: '+str(plan.get('status')))
     maximum=options.get('maximumSeconds') or plan.get('budget',{}).get('maximumSeconds')
     if not isinstance(maximum,(int,float)) or isinstance(maximum,bool) or maximum<=0:raise ValueError('maximumSeconds required: pass it, or set budget.maximumSeconds in the spatial job')
-    coverage=options.get('coverageMinimumPercent')
-    if coverage is None and not options.get('coverageOff'):raise ValueError('Give coverageMinimumPercent for this case, or coverageOff for a diagnostic-only brief; no shared percentage')
-    eye=options.get('eyeMm',1600)
-    if eye!=1600 and not str(options.get('eyeReason','')).strip():raise ValueError('A non-default eye height needs its reason (ruleExceptions camera_profile_override)')
+    coverage=options.get('coverageMinimumPercent');other_coverage=options.get('coverageOtherPercent')
+    if options.get('roomSizeTiers',True) and not options.get('coverageOff'):
+        # Product default (user decision 2026-11-15): main rooms 80%, other rooms (bathroom, balcony, passage, bay window) 50%.
+        coverage=80 if coverage is None else coverage;other_coverage=50 if other_coverage is None else other_coverage
+    if coverage is None and not options.get('coverageOff'):raise ValueError('Give coverageMinimumPercent for this case, or coverageOff for a diagnostic-only brief')
+    eye=options.get('eyeMm',DEFAULT_EYE_MM)
+    if eye!=DEFAULT_EYE_MM and not str(options.get('eyeReason','')).strip():raise ValueError('A non-default eye height needs its reason (ruleExceptions camera_profile_override)')
     bundle=read(resolve(plan['bundle'],plan_path.parent));rooms=bundle['model']['rooms'];room_name={r['id']:r.get('name',r['id']) for r in rooms}
     inv=inventory(bundle);furniture={f['id']:f for f in bundle['state']['furniture']};stations=plan['stations']
     notes={'defaults':[],'stations':[],'passThrough':[],'reassigned':[],'needsReview':[]}
@@ -100,11 +105,19 @@ def build(plan_path,options):
                 if moved_point:
                     x,y=moved_point;notes['needsReview'].append('站位“%s”在小空间“%s”里原深度 %d 毫米，已移到门内 %d 毫米处（小空间只在门口拍一轮）'%(s['name'],room_name[standing[i]],depth,SHALLOW_MM-100))
         near=[[x+a,y+b] for a,b in ((0,0),(80,0),(-80,0),(0,80),(0,-80),(80,80),(-80,-80),(160,0),(-160,0),(0,160),(0,-160))]
-        seconds=seconds_of(s['name'],role);types=sorted({furniture[i]['type'] for i in subjects if i in furniture})
+        tier_name=tier=None
+        if options.get('roomSizeTiers',True):
+            from tour_room_tiers import tier_for_room
+            standing_poly=next(r for r in rooms if r['id']==(s['roomId'] if s.get('outsideStation') else standing[i]));tier_name,tier=tier_for_room(standing_poly)  # a doorway station takes the tier of the room it shows
+        seconds=seconds_of(s['name'],role,tier);types=sorted({furniture[i]['type'] for i in subjects if i in furniture})
         item={'observationId':'s%02d'%i,'name':s['name'],'roomId':assigned[i],'tourRole':role,'subjectId':subject,'subjects':subjects,'targetMm':target,
-              'candidatePoints':near,'candidatePointsOnly':True,'candidateDepthMm':0,'viewSeconds':seconds,'observationPanDegrees':0,'lockPanDirection':True,'preferredDistanceMm':2000,
+              'candidatePoints':near,'candidatePointsOnly':True,'candidateDepthMm':0,'viewSeconds':seconds,**({'maxSweepDegrees':tier['maxSweepDegrees'],'roomSizeTier':tier_name} if tier else {}),'observationPanDegrees':0,'lockPanDirection':True,'preferredDistanceMm':2000,
               'episodeId':(standing[i]+'-'+str(furniture[s['anchor']]['type'])) if s.get('anchor') else assigned[i],
               'viewPurpose':('在'+s['name']+'门口看房间整体（没有可介绍的家具，视线朝向指定物件的位置），按已批准路线观看') if source=='user-specified view target' else '在'+s['name']+'看'+('、'.join(types) or '主要陈设')+'，按已批准路线观看'}
+        if s.get('outsideStation') and s['roomId']!=standing[i]:
+            # Introduced from its doorway: the observation stands in the neighbouring room and still counts for the room it shows.
+            item.update(coveredRoomIds=[s['roomId']],adjacentViewReason='在'+room_name[standing[i]]+'的门口外侧看'+room_name[s['roomId']]+'（该处过窄不进入，按用户选择在门口定位）。')
+            notes['needsReview'].append('站位“%s”在门口外侧，不进入房间'%s['name'])
         if assigned[i]!=standing[i]:
             item.update(observationRegionId=standing[i],coveredRoomIds=[standing[i]],adjacentViewReason='按已批准路线在'+room_name[standing[i]]+'看属于相邻房间的功能；物件及房间归属不改变。')
         items.append(item);notes['stations'].append({'station':s['name'],'observationId':item['observationId'],'standingRoom':standing[i],'filedUnder':assigned[i],'subject':subject,'subjects':subjects,'subjectSource':source,'tourRole':role,'viewSeconds':seconds})
@@ -126,6 +139,7 @@ def build(plan_path,options):
     by_standing={}
     for item,s in zip(items,[s for s in stations if s['name'] in {i['name'] for i in items}]):by_standing.setdefault(standing_room(rooms,s),[]).append(item)
     budgets=[{'name':room_name[r],'roomIds':[r],'maximumSeconds':round(sum(x['viewSeconds'] for x in group)+ENTER_EXIT_SECONDS*len(group),1)} for r,group in by_standing.items()]
+    if options.get('roomSizeTiers',True):notes['defaults'].append('房间大小分档（5/10/20 平方米）：停留 1.5/2.25/3.0/4.75 秒，单向扫视上限 40/60/80/100 度；路线站位深度上限 400/600/900/1200 毫米（见 tour_room_tiers.py）')
     notes['defaults']+=['停留：主卧、主卫等 primary 3秒，客厅、厨房 3秒，公共/次要 2.5秒，服务空间 2秒，阳台 2秒（单点上限3秒）','房间预算：每站观看时间加 %g 秒进出估算，请按案例核对'%ENTER_EXIT_SECONDS,'目标高度取主体半高，限制在 400–1200 毫米']
     notes['needsReview']+=['subjectSource 为“largest low furniture”的站位','passThrough 列出的站位在镜头中只经过不观看']+(['房间预算为估算值'] if budgets else [])
     cameraProfile={'eyeMm':eye,'horizontalFovDegrees':options.get('fovDegrees',76),'shiftY':0,'headBob':False,'gazeSmoothSeconds':.12,'finalSmoothSeconds':.15}
@@ -133,16 +147,18 @@ def build(plan_path,options):
     navigation={'avoidBroadWallViews':True,'broadWallPenalty':150,'forwardWeight':8,'preferredHeadingDegrees':60}
     brief={'schema':'homeowner-design-brief/1','tourMode':'full_tour','entranceOpeningId':plan['entrance']['openingId'],'startPoint':plan['entrance']['startPointMm'],'maximumSeconds':maximum,'fps':24,
            'bodyRadiusMm':plan['navigation']['bodyRadiusMm'],'planningMarginMm':35,'gridMm':50,'eyeMm':eye,'cameraProfile':cameraProfile,'observationPitchDegrees':-5,
-           'coveragePolicy':{'enabled':not options.get('coverageOff'),**({'minimumPercent':coverage} if coverage is not None else {})},
+           'coveragePolicy':{'enabled':not options.get('coverageOff'),**({'minimumPercent':coverage} if coverage is not None else {}),**({'otherMinimumPercent':other_coverage} if other_coverage is not None else {})},
            'roomViewingPolicy':{'singleEpisode':False,'excludeNormalTransit':True},
            'observationPointPolicy':{'defaultPointsPerRoom':1,'maximumPointsPerRoom':2,'recommendedSeconds':[1.5,2.5],'maximumSecondsPerPoint':3,'maximumStillSeconds':.5},
            'roomBudgetPolicy':{'maximumTotalSeconds':maximum,'rooms':budgets},'navigationPolicy':navigation,'rooms':items,'groups':[[i] for i in order],'ruleExceptions':[],
            'fixedOrder':order,'orderOverrideReason':'按用户已确认的空间路线顺序','singleEpisodeExceptionReason':'按用户已确认的空间路线顺序，开放空间分区单独介绍，普通经过不重复介绍。'}
-    if eye!=1600 or cameraProfile['horizontalFovDegrees']!=76:
+    if brief['coveragePolicy'].get('otherMinimumPercent'):notes['defaults'].append('覆盖率：主要房间（卧室、客厅、餐厅、厨房、书房等，按房内设施的功能判定）不低于 %g%%，其他房间（卫生间、阳台、过道、飘窗等）不低于 %g%%；见 tour_room_class.py'%(brief['coveragePolicy']['minimumPercent'],brief['coveragePolicy']['otherMinimumPercent']))
+    if eye!=DEFAULT_EYE_MM or cameraProfile['horizontalFovDegrees']!=76:
         brief['ruleExceptions'].append({'code':'camera_profile_override','reason':str(options.get('eyeReason') or '').strip() or '本案使用非默认视野，实际构图、碰撞、运动与时长门槛保持，镜头仍待用户确认。'})
     if tuned:
+        if options.get('roomSizeTiers',True):navigation.update(sweepConsistencyWeight=3,roomSizeTiers=True,pivotWeight=3)  # one-way sweeps: price left-right-left wobble inside a room
         navigation.update(mode='forward',forwardBandDegrees=70,smallRoomBackOut=True,smallRoomBackOutMm=800,comfortClearanceMm=450,comfortWeight=2.5,smallRoomShallowMm=500,smallRoomShallowAreaM2=6)
-        brief['speedPolicy']={'cruiseMps':1.1,'narrowCruiseMps':.95,'rampSeconds':.85,'startRampSeconds':.65,'narrowGapMm':150,'floorMps':.15}
+        brief['speedPolicy']={'cruiseMps':1.1,'narrowCruiseMps':.95,'rampSeconds':.85,'startRampSeconds':.65,'narrowGapMm':150,'floorMps':.15,'frameAccelerationMps2':2.6}
         brief.update(panPolicy='flow',pitchPolicy='subject',walkingPitchDegrees=-3,observationPitchMinDegrees=-8,observationPitchMaxDegrees=-2)
         notes['defaults'].append('速度取开阔 1.1、窄处 0.95 米/秒，停顿缓停 0.85 秒、起步 0.65 秒；路径离墙偏好 45 厘米；6 平方米以内单门小空间只在门内 50 厘米内拍一轮。总时长会比全程 1.2 米/秒略长，请确认 maximumSeconds 够用')
         notes['defaults'].append('镜头选项取“tuned”：最少转头、联合扫视、小房间回退、按主体俯仰；只在一个户型上调试过，见 tour-camera-options-and-lessons.md')
@@ -164,11 +180,11 @@ def build(plan_path,options):
 
 def main():
     a=argparse.ArgumentParser(description=__doc__);a.add_argument('--plan',required=True);a.add_argument('--out',required=True)
-    a.add_argument('--maximum-seconds',type=float);a.add_argument('--coverage-minimum-percent',type=float);a.add_argument('--coverage-off',action='store_true')
-    a.add_argument('--camera-options',choices=('tuned','basic'),default='tuned');a.add_argument('--eye-mm',type=float,default=1600);a.add_argument('--eye-reason');a.add_argument('--fov',type=float,default=76);a.add_argument('--overrides')
+    a.add_argument('--maximum-seconds',type=float);a.add_argument('--coverage-minimum-percent',type=float);a.add_argument('--coverage-other-percent',type=float);a.add_argument('--coverage-off',action='store_true')
+    a.add_argument('--camera-options',choices=('tuned','basic'),default='tuned');a.add_argument('--eye-mm',type=float,default=DEFAULT_EYE_MM);a.add_argument('--eye-reason');a.add_argument('--fov',type=float,default=76);a.add_argument('--overrides');a.add_argument('--no-room-size-tiers',action='store_true')
     v=a.parse_args();out=Path(v.out)
     if out.exists():raise ValueError('Use a new output directory')
-    brief,notes=build(v.plan,{'maximumSeconds':v.maximum_seconds,'coverageMinimumPercent':v.coverage_minimum_percent,'coverageOff':v.coverage_off,'cameraOptions':v.camera_options,'eyeMm':v.eye_mm,'eyeReason':v.eye_reason,'fovDegrees':v.fov,'overrides':read(v.overrides) if v.overrides else None})
+    brief,notes=build(v.plan,{'maximumSeconds':v.maximum_seconds,'coverageMinimumPercent':v.coverage_minimum_percent,'coverageOtherPercent':v.coverage_other_percent,'coverageOff':v.coverage_off,'cameraOptions':v.camera_options,'eyeMm':v.eye_mm,'eyeReason':v.eye_reason,'fovDegrees':v.fov,'roomSizeTiers':not v.no_room_size_tiers,'overrides':read(v.overrides) if v.overrides else None})
     out.mkdir(parents=True);(out/'brief.json').write_text(json.dumps(brief,ensure_ascii=False,indent=2),encoding='utf-8');(out/'brief-assumptions.json').write_text(json.dumps(notes,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps({'stations':len(brief['rooms']),'passThrough':[x['station'] for x in notes['passThrough']]+notes['routePassThrough'],'output':str(out)},ensure_ascii=False))
 if __name__=='__main__':

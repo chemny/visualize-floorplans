@@ -26,11 +26,11 @@ class RuleTests(unittest.TestCase):
   c['ruleExceptions']=list(c.get('ruleExceptions',[]))+[{'code':'motion_limit_override','reason':'用户同意本案转头速度上限提到45度/秒'}]
   self.assertNotIn('unexplained_motion_limit_override',{i['code'] for i in contract(self.b,self.t,c)['issues']})
  def test_shared_profile_matches_all_generation_entries(self):
-  self.assertEqual((profile()['eyeMm'],profile()['horizontalFovDegrees']),(1600,76))
+  self.assertEqual((profile()['eyeMm'],profile()['horizontalFovDegrees']),(1300,76))  # default eye height 1.3 m, user decision 2026-11-15
   from plan_route import plan
   b=copy.deepcopy(self.b);b['schema']='floor-visualization-production/1.0'
   raw=plan(b,{'stops':[{'name':'a','point':[3400,2000]},{'name':'b','point':[2800,2000]}],'fps':4,'seconds':2},preview=True)
-  self.assertEqual({(f['eyeMm'],f['horizontalFovDegrees']) for f in raw['frames']},{(1600,76)})
+  self.assertEqual({(f['eyeMm'],f['horizontalFovDegrees']) for f in raw['frames']},{(1300,76)})
   self.c['cameraProfile']['eyeMm']=1650
   for f in self.t['frames']:f['eyeMm']=1650
   self.assertIn('unexplained_camera_profile_override',self.codes())

@@ -8,7 +8,7 @@ def read(p):return json.loads(Path(p).read_text())
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def audit(bundle,tour,config):
     full=contract(bundle,tour,config);base=rules(tour,config)
-    cases=[('height',lambda t,c:[f.update(eyeMm=c.get('cameraProfile',{}).get('eyeMm',1600)+50) for f in t['frames']],'camera_profile_frame_mismatch'),
+    cases=[('height',lambda t,c:[f.update(eyeMm=c.get('cameraProfile',{}).get('eyeMm',1300)+50) for f in t['frames']],'camera_profile_frame_mismatch'),
            ('targets',lambda t,c:[ch.update(subjects=[],orderedViewTargets=[]) for ch in c['chapters'] if ch['phase']=='observe'],'missing_view_targets'),
            ('role',lambda t,c:[ch.pop('tourRole',None) for ch in c['chapters']],'missing_or_invalid_tour_role'),
            ('budgets',lambda t,c:c.pop('roomBudgetPolicy',None),'missing_room_visit_budgets'),

@@ -30,6 +30,14 @@ class CameraEvidenceTests(unittest.TestCase):
    a,z=m[c['from']],m[c['to']];c['singleSweepDegrees']=8 if ix==0 else -8
    for i in range(a,z+1):self.t['frames'][i]['yawRadians']=math.radians(8*(i-a)/(z-a) if ix==0 else 8-8*(i-a)/(z-a))
   self.assertIn('room_wide_sweep_reversal',self.codes())
+ def test_room_size_tier_budget_allows_a_small_retrace_and_still_rejects_a_large_one(self):
+  self.x.split_view(['room','room'],['public','public']);ch=self.c['chapters'][1:3];m=markers(self.t)
+  for ix,c in enumerate(ch):
+   a,z=m[c['from']],m[c['to']];c['singleSweepDegrees']=8 if ix==0 else -8
+   for i in range(a,z+1):self.t['frames'][i]['yawRadians']=math.radians(8*(i-a)/(z-a) if ix==0 else 8-8*(i-a)/(z-a))
+  every=lambda v:{n:v for n in ('under5','5to10','10to20','over20')}
+  self.c['roomSizeTiers']={'retraceBudgetDegrees':every(20)};self.assertNotIn('room_wide_sweep_reversal',self.codes())
+  self.c['roomSizeTiers']={'retraceBudgetDegrees':every(5)};self.assertIn('room_wide_sweep_reversal',self.codes())
  def test_normal_exit_not_counted_as_second_sweep(self):
   before=contract(self.b,self.t,self.c)['checks']['cameraEvidence']['roomSweeps']
   m=markers(self.t);ch=self.c['chapters'][-1];a,z=m[ch['from']],m[ch['to']]

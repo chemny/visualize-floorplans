@@ -9,6 +9,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 ASSETS = ROOT / 'assets/h5'
+TOUR_EXPOSURE = 1.2  # tone-mapping exposure of the tour renderer (user decision 2026-11-17: light from the fixtures, not from raising exposure)
+TOUR_FIXTURE_GAIN = 20  # exported fixture intensity 1 is ~1 candela and lights nothing; the tour runtime lights rooms with 20 (user decision 2026-11-17)
+TOUR_AMBIENT = {'hemisphere': .9, 'ambient': .2}  # less flat fill, so fixtures give the light its shape
 import quality
 from lighting_checks import lighting_report
 from floor_connection_checks import check_floor_connections
@@ -184,7 +187,8 @@ def validate_bundle(bundle,preview=False):
     if not bundle.get('scene',{}).get('meshes'): raise ValueError('Export actual meshes before rendering')
     if bundle.get('dimensionAudit',{}).get('errors'): raise ValueError('Exported model dimension audit failed')
 
-def prepare(bundle_path,out_path,preview=False,size=(1280,720)):
+def prepare(bundle_path,out_path,preview=False,size=(1280,720),exposure=TOUR_EXPOSURE,fixture_gain=TOUR_FIXTURE_GAIN):
+    if isinstance(exposure,bool) or not isinstance(exposure,(int,float)) or not .5<=exposure<=3:raise ValueError('exposure must be between 0.5 and 3')
     b=read(bundle_path);validate_bundle(b,preview); out=fresh(out_path)
     scene=b['scene']; meta={k:v for k,v in scene.items() if k!='meshes'};meshes=[];offset=0
     with (out/'geometry.bin').open('wb') as stream:
@@ -198,7 +202,9 @@ def prepare(bundle_path,out_path,preview=False,size=(1280,720)):
                 if sys.byteorder!='little': data.byteswap()
                 raw=data.tobytes();stream.write(raw);n[key]={'offset':offset,'count':len(values)};offset+=len(raw)
             meshes.append(n)
-    meta.update(meshes=meshes,schemeSha256=b['schemeSha256'],model=b['model'],state=b['state'],finishes=b['finishes'],presentationProfile=b.get('presentationProfile',{'hiddenTypes':[]}),renderSettings={'size':list(size),'exposure':1,'shiftY':0,'bodyRadiusMm':160},previewOnly=preview)
+    if isinstance(fixture_gain,bool) or not isinstance(fixture_gain,(int,float)) or not 1<=fixture_gain<=50:raise ValueError('fixture gain must be between 1 and 50')
+    meta['illumination']=[{**l,'intensity':min(50.,l['intensity']*fixture_gain)} for l in meta.get('illumination',[])]
+    meta.update(meshes=meshes,schemeSha256=b['schemeSha256'],model=b['model'],state=b['state'],finishes=b['finishes'],presentationProfile=b.get('presentationProfile',{'hiddenTypes':[]}),renderSettings={'size':list(size),'exposure':exposure,'shiftY':0,'bodyRadiusMm':160,'lighting':dict(TOUR_AMBIENT)},previewOnly=preview)
     dump(out/'scene.json',meta)
     for filename in ('renderer.html','three.module.js','three.core.js','THREE-LICENSE.txt'):
         shutil.copy2(ASSETS/'runtime'/filename,out/filename)
@@ -309,17 +315,17 @@ def parser():
     for name in ('narration-prepare','narration-compose'):
         p=sub.add_parser(name,help='Requires explicit approval of exact source video before narration work');p.add_argument('--job',required=True);p.add_argument('--out',required=True);p.add_argument('--ffmpeg')
     p=sub.add_parser('plan-route',help='Stage 1: rooms, openings, ordered path and returns; no cameras, frames or approval');p.add_argument('--job',required=True);p.add_argument('--out',required=True)
-    p=sub.add_parser('record-approval',help="Write the camera rehearsal, exact-video or narrated-film (--pending = composition-report.json) approval from the user's verbatim words; refuses agent names, empty evidence and unfinished rehearsals");p.add_argument('--kind',required=True,choices=('camera','video','narrated'));p.add_argument('--pending',required=True);p.add_argument('--confirmed-by',required=True);p.add_argument('--evidence',required=True);p.add_argument('--out',required=True)
+    p=sub.add_parser('record-approval',help="Write the camera rehearsal, exact-video or narrated-film (--pending = composition-report.json) approval from the user's verbatim words; refuses agent names, empty evidence and unfinished rehearsals");p.add_argument('--kind',required=True,choices=('camera','video','narrated'));p.add_argument('--pending',required=True);p.add_argument('--confirmed-by',required=True);p.add_argument('--evidence',required=True);p.add_argument('--out',required=True);p.add_argument('--review-only',action='store_true',help='camera only: confirm a rehearsal that fails just the screen audit, for a low-resolution review video; never production')
     p=sub.add_parser('tour-draft',help='Seconds-long camera draft with diagnostics; never for confirmation');p.add_argument('--bundle',required=True);p.add_argument('--brief',required=True);p.add_argument('--out',required=True);p.add_argument('--runtime');p.add_argument('--node')
     p=sub.add_parser('validate-corpus',help='Run route, brief and camera draft for every case in a manifest and compare with recorded baselines');p.add_argument('--manifest',required=True);p.add_argument('--out',required=True);p.add_argument('--only',action='append')
     p=sub.add_parser('optimize-stations',help='Choose observation stations by exported-mesh audit inside the approved route tolerance; verifies and undoes moves that add turn failures');p.add_argument('--brief',required=True);p.add_argument('--plan',required=True);p.add_argument('--runtime',required=True);p.add_argument('--out',required=True);p.add_argument('--node');p.add_argument('--no-verify',action='store_true')
-    p=sub.add_parser('brief-from-route',help='Camera brief from an approved spatial route, with an assumptions list; no cameras, no approval');p.add_argument('--plan',required=True);p.add_argument('--out',required=True);p.add_argument('--maximum-seconds',type=float);p.add_argument('--coverage-minimum-percent',type=float);p.add_argument('--coverage-off',action='store_true');p.add_argument('--camera-options',choices=('tuned','basic'),default='tuned');p.add_argument('--eye-mm',type=float,default=1600);p.add_argument('--eye-reason');p.add_argument('--fov',type=float,default=76);p.add_argument('--overrides')
+    p=sub.add_parser('brief-from-route',help='Camera brief from an approved spatial route, with an assumptions list; no cameras, no approval');p.add_argument('--plan',required=True);p.add_argument('--out',required=True);p.add_argument('--maximum-seconds',type=float);p.add_argument('--coverage-minimum-percent',type=float);p.add_argument('--coverage-off',action='store_true');p.add_argument('--camera-options',choices=('tuned','basic'),default='tuned');p.add_argument('--eye-mm',type=float,default=1300);p.add_argument('--eye-reason');p.add_argument('--fov',type=float,default=76);p.add_argument('--overrides')
     p=sub.add_parser('record-route-approval',help="Write the route approval from the user's verbatim words; refuses agent names and empty evidence");p.add_argument('--pending',required=True);p.add_argument('--confirmed-by',required=True);p.add_argument('--evidence',required=True);p.add_argument('--out',required=True)
     p=sub.add_parser('tour-stage-status',help='Read-only four-stage status from actual bound files; never grants approval');p.add_argument('--job',required=True);p.add_argument('--out',required=True)
     p=sub.add_parser('plan-tour',help='Stage 2 from an approved route: joint camera candidates, bounded repairs and rehearsal; never video');p.add_argument('--job',required=True);p.add_argument('--out',required=True)
     p=sub.add_parser('design-tour',help='Lower-level camera design from an approved route; no video');p.add_argument('--bundle',required=True);p.add_argument('--brief',required=True);p.add_argument('--out',required=True);p.add_argument('--spatial-plan');p.add_argument('--spatial-review')
     p=sub.add_parser('build',help='Case JSON -> offline single-file workbench');p.add_argument('--case',required=True);p.add_argument('--out',required=True)
-    p=sub.add_parser('prepare',help='Actual mesh bundle -> H5 renderer runtime');p.add_argument('--bundle',required=True);p.add_argument('--out',required=True);p.add_argument('--preview',action='store_true');p.add_argument('--width',type=int,default=1280);p.add_argument('--height',type=int,default=720)
+    p=sub.add_parser('prepare',help='Actual mesh bundle -> H5 renderer runtime');p.add_argument('--bundle',required=True);p.add_argument('--out',required=True);p.add_argument('--preview',action='store_true');p.add_argument('--width',type=int,default=1280);p.add_argument('--height',type=int,default=720);p.add_argument('--exposure',type=float,default=TOUR_EXPOSURE);p.add_argument('--fixture-gain',type=float,default=TOUR_FIXTURE_GAIN)
     p=sub.add_parser('quality',help='Verify source/image/tour review records without granting approval');p.add_argument('--bundle',required=True);p.add_argument('--review',required=True);p.add_argument('--stage',action='append',choices=quality.STAGES);p.add_argument('--out',required=True);p.add_argument('--accepted',action='store_true')
     p=sub.add_parser('review-template',help='Case-local review skeleton with pending provenance/acceptance');p.add_argument('--bundle',required=True);p.add_argument('--out',required=True)
     for command in ('export','capture','audit','run'):
@@ -422,7 +428,7 @@ def main():
         return
     elif args.command=='record-approval':
         import record_approval
-        record={'camera':record_approval.record_camera,'video':record_approval.record_video,'narrated':record_approval.record_narrated}[args.kind](args.pending,args.out,args.confirmed_by,args.evidence)
+        record=(record_approval.record_camera(args.pending,args.out,args.confirmed_by,args.evidence,review_only=args.review_only) if args.kind=='camera' else {'video':record_approval.record_video,'narrated':record_approval.record_narrated}[args.kind](args.pending,args.out,args.confirmed_by,args.evidence))
         print(json.dumps({'status':record['status'],'kind':args.kind,'output':str(args.out),'note':'Any change to the bound files invalidates it'},ensure_ascii=False));return
     elif args.command=='tour-draft':
         from tour_draft import draft as make_draft
@@ -471,7 +477,7 @@ def main():
         result=out
     elif args.command=='prepare':
         if args.width<320 or args.height<180 or args.width%2 or args.height%2:raise ValueError('Use even output dimensions >= 320 x 180')
-        result=prepare(args.bundle,args.out,args.preview,(args.width,args.height))
+        result=prepare(args.bundle,args.out,args.preview,(args.width,args.height),args.exposure,args.fixture_gain)
     elif args.command in ('package','handoff'):
         report=None;accepted=None
         if args.accepted:

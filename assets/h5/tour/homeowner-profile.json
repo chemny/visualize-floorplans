@@ -11,7 +11,7 @@
     "measuredMaxYawDegreesPerSecond": 43.302437899721
   },
   "defaults": {
-    "eyeMm": 1600,
+    "eyeMm": 1300,
     "horizontalFovDegrees": 76,
     "shiftY": 0,
     "headBob": false,

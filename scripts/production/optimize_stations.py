@@ -32,7 +32,7 @@ def candidates_for(planner,room_poly,station,tolerance,step=300,radius=1500,limi
 
 def sweep_for(planner,item,furniture,point,brief):
     """The sweep this observation would use from `point`, and the eye pitch it would hold."""
-    eye=brief.get('eyeMm',1600);fov=brief.get('cameraProfile',{}).get('horizontalFovDegrees',76)
+    eye=brief.get('eyeMm',1300);fov=brief.get('cameraProfile',{}).get('horizontalFovDegrees',76)
     ids=[i for i in dict.fromkeys(item.get('flowSubjects') or [item['subjectId']]+item.get('subjects',[])) if i in furniture]
     bearings=[math.atan2(furniture[i]['cy']-point[1],furniture[i]['cx']-point[0]) for i in ids]
     reach=math.hypot(item['targetMm'][0]-point[0],item['targetMm'][1]-point[1]) or 1
@@ -51,7 +51,7 @@ def sweep_for(planner,item,furniture,point,brief):
 
 def mini_tour(item,point,sweep,brief,scheme,furniture):
     """A stationary observation window, enough for the mesh audit to judge the shot."""
-    start,pan,walking,pitch,ids=sweep;count=max(2,round(item['viewSeconds']*FPS));eye=brief.get('eyeMm',1600);fov=brief.get('cameraProfile',{}).get('horizontalFovDegrees',76)
+    start,pan,walking,pitch,ids=sweep;count=max(2,round(item['viewSeconds']*FPS));eye=brief.get('eyeMm',1300);fov=brief.get('cameraProfile',{}).get('horizontalFovDegrees',76)
     frames=[]
     for i in range(count+1):
         u=i/count;tilt=min(1,u/.45)

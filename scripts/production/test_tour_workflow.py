@@ -49,4 +49,21 @@ class TourWorkflowTests(unittest.TestCase):
    with self.assertRaises(ValueError):require_preview(q,p/'tour.json',p)
    (p/'scene.json').write_text(json.dumps({'renderSettings':{'size':[1280,720]},'materials':['pearl']}));r['tourSha256']='stale';q.write_text(json.dumps(r))
    with self.assertRaises(ValueError):require_preview(q,p/'tour.json',p)
+
+class FrameAccelerationLimit(unittest.TestCase):
+    def frames(self,speeds):
+        x=0;out=[{'pointMm':[0.,0.]}]
+        for v in speeds:x+=v*1000/24;out.append({'pointMm':[x,0.]})
+        return out
+    def peak(self,frames):
+        v=[(b['pointMm'][0]-a['pointMm'][0])*24/1000 for a,b in zip(frames,frames[1:])]
+        return max(abs(b-a)*24 for a,b in zip(v,v[1:]))
+    def test_a_start_from_rest_no_longer_jumps_and_the_stretch_still_ends_on_its_point(self):
+        from tour_workflow import limit_frame_acceleration
+        speeds=[.0]*5+[.3]*3+[.7]*4+[1.1]*40+[.7]*4+[.3]*3+[0.]*5
+        frames=self.frames(speeds);end=frames[-1]['pointMm'][0];before=self.peak(frames)
+        out=limit_frame_acceleration(self.frames(speeds),24,2.6)
+        self.assertGreater(before,5);self.assertLessEqual(self.peak(out),3.0);self.assertAlmostEqual(out[-1]['pointMm'][0],end,places=3)
+        self.assertEqual([f['pointMm'][0] for f in out[:5]],[0.]*5)  # frames at rest stay at rest
+
 if __name__=='__main__':unittest.main()

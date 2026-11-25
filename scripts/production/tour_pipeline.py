@@ -472,8 +472,10 @@ class JointPlanner:
                 from tour_core_targets import scan_angles
                 angles=scan_angles(self.b,ch,point,self.observation_frames(ch)/self.fps,self.limits['maxYawDegreesPerSecond'])+angles
             if not ch.get('orderedViewTargets'):
-                target=target_anchor(self.b,ch['subjects'][0]);bearing=math.atan2(target[1]-point[1],target[0]-point[0]);span=min(abs(base['pan']),math.radians(55))
-                angles += [(bearing-sign*span/2,sign*span) for sign in (-1,1)]
+                aim=(ch.get('subjects') or ch.get('aimOnlySubjects') or [None])[0]  # a ceiling fixture may only aim the view
+                if aim:
+                    target=target_anchor(self.b,aim);bearing=math.atan2(target[1]-point[1],target[0]-point[0]);span=min(abs(base['pan']),math.radians(55))
+                    angles += [(bearing-sign*span/2,sign*span) for sign in (-1,1)]
                 angles += [(base['yaw']+base['pan']+math.radians(offset),-base['pan']) for offset in (0,-15,15)]
             else:
                 try:
@@ -746,7 +748,7 @@ class JointPlanner:
 def rank(report,tour):
     # Hard feasibility first, never trade a collision for seconds saved.
     codes=[x['code'] for x in report['issues']];checks=report.get('checks',{})
-    safety=sum(x in ('body_path_collision','scheme_mismatch','full_tour_does_not_return_to_entrance','path_tangent_discontinuity','path_acceleration_spike','locked_total_duration_changed','locked_viewing_duration_changed','locked_fps_changed','revision_scope_changed') for x in codes)
+    safety=sum(x in ('body_path_collision','scheme_mismatch','full_tour_does_not_return_to_entrance','path_tangent_discontinuity','path_acceleration_spike','camera_angular_acceleration','locked_total_duration_changed','locked_viewing_duration_changed','locked_fps_changed','revision_scope_changed') for x in codes)
     semantic=sum(x in ('split_room_view','room_wide_sweep_reversal','observation_sweep_reversal','invalid_ordered_view_target','ordered_target_not_visible_in_sequence','room_coverage_below_case_minimum','actual_mesh_target_unreadable','transit_reintroduces_subject','approach_view_reverses_into_observation','screen_near_surface_occlusion','screen_dominant_surface','subject_composition_unreadable','screen_blank_segment','known_visual_failure_unchanged','known_visual_failure_unverified') for x in codes)
     over=sum(max(0,x.get('seconds',0)-x.get('maximumSeconds',0)) for x in report['issues'] if x['code'] in ('room_visit_over_budget','total_over_budget'))
     camera=checks.get('cameraEvidence',{});acc=camera.get('angularAcceleration',{});ap=camera.get('policy',{});severity=max(acc.get('yawRadians',0)/ap.get('maximumYawAccelerationDegreesPerSecondSquared',240),acc.get('pitchRadians',0)/ap.get('maximumPitchAccelerationDegreesPerSecondSquared',120))
@@ -881,7 +883,7 @@ def run(job,out):
         attempts.append({'id':attempt,'origin':origin,'seconds':tour['seconds'],'rank':score,'issues':report['issues'],'choices':choices,'checks':report['checks'],'collisionSamples':[tour['frames'][i] for i in report['checks']['geometry']['collisionFrames'][:8]]})
         print(json.dumps({'attempt':attempt,'origin':origin,'seconds':round(tour['seconds'],3),'codes':[i['code'] for i in report['issues']]},ensure_ascii=False),flush=True)
         forbidden={'body_path_collision','scheme_mismatch','split_room_view','room_wide_sweep_reversal','observation_sweep_reversal','viewing_time_compressed','invalid_ordered_view_target','ordered_target_not_visible_in_sequence','motion_limit','camera_angular_acceleration'}
-        coverage=report['checks'].get('coverage',{});gap=sum(max(0,coverage.get('minimumPercent',0)-row['horizontalAreaPercent']) for row in coverage.get('rooms',[]))
+        coverage=report['checks'].get('coverage',{});gap=sum(max(0,row.get('requiredPercent',coverage.get('minimumPercent',0))-row['horizontalAreaPercent']) for row in coverage.get('rooms',[]))
         if tour['seconds']<=config['maximumSeconds'] and gap<=6 and not any(i['code'] in forbidden for i in report['issues']):
             frontier.append((tour,config,report))
         if score<rank(best[2],best[0]):
@@ -971,7 +973,7 @@ def run(job,out):
         working=best
         if frontier and best[2]['issues']:
             def exploration_key(state):
-                report=state[2];cp=report['checks'].get('coverage',{});gap=sum(max(0,cp.get('minimumPercent',0)-row['horizontalAreaPercent']) for row in cp.get('rooms',[]));over=sum(max(0,i.get('seconds',0)-i.get('maximumSeconds',0)) for i in report['issues'] if i['code']=='room_visit_over_budget')
+                report=state[2];cp=report['checks'].get('coverage',{});gap=sum(max(0,row.get('requiredPercent',cp.get('minimumPercent',0))-row['horizontalAreaPercent']) for row in cp.get('rooms',[]));over=sum(max(0,i.get('seconds',0)-i.get('maximumSeconds',0)) for i in report['issues'] if i['code']=='room_visit_over_budget')
                 return (over+gap/10,len(report['issues']),state[0]['seconds'])
             working=min(frontier,key=exploration_key)
             dump(out/'exploration-frontier.json',{'diagnosticOnly':True,'seconds':working[0]['seconds'],'issues':working[2]['issues']})
@@ -982,7 +984,7 @@ def run(job,out):
     # viewing durations; use soft transitions rather than whole-camera rotation.
     fine_source=working
     cp=fine_source[2]['checks'].get('coverage',{})
-    fringe=[] if scope is not None or search.get('strictRepairRounds') else [r['roomId'] for r in cp.get('rooms',[]) if 0<cp.get('minimumPercent',0)-r['horizontalAreaPercent']<=6]
+    fringe=[] if scope is not None or search.get('strictRepairRounds') else [r['roomId'] for r in cp.get('rooms',[]) if 0<r.get('requiredPercent',cp.get('minimumPercent',0))-r['horizontalAreaPercent']<=6]
     for room in fringe:
         for degrees in (-2,2,-4,4,-6,6):
             if attempt>=search['maximumFullEvaluations'] or time.monotonic()>search['_planningDeadline']:break

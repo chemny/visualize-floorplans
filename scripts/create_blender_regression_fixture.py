@@ -14,7 +14,7 @@ bpy.ops.mesh.primitive_cube_add(size=.8,location=(1.5,.5,.5));bpy.context.object
 bpy.ops.mesh.primitive_plane_add(size=8);bpy.context.object['schemeSha256']='synthetic-remote-regression'
 bpy.ops.object.light_add(type='AREA',location=(1,.5,3));bpy.context.object.data.energy=300;bpy.context.object.data.shape='DISK';bpy.context.object.data.size=3
 bpy.ops.object.camera_add();cam=bpy.context.object;cam.rotation_mode='QUATERNION';s.camera=cam
-frames=[{'pointMm':[500+i*30,500],'eyeMm':1600,'yawRadians':0,'pitchRadians':0,'horizontalFovDegrees':76,'shiftY':0} for i in range(4)]
+frames=[{'pointMm':[500+i*30,500],'eyeMm':1300,'yawRadians':0,'pitchRadians':0,'horizontalFovDegrees':76,'shiftY':0} for i in range(4)]
 model={'width':2000,'depth':2000};set_camera(s,cam,frames[0],model);s.render.filepath=str(out/'still.png');bpy.ops.render.render(write_still=True);bpy.ops.file.pack_all();bpy.ops.wm.save_as_mainfile(filepath=str(out/'scene.blend'))
 def save(name,value):
  f=out/name;f.write_text(json.dumps(value,ensure_ascii=False,indent=2));return bound(f)

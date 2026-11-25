@@ -163,7 +163,7 @@ class CandidateQualityTests(unittest.TestCase):
         t['frames'][-1]['yawRadians']=math.pi
         end=e.closing_pose()
         self.assertEqual(end['pointMm'],t['frames'][-1]['pointMm'])
-        self.assertEqual(end['eyeMm'],1600)
+        self.assertEqual(end['eyeMm'],1300)
         self.assertEqual(end['closingTargetOpeningId'],c['tourContract']['entranceOpeningId'])
         self.assertAlmostEqual(end['yawRadians'],0)
 
@@ -206,7 +206,7 @@ class CandidateQualityTests(unittest.TestCase):
     def reversal(self):
         fps=24
         t={'fps':fps,'frames':[{'frame':i,'pointMm':[min(i,48-i)*20.,0.],
-            'yawRadians':0.,'pitchRadians':-.1,'eyeMm':1600} for i in range(49)],
+            'yawRadians':0.,'pitchRadians':-.1,'eyeMm':1300} for i in range(49)],
             'visits':[{'name':'a','frame':0},{'name':'b','frame':24},{'name':'z','frame':48}]}
         c={'chapters':[{'from':'a','to':'b'},{'from':'b','to':'z'}]}
         return t,c
@@ -259,7 +259,7 @@ class CandidateQualityTests(unittest.TestCase):
         c['entryView']={'targetMm':[1000,2200,1300]}
         e=JointPlanner(b,t,c,{})
         self.assertEqual(e.entry['pointMm'],t['frames'][0]['pointMm'])
-        self.assertEqual(e.entry['eyeMm'],1600)
+        self.assertEqual(e.entry['eyeMm'],1300)
         self.assertNotEqual(e.entry['yawRadians'],t['frames'][0]['yawRadians'])
         self.assertEqual(t,before)
 

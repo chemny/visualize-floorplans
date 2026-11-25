@@ -17,13 +17,20 @@ def inspect(bundle,tour,planner,minimum_percent=None,grid_mm=300,sample_hz=4,con
         if not isinstance(room,str) or room not in room_ids or room in excluded or not isinstance(value.get('reason'),str) or not value['reason'].strip():
             raise ValueError('Coverage exclusion requires one known roomId, a unique entry and a reason')
         excluded[room]=value['reason'].strip()
+    policy=(config or {}).get('coveragePolicy') or {};other=policy.get('otherMinimumPercent');classes={}
+    if other is not None:
+        # Main rooms keep minimumPercent; other rooms (bathroom, balcony, passage, bay window) may be looked at less.
+        if isinstance(other,bool) or not isinstance(other,(int,float)) or not math.isfinite(other) or not 0<other<=minimum_percent:raise ValueError('otherMinimumPercent must be in (0,minimumPercent]')
+        from tour_room_class import classify
+        classes=classify(bundle,policy.get('roomClasses'))
+    required=lambda room:other if other is not None and classes.get(room)=='other' else minimum_percent
     for value in (config or {}).get('ruleExceptions',[]):
         if value.get('code')!='room_coverage_minimum_override':continue
         room=value.get('roomId');limit=value.get('minimumPercent')
         if (not isinstance(room,str) or room not in room_ids
                 or not isinstance(value.get('reason'),str) or not value['reason'].strip()
                 or isinstance(limit,bool) or not isinstance(limit,(int,float))
-                or not math.isfinite(limit) or not 0<limit<minimum_percent):
+                or not math.isfinite(limit) or not 0<limit<required(room)):
             raise ValueError('Coverage exception requires one known roomId, lower minimumPercent and reason')
         if room in scoped:raise ValueError('Duplicate room coverage exception')
         scoped[room]={'code':value['code'],'roomId':room,'minimumPercent':limit,'reason':value['reason'].strip()}
@@ -79,14 +86,14 @@ def inspect(bundle,tour,planner,minimum_percent=None,grid_mm=300,sample_hz=4,con
                 yaw=math.atan2(q[1]-f['pointMm'][1],q[0]-f['pointMm'][0])
                 if abs(delta(f['yawRadians'],yaw))<=math.radians(f.get('horizontalFovDegrees',76)/2) and clear_distance(planner,f['pointMm'],yaw,distance)>=distance-25:seen.add(i)
         percent=100*len(seen)/len(points) if points else 0
-        concession=scoped.get(room['id']);limit=concession['minimumPercent'] if concession else minimum_percent
-        row={'roomId':room['id'],'sampleCount':len(points),'visibleSamples':len(seen),'horizontalAreaPercent':round(percent,2),'meetsProxyMinimum':bool(points) and percent>=limit,'visitFrames':window}
+        concession=scoped.get(room['id']);base=required(room['id']);limit=concession['minimumPercent'] if concession else base
+        row={'roomId':room['id'],'sampleCount':len(points),'visibleSamples':len(seen),'horizontalAreaPercent':round(percent,2),'meetsProxyMinimum':bool(points) and percent>=limit,'visitFrames':window,'requiredPercent':limit,**({'roomClass':classes[room['id']]} if classes else {})}
         if windows is not None:row['visitWindows']=windows
-        if concession:row.update(minimumPercent=limit,defaultMinimumPercent=minimum_percent,
-            meetsDefaultMinimum=bool(points) and percent>=minimum_percent,thresholdException=concession)
+        if concession:row.update(minimumPercent=limit,defaultMinimumPercent=base,
+            meetsDefaultMinimum=bool(points) and percent>=base,thresholdException=concession)
         rows.append(row)
     status='proxy_pass_actual_3d_pending' if all(r['meetsProxyMinimum'] for r in rows) else 'needs_revision'
-    report={'schema':'homeowner-room-coverage/1','scope':'declared_introduction_visits' if separate else 'first_continuous_visit' if config is not None else 'whole_timeline_diagnostic','minimumPercent':minimum_percent,'scopedExceptions':list(scoped.values()),'excludedRooms':[{'roomId':k,'reason':v} for k,v in excluded.items()],'gridMm':grid_mm,'sampleHz':sample_hz,'temporalSampleCount':len(indices),'temporalSampling':'interval-anchored with endpoints','rooms':rows,'status':status,'actual3DVisibility':'pending','limitations':'Full room polygon denominator, including furniture footprints. Horizontal field and wall/door bounds only; furniture occlusion, vertical FOV and visible surfaces are not modelled. No actual 3D or human acceptance.'}
+    report={'schema':'homeowner-room-coverage/1','scope':'declared_introduction_visits' if separate else 'first_continuous_visit' if config is not None else 'whole_timeline_diagnostic','minimumPercent':minimum_percent,**({'otherMinimumPercent':other} if other is not None else {}),'scopedExceptions':list(scoped.values()),'excludedRooms':[{'roomId':k,'reason':v} for k,v in excluded.items()],'gridMm':grid_mm,'sampleHz':sample_hz,'temporalSampleCount':len(indices),'temporalSampling':'interval-anchored with endpoints','rooms':rows,'status':status,'actual3DVisibility':'pending','limitations':'Full room polygon denominator, including furniture footprints. Horizontal field and wall/door bounds only; furniture occlusion, vertical FOV and visible surfaces are not modelled. No actual 3D or human acceptance.'}
     reference=(config or {}).get('coverageReferencePolicy')
     if reference is not None:
         if reference.get('mode')!='reference_not_visual_acceptance':raise ValueError('Unknown explicit coverage reference mode')
