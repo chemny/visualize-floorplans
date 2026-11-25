@@ -2,6 +2,12 @@
 
 ## 0.2.14 — 发布候选
 
+- 预演灯光：灯具强度默认乘 20（上限 50）、曝光 1.2、半球光 0.9、环境光 0.2（`h5.py prepare --fixture-gain/--exposure`），只影响预演运行包；Blender 终渲染不变。灯具可见性审计（`inspectLighting`）由一条射线改为九条探测射线，任一条先打到发光面即算可见，避免网格接缝造成的误判；真被不透明面挡住的灯仍判不可见（`test_lamp_audit_browser.mjs` 用真实运行包验证）。
+- 房间分档（`tour_room_tiers.py`、`tour_room_class.py`）：按面积分 5 平方米以下（从门口拍，不进房）、5–10、10–20、20 以上四档，给出站位深度上限、观看时长与单向扫视；按用途区分主要房间与其他房间，覆盖率目标 80% / 50%。案例规则只能更严，不能放宽。
+- 新增 brief 选项：`speedPolicy.backOutSpeedFactor`（退出小房间的速度为进入的倍数，用户 2026-11-18 决定本案 1.5）；`finishPoint` 与 `finishReason`（结束点不在入户门时，必须写用户给出的理由，否则 `finish_point_needs_user_reason`，未到达则 `full_tour_does_not_reach_finish_point`）；房间级 `aimOnly`（直进直出，不做镜头与转角度）；`coreTargetPolicy.excludedRooms`（带用户理由才免除核心目标与可读性要求）。
+- 新增 `h5.py record-approval --kind camera --review-only`：只放行仅含画面问题的预演去出评审视频，数值门槛、`tourContract` 和章节审计不能有任何问题；记录带 `reviewOnly`，不能作为成片批准（用户 2026-11-18 同意）。
+- 已知限制：一个户型里若主卧某面墙必须靠很宽的扫视才能带到，会与家具可读性、3 秒观察上限或连接段转头上限冲突，目前没有通用解，需由用户决定是否给案例例外。
+
 - 新增 `compare_render_quality.py`（同帧相似度/峰值信噪比与放大对比图）和 `blender-quality-fast-template.json`（32 采样显卡降噪的质量档），带测试。
 - 新增 `references/tour-production-playbook.md`（四阶段流程、门槛、Blender 与远程渲染的做法和坑）；重写 `tour-camera-options-and-lessons.md`（按主题整理、状态列、1 号定稿设置、遗留）；`validate-corpus` 对输入缺失或方案哈希不符的案例标为跳过而不是失败或用错版本，清单支持 `entranceOpeningId`；远程快照回归断言。
 - Blender 质量配置新增 `persistentData`、`pngCompression`；新增 `references/blender-render-speed.md`：每帧耗时构成（光追约 3.1 秒、CPU 降噪约 1.5 秒）与对比实验，32 采样加显卡降噪每帧 1.65 秒（原 4.8 秒），仅在 1 号户型验证。整片校验改为按文件比较路径（Windows 路径风格）；远程快照补上灯光检查资源。

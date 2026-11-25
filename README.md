@@ -8,6 +8,8 @@ An Agent Skill for homeowners and renovation design teams. Start with one floor-
 
 Furniture layouts and style references are optional. The floor plan, furniture drawings and 3D preview use the same scheme.
 
+Version: 0.2.14 (local release candidate).
+
 ## Preview
 
 ![Interior Design workflow illustration: floor plan, furniture layout and interior spaces](assets/interior-design-hero-simple-en.png)

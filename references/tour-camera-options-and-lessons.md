@@ -17,6 +17,12 @@
 9. **目标与时长**：用户的目标是干练、直观、用最短时间讲清房子，时长数字只是估计。先用 `timeBreakdown` 报停留、原地转向、行走各占多少，说明压时长的代价，不要为凑数字牺牲画面；规则无法通过时，把需要写的案例例外逐项列出，由用户决定，不替用户写。
 10. **汇报**：分开写代码机制测试、真实路线检查、仍需用户目视确认；只在一个户型验证过的规则要写明。
 
+## 0b. 没有家具的房间和路线声明未走入的房间
+
+- 房间里没有可介绍的家具时，brief 默认把它当“只经过不看”，覆盖率里它是 0%，而覆盖率例外只能把最低值降到大于 0，救不了。要看它，在 `--overrides` 里给该站写 `{"viewSubject": "房间里某个固定物件的 id"}`（如顶灯）：只用该物件的平面位置定视线方向，站位和停留照常，观看目的会标明“没有家具、视线朝向指定物件”。物件 id 必须存在于户型文件。
+- 路线作业里 `excludedRooms` 带用户理由的房间（如并入客厅的飘窗），`brief-from-route` 自动写入 `coveragePolicy.excludedRooms`，覆盖率不再把它算作未覆盖，报告里保留 `roomId` 和原话；“自动判定”产生的排除不会自动写入，必须由用户明确说明后再写。
+- 镜头身体半径比路线更大（半径加规划余量）。路线能走过的窄道，镜头可能过不去，`tour-draft` 报 `Unreachable tour leg`。先查是哪段（家具间距、门开度），把事实报给用户；不要缩小半径或余量来通过。
+
 ## 1. 选项（写在 brief 里，随 `plan-tour` 或 `design-tour` 使用）
 
 “状态”：**用**＝1 号上验证有效；**可选**＝有效但有代价；**未采用**＝试过没有净收益，保留以便复现。
@@ -36,7 +42,7 @@
 | `panPolicy: flow`、`flowMinSweepDegrees`（24） | 所有房间的扫视联合选：按前后连接要多转多少度打分，主体须停留在画面内，同一房间段保持一个方向 | 关 | 用 |
 | `flowSubjects`、`maxSweepDegrees`（房间内） | 只让这些主体决定扫视；该房间扫视上限 | 全部 / 无 | 用；不改变核心设施检查，不能当绕过手段 |
 | `pitchPolicy: subject`、`walkingPitchDegrees`、`observationPitchMinDegrees`/`MaxDegrees` | 走路接近平视，观看时按主体高度小幅下倾 | 关；-3 / -16 / -2 | 用；定稿 -3 / -8 / -2 |
-| `eyeMm` + `cameraProfile.eyeMm` | 视高；低于 1600 须在 `ruleExceptions` 写 `camera_profile_override` 和原因 | 1600 | 定稿 1300（用户偏好） |
+| `eyeMm` + `cameraProfile.eyeMm` | 视高；默认 1300（用户 2026-11-15：1.6 m 太高）；与默认不同须在 `ruleExceptions` 写 `camera_profile_override` 和原因 | 1300 | 定稿 1300（用户偏好） |
 | `speedPolicy` | `cruiseMps` 开阔巡航、`narrowCruiseMps` 近墙或转弯、`rampSeconds` 进入停顿的缓停、`startRampSeconds` 离开停顿的起步（不低于巡航/2，否则被判急起）；只会拉长时间，不会突破运动上限 | 关 | 用；生成器 1.1 / 0.95 / 0.85 / 0.65，定稿 1.2 / 1.05 / 0.75 / 0.7 |
 | `motionReviewLimits`（brief 顶层） | 本案转头速度上限；高于 `homeowner-profile.json` 的 32°/s 必须在 `ruleExceptions` 写 `motion_limit_override` 并附用户原话 | 无 | 定稿 `maxYawDegreesPerSecond: 45` |
 | `trajectoryPolicy`、`cameraEvidencePolicy`、`visualQualityPolicy` | 加速度、近墙秒数、画面占满秒数等阈值；放宽须写对应的 `*_limit_override` 例外并附用户原话 | 默认 | 定稿见第 4 节 |
@@ -103,3 +109,25 @@
 - **没有解决**：书房门外走廊的朝墙和近墙画面（由走廊宽度决定）；次卧和厨房的房间内回摆。
 - **只靠人工**：路线对不对、镜头舒不舒服、预演和视频是否接受，没有办法也不应该自动化；工具只负责记录和绑定。
 - **验证范围**：数值只在 1 号上调试；2 号、3 号只验证过“能跑、规则不误报”，其生产户型文件现已不在原路径，需要重新导出后才能再验证；站位优化只是小幅改进。
+
+## 0c. 2026-11-15 新增的通用规则（5号案例验证，用户逐条确认）
+- **房间大小分档**（`tour_room_tiers.py`）：5㎡以下／5–10／10–20／20以上；站位深度上限 250/600/900/1200 mm（5㎡以下只在门口拍，不进入；用户 2026-11-15），观看 1.5/2.25/3.0/4.75 秒，单向扫视上限 40/60/80/100°，房间内允许回摆 0/0/60/90°（0 按 1° 噪声处理）。案例值只能更严。
+- **覆盖率按房间功能分类**（`tour_room_class.py`）：房内有睡、坐、餐、烹饪、工作设施的是主要房间，≥80%；其余（卫生间、阳台、过道、飘窗等）≥50%。案例可用 `coveragePolicy.roomClasses` 指定类别。
+- **相邻小房间可合并为门口一站**：两个相邻的小空间（如过道与卫生间）可合成一个门口站位、一次扫视，用 `outsideStation` + `coveredRoomIds`，路线需用户确认；5 号合并后总时长 72.6→67.7 秒，核心设施读清。
+- **小房间回退**：面积上限 15 ㎡、单出口。出房间转向用 `pivotWeight`（默认 3），边走边转优先于原地转。
+- **门口外侧站位**：`outsideStation` 的访问点站在相邻房间里，仍计入所示房间的覆盖。
+- **吸顶灯等天花板设施只给方向**：底部高于 1800 mm 的主体不作可读性检查（章节写 `aimOnlySubjects`），不再需要为它写 `detail_view` 例外。
+- **默认视高 1300 mm**，不再需要 `camera_profile_override`；与 1300 不同才需要例外。
+- **帧级加速度限制**：`speedPolicy.frameAccelerationMps2` 开启后，起步不再一帧从 0 跳到 0.28 m/s，急弯处限速；限值取 2.6 时实测峰值 3.0 m/s²（规则上限 3）。副作用：慢起步会让个别房间的覆盖率略降（5 号餐厅 81→77%）。
+
+## 预演灯光（用户决定 2026-11-17）
+- 导出的家具灯强度默认是 1（约 1 烛光），在物理单位的预演里几乎不发光，画面只靠均匀环境光，所以发灰。提高曝光只会把灰同比例放大，不是解决办法。
+- `h5.py prepare` 默认把每盏灯的强度乘 `TOUR_FIXTURE_GAIN`=20（上限 50），曝光 1.2，半球光 0.9、环境光 0.2；`--fixture-gain`、`--exposure` 可按案例调整。只影响预演运行包，Blender 终渲染按导出强度和自己的瓦数配置。
+- 判断亮度看画面有没有灯光层次（灯下高光、墙面暖光），不只看平均亮度数值。
+
+## 直进直出、结束点与评审专用批准（用户决定 2026-11-18）
+- **房间 `aimOnly`**：该房间不做镜头也不转角度，直进直出；必须同时在 `coveragePolicy.excludedRooms` 与 `coreTargetPolicy.excludedRooms` 写明房间和用户的原话理由，否则覆盖率与核心目标检查照常要求它。理由为空的条目不生效。
+- **退出加速 `speedPolicy.backOutSpeedFactor`**：退出小房间的倒走帧（`backOut`）速度上限为巡航的该倍数，默认 1（不变）；只提高上限，加速度限制照常生效。
+- **结束点 `finishPoint` / `finishReason`**：默认整屋参观回到入户门。案例要在别处结束，必须给坐标和用户的理由；理由缺失、空白或最后一帧不在该点，契约分别报 `finish_point_needs_user_reason`、`full_tour_does_not_reach_finish_point`。
+- **评审专用批准 `record-approval --kind camera --review-only`**：预演只剩画面问题时，用它记录一份只够出评审视频的批准。数值报告必须是 `numeric_pass_visual_pending` 且无数值问题、`tourContract` 无问题、章节画面审计全部通过，并至少有一项画面问题；记录带 `reviewOnly=true`，评审片放行（`homeowner-review-capture-release/2`）必须逐项列出允许的画面问题。成片和讲解不接受这种批准。
+- **灯具可见性审计**：每盏主灯发光面用九条探测射线，任一条先打到该面即可见；`probeRays` 记录实际射线数，被遮挡时为 9 且 `firstName` 是挡住它的物体。

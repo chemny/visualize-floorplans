@@ -177,7 +177,7 @@ H5 is the default. `h5.py run` also accepts an already reviewed `--tour` instead
 of replanning. Use `--views` for explicit still cameras; view entries contain
 `name`, `point`, `target`, optional `roomId`, `heightMm`,
 `horizontalFovDegrees`, `shiftY`, `mustShow` and `size:[width,height]`.
-Default output is 1280×720, eye 1600 mm, horizontal field of view 76°, no head
+Default output is 1280×720, eye 1300 mm (tour default since 2026-11-15; reference case used 1600 mm), horizontal field of view 76°, no head
 bob or synthetic handheld shake. These are starting points to review, not a
 universal room-camera solution.
 
