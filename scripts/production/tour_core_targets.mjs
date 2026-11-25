@@ -33,8 +33,8 @@ export function introductionEpisodes(config){
  }return out;
 }
 export function coreInventoryCheck(bundle,config){
- const actual=inventory(bundle),rows=[],issues=[],separate=declaredIntroductions(config),episodes=separate?introductionEpisodes(config):Object.fromEntries(Object.entries(firstEpisodes(config)).map(([room,chs])=>[room,[chs]]));
- for(const [room,roomEpisodes] of Object.entries(episodes)){const chs=roomEpisodes.flat(),required=actual[room]||[],declared=new Set(chs.flatMap(targetIds)),missing=required.filter(f=>!declared.has(f.subjectId)).map(f=>f.subjectId),subjectChapters={};
+ const excused=new Set((config.coreTargetPolicy?.excludedRooms||[]).filter(r=>r&&typeof r.reason==='string'&&r.reason.trim()).map(r=>r.roomId)),actual=inventory(bundle),rows=[],issues=[],separate=declaredIntroductions(config),episodes=separate?introductionEpisodes(config):Object.fromEntries(Object.entries(firstEpisodes(config)).map(([room,chs])=>[room,[chs]]));
+ for(const [room,roomEpisodes] of Object.entries(episodes)){const chs=roomEpisodes.flat(),required=excused.has(room)?[]:(actual[room]||[]),declared=new Set(chs.flatMap(targetIds)),missing=required.filter(f=>!declared.has(f.subjectId)).map(f=>f.subjectId),subjectChapters={};
   for(const f of required){const episode=separate?(roomEpisodes.find(episode=>episode.some(ch=>targetIds(ch).includes(f.subjectId)))||[]):roomEpisodes[0];subjectChapters[f.subjectId]=episode.map(ch=>ch.name);}
   rows.push({roomId:room,required,chapters:chs.map(ch=>ch.name),subjectChapters,missingTargets:missing});for(const subjectId of missing)issues.push({code:'missing_core_view_target',roomId:room,subjectId});
  }return {schema:'homeowner-core-targets/1',status:issues.length?'needs_revision':'pass',rooms:rows,minimumReadableSeconds:coreSpec.minimumReadableSeconds,issues};

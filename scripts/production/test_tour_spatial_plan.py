@@ -16,7 +16,7 @@ def bundle_value():
   'model':{'title':'合成户型','footprint':[[0,0],[8000,0],[8000,4000],[0,4000]],'rooms':[{'id':'hall','name':'厅','poly':[[60,60],[3940,60],[3940,3940],[60,3940]]},{'id':'east','name':'东室','poly':[[4060,60],[7940,60],[7940,3940],[4060,3940]]}]},
   'state':{'walls':[wall('S',[0,0],[8000,0],[door('IN',1000)]),wall('N',[0,4000],[8000,4000]),wall('W',[0,0],[0,4000]),wall('E',[8000,0],[8000,4000]),wall('M',[4000,0],[4000,4000],[door('MID',1500)])],'furniture':[{'id':'sofa','type':'sofa','cx':1500,'cy':3200,'w':1800,'d':800,'h':800,'rot':0}]}}
 def job_value(**extra):
- return {'schema':'homeowner-spatial-job/1','bundle':'bundle.json','entranceOpeningId':'IN','entranceSource':'synthetic fixture','startPoint':[1450,-600],'bodyRadiusMm':180,'gridMm':80,'order':{'mode':'fixed','source':'synthetic'},'visits':[{'name':'厅','roomId':'hall'},{'name':'东室','roomId':'east'}],**extra}
+ return {'schema':'homeowner-spatial-job/1','bundle':'bundle.json','entranceOpeningId':'IN','entranceSource':'synthetic fixture','startPoint':[1450,-600],'bodyRadiusMm':180,'gridMm':80,'order':{'mode':'fixed','source':'synthetic'},'visits':[{'name':'厅','roomId':'hall'},{'name':'东室','roomId':'east'}],'roomSizeTiers':False,**extra}
 def frames(points,fps=2):return {'schemeSha256':'a'*64,'fps':fps,'seconds':len(points)/fps,'frames':[{'pointMm':p} for p in points]}
 
 class Base(unittest.TestCase):
@@ -55,6 +55,26 @@ class ShallowStations(Base):
   hall=[g['id'] for g in spatial.room_gates(rooms['hall'],gates)];east=[g['id'] for g in spatial.room_gates(rooms['east'],gates)]
   self.assertIn('IN',hall);self.assertIn('MID',hall);self.assertIn('MID',east);self.assertNotIn('IN',east)
 
+class RoomSizeTierDepth(Base):
+ """Room-size tiers cap the station depth by floor area; a case value may only be stricter."""
+ def station(self,name,**extra):
+  plan,_=self.generate(name,roomSizeTiers=True,**extra);return {s['name']:s for s in plan['stations']}['东室']
+ def test_tier_caps_the_depth_and_is_recorded(self):
+  east=self.station('a')  # about 15 m2: the 10-20 tier, 900 mm
+  self.assertEqual(east['sizeTier'],'10to20');self.assertEqual(east['maxEntryDepthMm'],900);self.assertLessEqual(east['entryDepthMm'],900)
+ def test_case_value_can_only_make_it_stricter(self):
+  self.assertEqual(self.station('b',maxEntryDepthMm=600)['maxEntryDepthMm'],600)
+  self.assertEqual(self.station('c',maxEntryDepthMm=1200)['maxEntryDepthMm'],900)
+ def test_tiers_can_be_switched_off_for_a_case(self):
+  plan,_=self.generate('d');east={s['name']:s for s in plan['stations']}['东室'];self.assertIsNone(east['sizeTier']);self.assertIsNone(east['maxEntryDepthMm'])
+
+ def test_a_doorway_station_outside_its_room_needs_the_explicit_flag(self):
+  def run(name,flag):
+   job=job_value();job['visits'][1].update(pointMm=[3500,2000],**({'outsideStation':True} if flag else {}))
+   return spatial.run(job,self.p,self.p/name)
+  plan=run('y',True);east=[s for s in plan['stations'] if s['name']=='东室'][0]
+  self.assertTrue(east['outsideStation']);self.assertNotIn('station_outside_room',[i['code'] for i in plan['issues']])
+
 class RoutePlanning(Base):
  def test_plan_has_route_data_and_no_camera_or_frames(self):
   plan,out=self.generate()
@@ -65,6 +85,9 @@ class RoutePlanning(Base):
   page=(out/'route.html').read_text()
   for word in ('参观路线','路线待确认'):self.assertIn(word,page)
   self.assertNotIn('<video',page);self.assertNotIn('rehearsalPlayback',page);self.assertNotIn('<iframe',page)
+  # The route page has a station-by-station walk-through marker: controls, one stop per station plus the entrance, no timeline.
+  for ident in ('wplay','wprev','wnext','wreset','runner'):self.assertIn('id="'+ident+'"',page)
+  data=json.loads(page.split('var D=',1)[1].split(';var run',1)[0]);self.assertEqual(len(data['stops']),len(plan['stations'])+2);self.assertEqual(data['names'][0],'入口');self.assertEqual(data['stops'],sorted(data['stops']))
   self.assertEqual(json.loads((out/'spatial-review.pending.json').read_text())['status'],'pending')
   stages=json.loads((out/'stage-state.json').read_text())['stages']
   self.assertEqual(stages['route']['status'],'pending_user_confirmation')
@@ -351,8 +374,18 @@ class BriefFromRoute(Base):
   brief,notes=self.build([{'name':'厅','roomId':'hall','pointMm':[1500,1000]},{'name':'东室','roomId':'east','pointMm':[6000,1500]}])
   self.assertEqual([r['name'] for r in brief['rooms']],['厅','东室']);self.assertEqual(brief['fixedOrder'],['s00','s01'])
   self.assertEqual(chain.check_brief_alignment(brief,json.loads((self.p/'plan.json').read_text())),[])
-  self.assertEqual(notes['stations'][1]['subject'],'bed1');self.assertTrue(notes['defaults']);self.assertEqual(brief['coveragePolicy'],{'enabled':True,'minimumPercent':80})
+  self.assertEqual(notes['stations'][1]['subject'],'bed1');self.assertTrue(notes['defaults']);self.assertEqual(brief['coveragePolicy'],{'enabled':True,'minimumPercent':80,'otherMinimumPercent':50})
   self.assertEqual(brief['navigationPolicy']['mode'],'forward');self.assertEqual(brief['panPolicy'],'flow')
+ def test_room_size_tier_sets_time_sweep_and_wobble_price(self):
+  stations=[{'name':'厅','roomId':'hall','pointMm':[1500,1000]},{'name':'东室','roomId':'east','pointMm':[6000,1500]}]
+  brief,notes=self.build(stations);hall=brief['rooms'][0]
+  self.assertEqual((hall['roomSizeTier'],hall['viewSeconds'],hall['maxSweepDegrees']),('10to20',3.0,80));self.assertEqual(brief['navigationPolicy']['sweepConsistencyWeight'],3)
+  plain,_=self.build(stations,roomSizeTiers=False)
+  self.assertNotIn('maxSweepDegrees',plain['rooms'][0]);self.assertEqual(plain['rooms'][0]['viewSeconds'],2.5);self.assertNotIn('sweepConsistencyWeight',plain['navigationPolicy'])
+ def test_a_doorway_station_outside_a_room_counts_for_the_room_it_shows(self):
+  stations=[{'name':'厅','roomId':'hall','pointMm':[1500,1000]},{'name':'东室','roomId':'east','pointMm':[3500,2000],'outsideStation':True}]
+  brief,notes=self.build(stations,overrides={'东室':{'viewSubject':'bed1'}});east=brief['rooms'][1]
+  self.assertEqual(east['roomId'],'hall');self.assertEqual(east['coveredRoomIds'],['east']);self.assertIn('门口外侧',east['adjacentViewReason'])
  def test_a_station_with_nothing_to_show_is_reported_as_pass_through(self):
   brief,notes=self.build([{'name':'厅','roomId':'hall','pointMm':[1500,1000]},{'name':'东室','roomId':'east','pointMm':[6000,1500]}])
   b=bundle_value();b['state']['furniture']=[];(self.p/'bundle.json').write_text(json.dumps(b))
@@ -365,10 +398,14 @@ class BriefFromRoute(Base):
   self.plan(stations)
   plan=json.loads((self.p/'plan.json').read_text());plan['budget']={};(self.p/'plan.json').write_text(json.dumps(plan))
   with self.assertRaisesRegex(ValueError,'maximumSeconds'):build(self.p/'plan.json',{'coverageMinimumPercent':80})
-  with self.assertRaisesRegex(ValueError,'coverageMinimumPercent'):build(self.p/'plan.json',{'maximumSeconds':60})
-  with self.assertRaisesRegex(ValueError,'reason'):build(self.p/'plan.json',{'maximumSeconds':60,'coverageOff':True,'eyeMm':1300})
-  brief,_=build(self.p/'plan.json',{'maximumSeconds':60,'coverageOff':True,'eyeMm':1300,'eyeReason':'用户要求降低视高'})
+  with self.assertRaisesRegex(ValueError,'coverageMinimumPercent'):build(self.p/'plan.json',{'maximumSeconds':60,'roomSizeTiers':False})
+  defaults,_=build(self.p/'plan.json',{'maximumSeconds':60})  # user decision 2026-11-15: main rooms 80%, other rooms 50%
+  self.assertEqual((defaults['coveragePolicy']['minimumPercent'],defaults['coveragePolicy']['otherMinimumPercent']),(80,50))
+  with self.assertRaisesRegex(ValueError,'reason'):build(self.p/'plan.json',{'maximumSeconds':60,'coverageOff':True,'eyeMm':1600})
+  brief,_=build(self.p/'plan.json',{'maximumSeconds':60,'coverageOff':True,'eyeMm':1600,'eyeReason':'用户要求抬高视高'})
   self.assertEqual(brief['ruleExceptions'][0]['code'],'camera_profile_override');self.assertEqual(brief['coveragePolicy'],{'enabled':False})
+  default,_=build(self.p/'plan.json',{'maximumSeconds':60,'coverageOff':True})  # the default eye height is 1.3 m and needs no exception
+  self.assertEqual(default['eyeMm'],1300);self.assertEqual(default['ruleExceptions'],[])
  def test_more_than_two_stations_in_one_room_are_filed_under_the_neighbouring_room(self):
   stations=[{'name':'东室甲','roomId':'east','pointMm':[6000,1500]},{'name':'餐桌区','roomId':'hall','pointMm':[2500,2000],'anchor':'t1'},{'name':'沙发区','roomId':'hall','pointMm':[1500,3000],'anchor':'sofa'},{'name':'厅中','roomId':'hall','pointMm':[1000,1000]}]
   brief,notes=self.build(stations);rooms={r['name']:r for r in brief['rooms']}
@@ -395,6 +432,20 @@ class StageApprovals(unittest.TestCase):
    with self.subTest(who=who),self.assertRaises(ValueError):record_camera(self.p/'pending.json',self.p/'b.json',who,'确认')
   record=record_camera(self.p/'pending.json',self.p/'ok.json','王女士','镜头看过了，可以');self.assertEqual(record['presentedAnimationSha256'],bound(self.p/'animation.html')['sha256']);self.assertTrue(all(record['checks'].values()))
   with self.assertRaisesRegex(ValueError,'preserved'):record_camera(self.p/'pending.json',self.p/'ok.json','王女士','再来')
+ def test_review_only_camera_approval_accepts_screen_issues_but_nothing_else(self):
+  from record_approval import record_camera
+  p=self.p
+  def files(contract_status='numeric_pass_visual_pending',contract_issues=(),screen_issues=({'code':'screen_near_surface_occlusion'},),chapters_pass=True):
+   self.camera_files('needs_revision');m=json.loads((p/'rehearsal.json').read_text())
+   (p/'contract.json').write_text(json.dumps({'status':contract_status,'issues':list(contract_issues)}));(p/'screen.json').write_text(json.dumps({'screenQuality':{'issues':list(screen_issues)},'chapters':[{'pass':chapters_pass}]}))
+   m['references'].update(contractReport=bound(p/'contract.json'),screenAudit=bound(p/'screen.json'));m['timing']={'tourContract':{'issues':[]}};(p/'rehearsal.json').write_text(json.dumps(m))
+   pending=json.loads((p/'pending.json').read_text());pending['rehearsal']=bound(p/'rehearsal.json');(p/'pending.json').write_text(json.dumps(pending))
+  files()
+  with self.assertRaisesRegex(ValueError,'still needs revision'):record_camera(p/'pending.json',p/'a.json','王女士','可以')  # the ordinary path still refuses
+  record=record_camera(p/'pending.json',p/'ok.json','王女士','OK，就按这个出评审视频',review_only=True);self.assertTrue(record['reviewOnly']);self.assertTrue(all(record['checks'].values()))
+  for bad in (dict(contract_status='needs_revision'),dict(contract_issues=[{'code':'abrupt_stop'}]),dict(chapters_pass=False),dict(screen_issues=[])):
+   files(**bad)
+   with self.subTest(bad=bad),self.assertRaises(ValueError):record_camera(p/'pending.json',p/('b%d.json'%len(str(bad))),'王女士','可以',review_only=True)
  def test_video_approval_uses_the_narration_gate_and_refuses_samples(self):
   from record_approval import record_video
   from tour_stage_gate import pending,require_video

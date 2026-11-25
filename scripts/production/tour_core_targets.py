@@ -38,6 +38,12 @@ def first_episodes(config):
     return result
 
 
+def excused_rooms(config):
+    """Rooms the user chose to pass through without presenting them (explicit case policy with the user's reason)."""
+    rows=config.get('coreTargetPolicy',{}).get('excludedRooms',[])
+    return {r['roomId'] for r in rows if isinstance(r,dict) and isinstance(r.get('reason'),str) and r['reason'].strip()}
+
+
 def declared_introductions(config):
     """Use separate introductions only for an explicit, justified case policy."""
     reason=config.get('tourContract',{}).get('singleEpisodeExceptionReason')
@@ -68,11 +74,12 @@ def introduction_episodes(config):
 def inspect(bundle, config):
     actual = inventory(bundle); rows = []; issues = []
     separate=declared_introductions(config)
+    excused=excused_rooms(config)
     episodes=(introduction_episodes(config) if separate
               else {room:[chapters] for room,chapters in first_episodes(config).items()})
     for room, room_episodes in episodes.items():
         chapters=[ch for episode in room_episodes for ch in episode]
-        required = actual.get(room, [])
+        required = [] if room in excused else actual.get(room, [])
         declared = {s for ch in chapters for s in ch.get('subjects', [])+ch.get('orderedViewTargets', [])}
         missing = [f['subjectId'] for f in required if f['subjectId'] not in declared]
         permitted={}

@@ -33,14 +33,27 @@ def _signer(confirmed_by,evidence):
     if len(words)<2:raise ValueError("evidence must be the user's own words about what they were shown")
     return name,words
 
-def record_camera(pending,out,confirmed_by,evidence):
+def _screen_issues_only(manifest,manifest_path):
+    """A rehearsal that fails only the real-mesh screen audit may be confirmed for a review video; any numeric, coverage, budget or core failure may not."""
+    base=manifest_path.parent;refs=manifest.get('references',{})
+    report=read(resolve(refs.get('contractReport'),base));screen=read(resolve(refs.get('screenAudit'),base))
+    if report.get('status')!='numeric_pass_visual_pending' or report.get('issues'):raise ValueError('Numeric contract fails; review confirmation is not possible')
+    if manifest.get('timing',{}).get('tourContract',{}).get('issues'):raise ValueError('Contract issues remain; review confirmation is not possible')
+    if any(c.get('pass') is not True for c in screen.get('chapters',[])):raise ValueError('Unreadable observation subjects cannot be confirmed for review')
+    if not screen.get('screenQuality',{}).get('issues'):raise ValueError('No screen issues; the rehearsal fails for another reason')
+
+
+def record_camera(pending,out,confirmed_by,evidence,review_only=False):
     """Camera rehearsal confirmation (homeowner-route-approval/1): only for a rehearsal that passed its own checks."""
     pending=Path(pending).resolve();out=Path(out).resolve()
     if out.exists():raise ValueError('Use a new approval path; existing records are preserved')
     name,words=_signer(confirmed_by,evidence);record=read(pending)
     if record.get('schema')!='homeowner-route-approval/1' or record.get('status')!='pending':raise ValueError('Expected an untouched pending camera approval')
     manifest_path=resolve(record.get('rehearsal'),pending.parent);manifest=read(manifest_path)
-    if manifest.get('status')!='pending_user_review':raise ValueError('The rehearsal still needs revision ('+str(manifest.get('status'))+'); it is not something the user can confirm yet')
+    if manifest.get('status')!='pending_user_review':
+        if not review_only:raise ValueError('The rehearsal still needs revision ('+str(manifest.get('status'))+'); it is not something the user can confirm yet')
+        _screen_issues_only(manifest,manifest_path)
+        record['reviewOnly']=True  # the user's view of this exact animation, for a low-resolution review video only; production capture still needs a passing screen audit
     animation=manifest['references']['animation'];shown=resolve(animation,manifest_path.parent)
     record.update(status='approved',approvalSource='explicit_user_confirmation',confirmedBy=name,evidence=words,presentedAnimationSha256=bound(shown)['sha256'],
                   checks={k:True for k in ('animationViewed','pathAndFacingApproved','durationAndRhythmApproved')},recordedAt=datetime.datetime.now().astimezone().isoformat(timespec='seconds'))

@@ -83,7 +83,10 @@ window.inspectComposition=async (f,options={})=>{
  const opaque=meshes.filter(m=>m.visible&&!(Array.isArray(m.material)?m.material:[m.material]).every(a=>a.transparent));
  const faces=primaryIds.map(id=>{
   const lamps=meshes.filter(m=>m.userData.objectId===id),emitters=lamps.filter(m=>(Array.isArray(m.material)?m.material:[m.material]).some(a=>a.emissive.getHex()&&a.emissiveIntensity>0));
-  const visible=emitters.map(m=>{const box=new THREE.Box3().setFromObject(m),p=box.getCenter(new THREE.Vector3());p.y=box.min.y+.00001;const from=new THREE.Vector3(p.x,p.y-.20,p.z),dir=p.clone().sub(from),dist=dir.length();ray.set(from,dir.normalize());ray.near=.0001;ray.far=dist+.02;const hit=ray.intersectObjects(opaque,false)[0];return {name:m.name,intensity:(Array.isArray(m.material)?m.material[0]:m.material).emissiveIntensity,visible:hit?.object===m,firstName:hit?.object.name};});
+  const visible=emitters.map(m=>{const box=new THREE.Box3().setFromObject(m),c=box.getCenter(new THREE.Vector3());
+   // One ray through the centre can slip through a mesh vertex or seam; probe the centre and a few small offsets. Any ray that first hits this emitter shows it; a real occluder blocks every ray.
+   let hit=null,rays=0;for(const [dx,dz] of [[0,0],[.01,0],[-.01,0],[0,.01],[0,-.01],[.03,.03],[-.03,.03],[.03,-.03],[-.03,-.03]]){const p=new THREE.Vector3(c.x+dx,box.min.y+.00001,c.z+dz),from=new THREE.Vector3(p.x,p.y-.20,p.z),dir=p.clone().sub(from),dist=dir.length();ray.set(from,dir.normalize());ray.near=.0001;ray.far=dist+.02;const h=ray.intersectObjects(opaque,false)[0];rays++;if(h?.object===m){hit=h;break;}hit=hit||h;}
+   return {name:m.name,intensity:(Array.isArray(m.material)?m.material[0]:m.material).emissiveIntensity,visible:hit?.object===m,firstName:hit?.object.name,probeRays:rays};});
   return {id,name:ids.get(id)?.name,emittingFaces:visible,visibleFromBelow:visible.some(v=>v.visible)};
  });
  const ceilings=meshes.filter(m=>(Array.isArray(m.material)?m.material:[m.material]).some(a=>a===mats.find((_,i)=>data.materials[i].role==='ceiling')));

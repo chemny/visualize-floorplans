@@ -18,6 +18,7 @@ def from_brief(brief):
     return {'schema':SCHEMA,'rulesetVersion':RULESET,'tourMode':brief.get('tourMode','full_tour'),
             'entranceOpeningId':brief.get('entranceOpeningId'),
             'bodyRadiusMm':brief.get('bodyRadiusMm',180),
+            'finishPoint':brief.get('finishPoint'),'finishReason':brief.get('finishReason',''),
             'orderOverrideReason':brief.get('orderOverrideReason',''),
             'singleEpisodeExceptionReason':brief.get('singleEpisodeExceptionReason',''),
             'subjectRepeatExceptionReason':brief.get('subjectRepeatExceptionReason',''),
@@ -69,7 +70,11 @@ def inspect(bundle,tour,config):
         from design_homeowner_tour import entry_apron
         try:
             access,_=entry_apron(bundle,{'entranceOpeningId':contract.get('entranceOpeningId'),'startPoint':fs[0]['pointMm'],'bodyRadiusMm':radius})
-            if math.dist(fs[0]['pointMm'],fs[-1]['pointMm'])>1:issue('full_tour_does_not_return_to_entrance')
+            finish=contract.get('finishPoint')
+            if finish is None:
+                if math.dist(fs[0]['pointMm'],fs[-1]['pointMm'])>1:issue('full_tour_does_not_return_to_entrance')
+            elif not str(contract.get('finishReason','')).strip():issue('finish_point_needs_user_reason')
+            elif math.dist(finish,fs[-1]['pointMm'])>1:issue('full_tour_does_not_reach_finish_point')
         except ValueError as e:issue('unsupported_entrance',message=str(e))
     planner=Planner(bundle,{'accessPolygons':access,'bodyRadiusMm':radius,'gridMm':50})
     hits=[i for i,f in enumerate(fs) if planner.blocked(f['pointMm'])]

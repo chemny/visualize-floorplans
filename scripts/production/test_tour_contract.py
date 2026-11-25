@@ -63,6 +63,13 @@ class ContractTests(unittest.TestCase):
  def test_full_tour_cannot_finish_inside_room(self):
   self.t['frames'][-1]['pointMm']=[2800,2000]
   self.assertIn('full_tour_does_not_return_to_entrance',self.codes())
+ def test_finish_point_needs_the_users_reason_and_must_be_reached(self):
+  self.t['frames'][-1]['pointMm']=[2800,2000];self.c['tourContract']['finishPoint']=[2800,2000]
+  self.assertIn('finish_point_needs_user_reason',self.codes())
+  self.c['tourContract']['finishReason']='   ';self.assertIn('finish_point_needs_user_reason',self.codes())
+  self.c['tourContract']['finishReason']='Synthetic: the user chose to end the tour here'
+  codes=self.codes();self.assertNotIn('finish_point_needs_user_reason',codes);self.assertNotIn('full_tour_does_not_return_to_entrance',codes);self.assertNotIn('full_tour_does_not_reach_finish_point',codes)
+  self.c['tourContract']['finishPoint']=[2000,2000];self.assertIn('full_tour_does_not_reach_finish_point',self.codes())
  def test_final_frame_body_collisions_are_rechecked(self):
   self.t['frames'][30]['pointMm']=[1200,2000]
   self.assertIn('body_path_collision',self.codes())
